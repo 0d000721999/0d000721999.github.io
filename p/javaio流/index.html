@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="javaIO流 跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习\n">
+<title>javaIO流</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/javaio%E6%B5%81/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="javaIO流">
+<meta property='og:description' content="javaIO流 跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/javaio%E6%B5%81/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='java' /><meta property='article:published_time' content='2025-07-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-07-15T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/javaio%E6%B5%81/1.webp' />
+<meta name="twitter:title" content="javaIO流">
+<meta name="twitter:description" content="javaIO流 跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/javaio%E6%B5%81/1.webp' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "light");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#创建文件">创建文件</a>
+      <ol>
+        <li><a href="#根据路径创建一个-file-对象">根据路径创建一个 File 对象</a></li>
+        <li><a href="#根据父目录-file-对象在子路径创建一个文件">根据父目录 File 对象，在子路径创建一个文件</a></li>
+        <li><a href="#根据父目录路径在子路径下生成文件">根据父目录路径，在子路径下生成文件</a></li>
+      </ol>
+    </li>
+    <li><a href="#获取文件信息">获取文件信息</a></li>
+    <li><a href="#目录与文件操作">目录与文件操作</a>
+      <ol>
+        <li><a href="#文件删除">文件删除</a></li>
+        <li><a href="#目录删除">目录删除</a></li>
+        <li><a href="#创建单级目录">创建单级目录</a></li>
+        <li><a href="#创建多级目录">创建多级目录</a></li>
+      </ol>
+    </li>
+    <li><a href="#文件流的一些操作">文件流的一些操作</a>
+      <ol>
+        <li><a href="#runtime-命令执行操作的-payload">Runtime 命令执行操作的 Payload</a></li>
+        <li><a href="#fileinputstream">FileInputStream</a>
+          <ol>
+            <li><a href="#read方法">read()方法</a></li>
+            <li><a href="#readbyte-d-方法">read(byte[] d) 方法</a></li>
+          </ol>
+        </li>
+        <li><a href="#fileoutputstream">FileOutputStream</a>
+          <ol>
+            <li><a href="#writebyte-b-方法">write(byte[] b) 方法</a></li>
+            <li><a href="#writebyte-b-int-off-int-len-方法">write(byte[] b, int off, int len) 方法</a></li>
+            <li><a href="#追加写入">追加写入</a></li>
+          </ol>
+        </li>
+        <li><a href="#文件拷贝--input-output-结合">文件拷贝 —— input output 结合</a></li>
+        <li><a href="#filereader">FileReader</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/javaio%E6%B5%81/">
+                <img src="/p/javaio%E6%B5%81/1.webp"
+                        
+                        width="2879" 
+                        height="3125" 
+                        loading="lazy"
+                        alt="Featured image of post javaIO流" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/java/" style="background-color: #264653; color: #fff;">
+                Java
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/javaio%E6%B5%81/">javaIO流</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 15, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="javaio流">javaIO流
+</h1><p>跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习</p>
+<h2 id="创建文件">创建文件
+</h2><h3 id="根据路径创建一个-file-对象">根据路径创建一个 File 对象
+</h3><ul>
+<li>方法 <code>new File(String pathname)</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.File</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">NewFile</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">createFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">createFile</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\1.txt&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">file</span><span class="p">.</span><span class="na">createNewFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;Create Successfully&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="根据父目录-file-对象在子路径创建一个文件">根据父目录 File 对象，在子路径创建一个文件
+</h3><ul>
+<li>方法 <code>new File(File parent, String child)</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.File</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">NewFile02</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">createFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">createFile</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">parentFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">parentFile</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;2.txt&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">file</span><span class="p">.</span><span class="na">createNewFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;Create Successfully&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="根据父目录路径在子路径下生成文件">根据父目录路径，在子路径下生成文件
+</h3><ul>
+<li>方法 <code>new File(String parent, String child)</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.File</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">NewFile03</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">createFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">createFile</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="o">=</span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;3.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">parentpath</span><span class="p">,</span><span class="n">filename</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">file</span><span class="p">.</span><span class="na">createNewFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="获取文件信息">获取文件信息
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.File</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GetFile</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">getFileContents</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">getFileContents</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\3.txt&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;文件名称为：&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">getName</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;文件的绝对路径为：&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;文件的父级目录为：&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">getParent</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;文件的大小(字节)为：&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">length</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;这是不是一个文件：&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">isFile</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;这是不是一个目录：&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">isDirectory</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="目录与文件操作">目录与文件操作
+</h2><h3 id="文件删除">文件删除
+</h3><ul>
+<li>使用 <code>file.delete(文件)</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.File</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileDelete</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">deleteFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">deleteFile</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\3.txt&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="na">delete</span><span class="p">()</span><span class="o">?</span><span class="s">&#34;Deleted Successfully&#34;</span><span class="p">:</span><span class="s">&#34;Failed to Delete&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="目录删除">目录删除
+</h3><ul>
+<li>方法 <code>file.delete(目录)</code>，这里有个小坑，只有空的目录才可以删除，不然会显示删除失败。</li>
+</ul>
+<p>示例跟上面一样</p>
+<h3 id="创建单级目录">创建单级目录
+</h3><ul>
+<li>方法 <code>file.mkdir()</code></li>
+</ul>
+<h3 id="创建多级目录">创建多级目录
+</h3><ul>
+<li>方法 <code>file.mkdirs()</code></li>
+</ul>
+<h2 id="文件流的一些操作">文件流的一些操作
+</h2><h3 id="runtime-命令执行操作的-payload">Runtime 命令执行操作的 Payload
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream.RCETest</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.ByteArrayOutputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.InputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RuntimeExec</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">InputStream</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="s">&#34;whoami&#34;</span><span class="p">).</span><span class="na">getInputStream</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="n">1024</span><span class="o">]</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ByteArrayOutputStream</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ByteArrayOutputStream</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="o">=</span><span class="n">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buf</span><span class="p">))</span><span class="o">!=-</span><span class="n">1</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">out</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>byte用来缓存数据</p>
+<h3 id="fileinputstream">FileInputStream
+</h3><h4 id="read方法">read()方法
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">read</span><span class="p">()</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">length</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">从此输入流中读取一个数据字节</span><span class="err">。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">如果没有输入可用</span><span class="err">，</span><span class="n">则此方法将阻塞</span><span class="err">。</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">	
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">指定者</span><span class="err">：</span><span class="w"> </span><span class="n">类</span><span class="w"> </span><span class="n">InputStream</span><span class="w"> </span><span class="n">中的</span><span class="w"> </span><span class="n">read</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">	
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">返回</span><span class="err">：</span><span class="w"> </span><span class="n">下一个数据字节</span><span class="err">；</span><span class="n">如果已到达文件末尾</span><span class="err">，</span><span class="n">则返回</span><span class="w"> </span><span class="o">-</span><span class="n">1</span><span class="err">。</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">	
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">抛出</span><span class="err">：</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">如果发生</span><span class="w"> </span><span class="n">I</span><span class="o">/</span><span class="n">O</span><span class="w"> </span><span class="n">错误</span><span class="err">。</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>之前我们用 <code>file</code> 的一系列操作读取过文件的信息，现在我们用 <code>FileInputStream.read()</code> 来读取文件内容。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileInputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileNotFoundException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileInputRead</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">readFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">readFile</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">filepath</span><span class="o">=</span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\3.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="o">=</span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">fis</span><span class="o">=</span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="n">filepath</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">length</span><span class="o">=</span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">())</span><span class="o">!=-</span><span class="n">1</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">((</span><span class="kt">char</span><span class="p">)</span><span class="n">length</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">finally</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="readbyte-d-方法">read(byte[] d) 方法
+</h4><p>允许在方法中添加一个字节数组。</p>
+<p>当我们设置缓冲区的值为 8 时，若文件中的字符长度超过了 8，则会换行输出。</p>
+<p>再回到之前我们讲的 <code>Runtime</code> 类进行命令执行的 Payload，在那里，我们设置的 Cache 缓冲区的值为 1024.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileInputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileInputRead02</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">readFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">readFile</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">filepath</span><span class="o">=</span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\3.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="o">=</span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">buffer</span><span class="o">=</span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="n">8</span><span class="o">]</span><span class="p">;</span><span class="c1">//设置缓冲区，缓冲区大小为8字节</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">fis</span><span class="o">=</span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="n">filepath</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">length</span><span class="o">=</span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span><span class="o">!=-</span><span class="n">1</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span><span class="n">0</span><span class="p">,</span><span class="n">length</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">finally</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="fileoutputstream">FileOutputStream
+</h3><p>往文件里面写数据</p>
+<h4 id="writebyte-b-方法">write(byte[] b) 方法
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">write</span><span class="p">(</span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">           </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">将</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="n">个字节从指定</span><span class="w"> </span><span class="kt">byte</span><span class="w"> </span><span class="n">数组写入此文件输出流中</span><span class="err">。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">覆盖</span><span class="err">：</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">类</span><span class="w"> </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">中的</span><span class="w"> </span><span class="n">write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">参数</span><span class="err">：</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">数据</span><span class="err">。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">抛出</span><span class="err">：</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">IOException</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">如果发生</span><span class="w"> </span><span class="n">I</span><span class="o">/</span><span class="n">O</span><span class="w"> </span><span class="n">错误</span><span class="err">。</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>尝试写内容到文件里</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.File</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileNotFoundException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileOutputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileOutputWrite</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">writeFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">writeFile</span><span class="p">()</span><span class="w">  </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">filePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\1.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="n">filePath</span><span class="p">);</span><span class="c1">//注意fos的作用域，这里它需要在finally被捕获</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;gulugulu&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">content</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span><span class="c1">//String类型的字符串可以使用getBytes()方法将字符串转换为byte数组</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">finally</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="writebyte-b-int-off-int-len-方法">write(byte[] b, int off, int len) 方法
+</h4><ul>
+<li>将指定 byte 数组中从偏移量 off 开始的 len 个字节写入此文件输出流。</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileNotFoundException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileOutputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.charset.StandardCharsets</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileOutputWrite02</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">writeFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">writeFile</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">filePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\1.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="n">filePath</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;hajimi&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">content</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">),</span><span class="n">0</span><span class="p">,</span><span class="n">6</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">finally</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="追加写入">追加写入
+</h4><p>如果想要写入的数据不被覆盖，可以设置 <code>FileOutputStream</code> 的构造方法 <code>append</code> 参数设置为 <code>true</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">fileOutputStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="n">filePath</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// 设置追加写入</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fileOutputStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="n">filePath</span><span class="p">),</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="文件拷贝--input-output-结合">文件拷贝 —— input output 结合
+</h3><p>利用前文讲的 <code>fileInputStream</code> 和 <code>fileOutputStream</code> 进行文件拷贝。</p>
+<p>原理上来说，先将文件的内容(注意，其实图片当中也是内容，这个内容不光是文字！) 读取出来，再写入新的文件当中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileInputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileNotFoundException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileOutputStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileCopy</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">copyFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">copyFile</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">originalPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\1.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">endPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\2.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="n">originalPath</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="n">endPath</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="n">1024</span><span class="o">]</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span><span class="o">!=-</span><span class="n">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span><span class="n">0</span><span class="p">,</span><span class="n">len</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="filereader">FileReader
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileReader</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">用来读取字符文件的便捷类</span><span class="err">。</span><span class="n">此类的构造方法假定默认字符编码和默认字节缓冲区大小都是适当的</span><span class="err">。</span><span class="n">要自己指定这些值</span><span class="err">，</span><span class="n">可以先在</span><span class="w"> </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">上构造一个</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="err">。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">FileReader</span><span class="w"> </span><span class="n">用于读取字符流</span><span class="err">。</span><span class="n">要读取原始字节流</span><span class="err">，</span><span class="n">请考虑使用</span><span class="w"> </span><span class="n">FileInputStream</span><span class="err">。</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>读取文件内容</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">IOStream</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileNotFoundException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileReader</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileReaderTest</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">readFile</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">readFile</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">filePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;D:\\idea\\javatest\\src\\IOStream\\1.txt&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">FileReader</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="n">filePath</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">char</span><span class="o">[</span><span class="n">1024</span><span class="o">]</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buf</span><span class="p">))</span><span class="o">!=-</span><span class="n">1</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="n">0</span><span class="p">,</span><span class="n">len</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="k">finally</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>FileReader</code> 将会一个一个<strong>字符</strong>读取，因此可以不乱码输出中文</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/java/">Java</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/java%E5%8F%8D%E5%B0%84%E5%92%8Curldns%E9%93%BE%E5%88%86%E6%9E%90/">
+        
+        
+            <div class="article-image">
+                <img src="/p/java%E5%8F%8D%E5%B0%84%E5%92%8Curldns%E9%93%BE%E5%88%86%E6%9E%90/1.207cf43606049e3f222461562976e166.webp" 
+                        width="1690" 
+                        height="1974" 
+                        loading="lazy"
+                        alt="Featured image of post Java反射和URLDNS链分析"
+                        
+                        data-hash="md5-IHz0NgYEnj8iJGFWKXbhZg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Java反射和URLDNS链分析</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%A6%82%E5%BF%B5%E4%B8%8E%E5%88%A9%E7%94%A8/">
+        
+        
+            <div class="article-image">
+                <img src="/p/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%A6%82%E5%BF%B5%E4%B8%8E%E5%88%A9%E7%94%A8/1.5658766c795d4ce052aa18e3dc01f347.jpg" 
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post Java反序列化概念与利用"
+                        
+                        data-hash="md5-Vlh2bHldTOBSqhjj3AHzRw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Java反序列化概念与利用</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/java%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/java%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0/1.cce94963e445abb0eb93518caa2b4185.jpg" 
+                        width="3022" 
+                        height="4000" 
+                        loading="lazy"
+                        alt="Featured image of post java语法学习"
+                        
+                        data-hash="md5-zOlJY&#43;RFq7Drk1GMqitBhQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">java语法学习</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
