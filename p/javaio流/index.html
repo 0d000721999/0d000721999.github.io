@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="javaIO流 跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="javaIO流 跟着https://drun1baby.github.io/2022/05/30/Java-IO%E6%B5%81/学习\n创建文件 根据路径创建一个 File 对象 方法 new File(String pathname) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 package IOStream; import java.io.File; import java.io.IOException; public class NewFile { public static void main(String[] args) { createFile(); } public static void createFile() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\1.txt&#34;); try{ file.createNewFile(); System.out.println(&#34;Create Successfully&#34;); }catch(IOException e){ e.printStackTrace(); } } } 根据父目录 File 对象，在子路径创建一个文件 方法 new File(File parent, String child) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 package IOStream; import java.io.File; import java.io.IOException; public class NewFile02 { public static void main(String[] args) { createFile(); } public static void createFile() { File parentFile = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream&#34;); File file = new File(parentFile, &#34;2.txt&#34;); try{ file.createNewFile(); System.out.println(&#34;Create Successfully&#34;); }catch(IOException e){ e.printStackTrace(); } } } 根据父目录路径，在子路径下生成文件 方法 new File(String parent, String child) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package IOStream; import java.io.File; import java.io.IOException; public class NewFile03 { public static void main(String[] args) { createFile(); } public static void createFile() { String parentpath =&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream&#34;; String filename = &#34;3.txt&#34;; File file = new File(parentpath,filename); try{ file.createNewFile(); }catch(IOException e){ e.printStackTrace(); } } } 获取文件信息 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 package IOStream; import java.io.File; public class GetFile { public static void main(String[] args) { getFileContents(); } public static void getFileContents() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\3.txt&#34;); System.out.println(&#34;文件名称为：&#34; + file.getName()); System.out.println(&#34;文件的绝对路径为：&#34; + file.getAbsolutePath()); System.out.println(&#34;文件的父级目录为：&#34; + file.getParent()); System.out.println(&#34;文件的大小(字节)为：&#34; + file.length()); System.out.println(&#34;这是不是一个文件：&#34; + file.isFile()); System.out.println(&#34;这是不是一个目录：&#34; + file.isDirectory()); } } 目录与文件操作 文件删除 使用 file.delete(文件) 1 2 3 4 5 6 7 8 9 10 11 12 package IOStream; import java.io.File; public class FileDelete { public static void main(String[] args) { deleteFile(); } public static void deleteFile() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\3.txt&#34;); System.out.println(file.delete()?&#34;Deleted Successfully&#34;:&#34;Failed to Delete&#34;); } } 目录删除 方法 file.delete(目录)，这里有个小坑，只有空的目录才可以删除，不然会显示删除失败。 示例跟上面一样\n">
 <title>javaIO流</title>
 
 <link rel='canonical' href='https://0d000721999.github.io/p/javaio%E6%B5%81/'>
 
 <link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="javaIO流">
-<meta property='og:description' content="javaIO流 跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习\n">
+<meta property='og:description' content="javaIO流 跟着https://drun1baby.github.io/2022/05/30/Java-IO%E6%B5%81/学习\n创建文件 根据路径创建一个 File 对象 方法 new File(String pathname) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 package IOStream; import java.io.File; import java.io.IOException; public class NewFile { public static void main(String[] args) { createFile(); } public static void createFile() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\1.txt&#34;); try{ file.createNewFile(); System.out.println(&#34;Create Successfully&#34;); }catch(IOException e){ e.printStackTrace(); } } } 根据父目录 File 对象，在子路径创建一个文件 方法 new File(File parent, String child) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 package IOStream; import java.io.File; import java.io.IOException; public class NewFile02 { public static void main(String[] args) { createFile(); } public static void createFile() { File parentFile = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream&#34;); File file = new File(parentFile, &#34;2.txt&#34;); try{ file.createNewFile(); System.out.println(&#34;Create Successfully&#34;); }catch(IOException e){ e.printStackTrace(); } } } 根据父目录路径，在子路径下生成文件 方法 new File(String parent, String child) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package IOStream; import java.io.File; import java.io.IOException; public class NewFile03 { public static void main(String[] args) { createFile(); } public static void createFile() { String parentpath =&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream&#34;; String filename = &#34;3.txt&#34;; File file = new File(parentpath,filename); try{ file.createNewFile(); }catch(IOException e){ e.printStackTrace(); } } } 获取文件信息 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 package IOStream; import java.io.File; public class GetFile { public static void main(String[] args) { getFileContents(); } public static void getFileContents() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\3.txt&#34;); System.out.println(&#34;文件名称为：&#34; + file.getName()); System.out.println(&#34;文件的绝对路径为：&#34; + file.getAbsolutePath()); System.out.println(&#34;文件的父级目录为：&#34; + file.getParent()); System.out.println(&#34;文件的大小(字节)为：&#34; + file.length()); System.out.println(&#34;这是不是一个文件：&#34; + file.isFile()); System.out.println(&#34;这是不是一个目录：&#34; + file.isDirectory()); } } 目录与文件操作 文件删除 使用 file.delete(文件) 1 2 3 4 5 6 7 8 9 10 11 12 package IOStream; import java.io.File; public class FileDelete { public static void main(String[] args) { deleteFile(); } public static void deleteFile() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\3.txt&#34;); System.out.println(file.delete()?&#34;Deleted Successfully&#34;:&#34;Failed to Delete&#34;); } } 目录删除 方法 file.delete(目录)，这里有个小坑，只有空的目录才可以删除，不然会显示删除失败。 示例跟上面一样\n">
 <meta property='og:url' content='https://0d000721999.github.io/p/javaio%E6%B5%81/'>
 <meta property='og:site_name' content='美咕噜的小站'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='java' /><meta property='article:published_time' content='2025-07-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-07-15T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/javaio%E6%B5%81/1.webp' />
 <meta name="twitter:title" content="javaIO流">
-<meta name="twitter:description" content="javaIO流 跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习\n"><meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="javaIO流 跟着https://drun1baby.github.io/2022/05/30/Java-IO%E6%B5%81/学习\n创建文件 根据路径创建一个 File 对象 方法 new File(String pathname) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 package IOStream; import java.io.File; import java.io.IOException; public class NewFile { public static void main(String[] args) { createFile(); } public static void createFile() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\1.txt&#34;); try{ file.createNewFile(); System.out.println(&#34;Create Successfully&#34;); }catch(IOException e){ e.printStackTrace(); } } } 根据父目录 File 对象，在子路径创建一个文件 方法 new File(File parent, String child) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 package IOStream; import java.io.File; import java.io.IOException; public class NewFile02 { public static void main(String[] args) { createFile(); } public static void createFile() { File parentFile = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream&#34;); File file = new File(parentFile, &#34;2.txt&#34;); try{ file.createNewFile(); System.out.println(&#34;Create Successfully&#34;); }catch(IOException e){ e.printStackTrace(); } } } 根据父目录路径，在子路径下生成文件 方法 new File(String parent, String child) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package IOStream; import java.io.File; import java.io.IOException; public class NewFile03 { public static void main(String[] args) { createFile(); } public static void createFile() { String parentpath =&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream&#34;; String filename = &#34;3.txt&#34;; File file = new File(parentpath,filename); try{ file.createNewFile(); }catch(IOException e){ e.printStackTrace(); } } } 获取文件信息 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 package IOStream; import java.io.File; public class GetFile { public static void main(String[] args) { getFileContents(); } public static void getFileContents() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\3.txt&#34;); System.out.println(&#34;文件名称为：&#34; + file.getName()); System.out.println(&#34;文件的绝对路径为：&#34; + file.getAbsolutePath()); System.out.println(&#34;文件的父级目录为：&#34; + file.getParent()); System.out.println(&#34;文件的大小(字节)为：&#34; + file.length()); System.out.println(&#34;这是不是一个文件：&#34; + file.isFile()); System.out.println(&#34;这是不是一个目录：&#34; + file.isDirectory()); } } 目录与文件操作 文件删除 使用 file.delete(文件) 1 2 3 4 5 6 7 8 9 10 11 12 package IOStream; import java.io.File; public class FileDelete { public static void main(String[] args) { deleteFile(); } public static void deleteFile() { File file = new File(&#34;D:\\\\idea\\\\javatest\\\\src\\\\IOStream\\\\3.txt&#34;); System.out.println(file.delete()?&#34;Deleted Successfully&#34;:&#34;Failed to Delete&#34;); } } 目录删除 方法 file.delete(目录)，这里有个小坑，只有空的目录才可以删除，不然会显示删除失败。 示例跟上面一样\n"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://0d000721999.github.io/p/javaio%E6%B5%81/1.webp' />
     <link rel="shortcut icon" href="/favicon.ico" />
 
@@ -396,7 +396,7 @@
     
     
     <h1 id="javaio流">javaIO流
-</h1><p>跟着https://drun1baby.top/2022/05/30/Java-IO%E6%B5%81/#0x05-%E5%9B%9E%E5%BD%92-IO-%E7%9F%A5%E8%AF%86%E7%82%B9-%E2%80%94%E2%80%94-IO-%E6%B5%81%E5%88%86%E7%B1%BB学习</p>
+</h1><p>跟着https://drun1baby.github.io/2022/05/30/Java-IO%E6%B5%81/学习</p>
 <h2 id="创建文件">创建文件
 </h2><h3 id="根据路径创建一个-file-对象">根据路径创建一个 File 对象
 </h3><ul>
@@ -1250,6 +1250,30 @@
     <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%B1%BB%E7%9A%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E7%B1%BB%E7%9A%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/1.0f8feb9acb829c32c322a84495ec5ce3.png" 
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post 类的动态加载"
+                        
+                        data-hash="md5-D4/rmsuCnDLDIqhElexc4w==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">类的动态加载</h2>
+        </div>
+    </a>
+</article>
+
             
                 
 <article class="has-image">
