@@ -2764,7 +2764,640 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;第二章日志分析-redis应急响应&#34;&gt;第二章日志分析-redis应急响应
-&lt;/h2&gt;</description>
+&lt;/h2&gt;&lt;h3 id=&#34;通过本地-pc-ssh到服务器并且分析黑客攻击成功的-ip-为多少将黑客-ip-作为-flag-提交&#34;&gt;通过本地 PC SSH到服务器并且分析黑客攻击成功的 IP 为多少,将黑客 IP 作为 FLAG 提交;
+&lt;/h3&gt;&lt;p&gt;初步查看本地没有web服务，我们直接查看&lt;code&gt;/var/log/redis.log&lt;/code&gt;日志&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;  1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 83
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 84
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 85
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 86
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 87
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 88
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 89
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 90
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 91
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 92
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 93
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 94
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 95
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 96
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 97
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 98
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 99
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;100
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;101
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;102
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;103
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;104
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;105
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;106
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;107
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;108
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;109
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;110
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;111
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;112
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;113
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;114
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;115
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;116
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;117
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;118
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;119
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;120
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;121
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;122
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;123
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;124
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;125
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;126
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;127
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;128
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;129
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;130
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;131
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;132
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;133
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;134
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;135
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;136
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;137
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;138
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;139
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;140
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;141
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;142
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;143
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;144
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;145
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;146
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;147
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;148
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;149
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;150
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;151
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;152
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;153
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;154
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;155
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;156
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;157
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;158
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;159
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;160
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;161
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;162
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;163
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;164
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;165
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;166
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;167
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;168
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;169
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;170
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;171
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;172
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;173
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;174
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;175
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;176
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;177
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;178
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;179
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;180
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;181
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;182
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;183
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;184
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;185
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:25:31.525 &lt;span class=&#34;c1&#34;&gt;# WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:25:31.525 &lt;span class=&#34;c1&#34;&gt;# Server initialized&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:25:31.525 &lt;span class=&#34;c1&#34;&gt;# WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add &amp;#39;vm.overcommit_memory = 1&amp;#39; to /etc/sysctl.conf and then reboot or run the command &amp;#39;sysctl vm.overcommit_memory=1&amp;#39; for this to take effect.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:25:31.525 &lt;span class=&#34;c1&#34;&gt;# WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command &amp;#39;echo never &amp;gt; /sys/kernel/mm/transparent_hugepage/enabled&amp;#39; as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:25:31.525 * Ready to accept connections
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:15.065 * Before turning into a replica, using my master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:15.065 * REPLICAOF 192.168.100.13:8888 enabled &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;user request from &lt;span class=&#34;s1&#34;&gt;&amp;#39;id=3 addr=192.168.200.2:64289 fd=7 name= age=0 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=48 qbuf-free=32720 obl=0 oll=0 omem=0 events=r cmd=slaveof&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:15.610 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:15.610 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:15.611 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:16.612 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:16.612 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:16.613 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:17.614 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:17.614 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:17.615 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:18.616 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:18.616 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:18.617 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:19.618 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:19.619 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:19.620 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:20.621 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:20.621 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:20.622 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:21.623 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:21.623 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:21.624 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:22.625 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:22.625 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:22.626 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:23.627 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:23.627 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:23.628 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:24.628 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:24.629 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:24.630 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:25.631 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:25.631 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:25.632 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:26.633 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:26.633 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:26.634 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:27.635 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:27.635 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:27.636 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:28.637 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:28.637 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:28.638 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:29.639 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:29.639 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:29.640 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:30.641 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:30.641 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:30.642 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:31.643 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:31.643 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:31.644 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:32.644 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:32.645 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:32.645 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:33.647 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:33.647 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:33.648 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:34.649 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:34.650 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:34.650 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:35.652 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:35.653 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:35.653 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:36.656 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:36.656 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:36.656 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:37.659 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:37.659 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:37.659 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:38.661 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:38.662 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:38.662 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:39.664 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:39.665 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:39.666 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:40.667 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:40.668 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:40.668 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:41.670 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:41.671 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:41.671 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:42.674 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:42.674 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:42.675 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:43.676 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:43.676 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:43.676 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:44.679 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:44.679 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:44.680 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:45.681 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:45.681 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:45.682 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:46.683 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:46.683 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:46.684 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:47.685 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:47.685 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:47.686 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:48.687 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:48.687 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:48.688 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:49.689 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:49.690 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:49.691 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:50.692 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:50.692 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:50.693 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:51.694 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:51.694 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:51.695 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:52.696 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:52.696 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:52.697 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:53.698 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:53.698 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:53.699 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:54.700 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:54.700 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:54.701 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:55.702 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:55.702 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:55.702 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:56.704 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:56.705 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:56.705 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:57.707 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:57.708 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:57.708 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:58.709 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:58.709 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:58.710 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:59.711 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:59.712 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:33:59.712 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:00.715 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:00.715 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:00.715 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:01.717 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:01.717 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:01.718 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:02.719 * Connecting to MASTER 192.168.100.13:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:02.719 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:02.720 &lt;span class=&#34;c1&#34;&gt;# Error condition on socket for SYNC: Connection refused&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:03.034 * REPLICAOF 192.168.31.55:8888 enabled &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;user request from &lt;span class=&#34;s1&#34;&gt;&amp;#39;id=5 addr=192.168.200.2:64319 fd=7 name= age=0 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=47 qbuf-free=32721 obl=0 oll=0 omem=0 events=r cmd=slaveof&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:03.722 * Connecting to MASTER 192.168.31.55:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:03.722 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:33.173 * REPLICAOF 192.168.100.20:8888 enabled &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;user request from &lt;span class=&#34;s1&#34;&gt;&amp;#39;id=6 addr=192.168.200.2:64339 fd=7 name= age=0 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=48 qbuf-free=32720 obl=0 oll=0 omem=0 events=r cmd=slaveof&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:33.786 * Connecting to MASTER 192.168.100.20:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:33.786 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:33.788 * Non blocking connect &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; SYNC fired the event.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.192 * Master replied to PING, replication can &lt;span class=&#34;k&#34;&gt;continue&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.194 * Trying a partial resynchronization &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;request 7a73a1a4297a16c50d8465b0cc432444f0e5df71:1&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.195 * Full resync from master: ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ:1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.195 * Discarding previously cached master state.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.195 * MASTER &amp;lt;-&amp;gt; REPLICA sync: receiving &lt;span class=&#34;m&#34;&gt;48040&lt;/span&gt; bytes from master
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 * MASTER &amp;lt;-&amp;gt; REPLICA sync: Flushing old data
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 * MASTER &amp;lt;-&amp;gt; REPLICA sync: Loading DB in memory
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 &lt;span class=&#34;c1&#34;&gt;# Wrong signature trying to load DB from file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 &lt;span class=&#34;c1&#34;&gt;# Failed trying to load the MASTER synchronization DB from disk&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.791 * Connecting to MASTER 192.168.100.20:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.791 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.792 * Non blocking connect &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; SYNC fired the event.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.205 * Module &lt;span class=&#34;s1&#34;&gt;&amp;#39;system&amp;#39;&lt;/span&gt; loaded from ./exp.so
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.210 &lt;span class=&#34;c1&#34;&gt;# Setting secondary replication ID to 7a73a1a4297a16c50d8465b0cc432444f0e5df71, valid up to offset: 1. New replication ID is 46e68f9593cd148bffe464f0b04bee19ac447c39&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.210 * MASTER MODE enabled &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;user request from &lt;span class=&#34;s1&#34;&gt;&amp;#39;id=6 addr=192.168.200.2:64339 fd=7 name= age=4 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=34 qbuf-free=32734 obl=0 oll=0 omem=0 events=r cmd=slaveof&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.231 * Module system unloaded
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:42:00.685 * DB saved on disk
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:42:42.213 * DB saved on disk
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:06:44.597 &lt;span class=&#34;c1&#34;&gt;# User requested shutdown...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:06:44.597 * Saving the final RDB snapshot before exiting.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:06:44.599 * DB saved on disk
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:06:44.599 * Removing the pid file.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:06:44.599 &lt;span class=&#34;c1&#34;&gt;# Redis is now ready to exit, bye bye...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;441:C &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:10:29.635 &lt;span class=&#34;c1&#34;&gt;# oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;441:C &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:10:29.640 &lt;span class=&#34;c1&#34;&gt;# Redis version=5.0.1, bits=64, commit=00000000, modified=0, pid=441, just started&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;441:C &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:10:29.640 &lt;span class=&#34;c1&#34;&gt;# Configuration loaded&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;441:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 06:10:29.643 * Increased maximum number of open files to &lt;span class=&#34;m&#34;&gt;10032&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;it was originally &lt;span class=&#34;nb&#34;&gt;set&lt;/span&gt; to 1024&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;发现这里跟所有日志都不一样，是进行了主从复制攻击，并且可以看到ip&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;flag{192.168.100.20}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;通过本地-pc-ssh到服务器并且分析黑客第一次上传的恶意文件将黑客上传的恶意文件里面的-flag-提交&#34;&gt;通过本地 PC SSH到服务器并且分析黑客第一次上传的恶意文件,将黑客上传的恶意文件里面的 FLAG 提交;
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.195 * Full resync from master: ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ:1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.195 * Discarding previously cached master state.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.195 * MASTER &amp;lt;-&amp;gt; REPLICA sync: receiving &lt;span class=&#34;m&#34;&gt;48040&lt;/span&gt; bytes from master
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 * MASTER &amp;lt;-&amp;gt; REPLICA sync: Flushing old data
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 * MASTER &amp;lt;-&amp;gt; REPLICA sync: Loading DB in memory
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 &lt;span class=&#34;c1&#34;&gt;# Wrong signature trying to load DB from file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.197 &lt;span class=&#34;c1&#34;&gt;# Failed trying to load the MASTER synchronization DB from disk&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.791 * Connecting to MASTER 192.168.100.20:8888
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.791 * MASTER &amp;lt;-&amp;gt; REPLICA sync started
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:35.792 * Non blocking connect &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; SYNC fired the event.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.205 * Module &lt;span class=&#34;s1&#34;&gt;&amp;#39;system&amp;#39;&lt;/span&gt; loaded from ./exp.so
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.210 &lt;span class=&#34;c1&#34;&gt;# Setting secondary replication ID to 7a73a1a4297a16c50d8465b0cc432444f0e5df71, valid up to offset: 1. New replication ID is 46e68f9593cd148bffe464f0b04bee19ac447c39&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:M &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.210 * MASTER MODE enabled &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;user request from &lt;span class=&#34;s1&#34;&gt;&amp;#39;id=6 addr=192.168.200.2:64339 fd=7 name= age=4 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=34 qbuf-free=32734 obl=0 oll=0 omem=0 events=r cmd=slaveof&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这里看到这条&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;419:S &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; 05:34:37.205 * Module &lt;span class=&#34;s1&#34;&gt;&amp;#39;system&amp;#39;&lt;/span&gt; loaded from ./exp.so
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;所以恶意文件就是exp.so&lt;/p&gt;
+&lt;p&gt;用工具把他传出来,然后丢到IDA里面分析,已知是flag字符串&lt;/p&gt;
+&lt;p&gt;我们直接&lt;code&gt;shift+F12&lt;/code&gt;调出string，然后查找flag&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722112302698.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722112302698_hu6404734759285326220.png 480w, https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722112302698_hu4598138524733352402.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250722112302698&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;flag{XJ_78f012d7-42fc-49a8-8a8c-e74c87ea109b}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;通过本地-pc-ssh到服务器并且分析黑客反弹-shell-的ip-为多少将反弹-shell-的ip-作为-flag-提交&#34;&gt;通过本地 PC SSH到服务器并且分析黑客反弹 shell 的IP 为多少,将反弹 shell 的IP 作为 FLAG 提交;
+&lt;/h3&gt;&lt;p&gt;可以直接看日志前面的大量相同ip，跟精确一点要分析exp.so,或者分析&lt;/p&gt;
+&lt;p&gt;对于&lt;strong&gt;redis&lt;/strong&gt;数据库提权一般来说有4种方法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;写密钥ssh&lt;/li&gt;
+&lt;li&gt;计划任务&lt;/li&gt;
+&lt;li&gt;反弹shell&lt;/li&gt;
+&lt;li&gt;CVE-2022-0543 沙盒绕过命令执行 （集成在template当中）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这里面可以先排除反弹shell与CVE-2022-0543 因为反弹shell很容易出问题导致连接失败。&lt;/p&gt;
+&lt;p&gt;可以查看定时任务&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;crontab -l
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722113349357.png&#34;
+	width=&#34;752&#34;
+	height=&#34;51&#34;
+	srcset=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722113349357_hu8759198635088987587.png 480w, https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722113349357_hu5417063351897305129.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250722113349357&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1474&#34;
+		data-flex-basis=&#34;3538px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其实查看ida&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722113436568.png&#34;
+	width=&#34;1204&#34;
+	height=&#34;675&#34;
+	srcset=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722113436568_hu12293640888704078362.png 480w, https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722113436568_hu4449428787141804224.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250722113436568&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;178&#34;
+		data-flex-basis=&#34;428px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以发现是反弹shell，在机子上找到&lt;code&gt;linpeass.sh&lt;/code&gt;，同样可以找到反弹shell的定时任务&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;flag{192.168.100.13}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;通过本地-pc-ssh到服务器并且溯源分析黑客的用户名并且找到黑客使用的工具里的关键字符串flag黑客的用户-关键字符串-注关键字符串-xxx-xxx-xxx将用户名和关键字符串作为-flag提交&#34;&gt;通过本地 PC SSH到服务器并且溯源分析黑客的用户名，并且找到黑客使用的工具里的关键字符串(flag{黑客的用户-关键字符串} 注关键字符串 xxx-xxx-xxx)。将用户名和关键字符串作为 FLAG提交
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;root@ip-10-0-10-3:~# ls -al
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;total &lt;span class=&#34;m&#34;&gt;28&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;drwx------  &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; root root &lt;span class=&#34;m&#34;&gt;4096&lt;/span&gt; Aug  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; .
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;drwxr-xr-x &lt;span class=&#34;m&#34;&gt;18&lt;/span&gt; root root &lt;span class=&#34;m&#34;&gt;4096&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;22&lt;/span&gt; 02:43 ..
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw-------  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; root root    &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; Aug  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; .bash_history
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw-r--r--  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; root root  &lt;span class=&#34;m&#34;&gt;570&lt;/span&gt; Jan &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2010&lt;/span&gt; .bashrc
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw-r--r--  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; root root  &lt;span class=&#34;m&#34;&gt;148&lt;/span&gt; Aug &lt;span class=&#34;m&#34;&gt;17&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2015&lt;/span&gt; .profile
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw-r--r--  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; root root   &lt;span class=&#34;m&#34;&gt;75&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; .selected_editor
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;drwx------  &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; root root &lt;span class=&#34;m&#34;&gt;4096&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; .ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;root@ip-10-0-10-3:~# ls -al .ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;total &lt;span class=&#34;m&#34;&gt;12&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;drwx------ &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; root root &lt;span class=&#34;m&#34;&gt;4096&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; .
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;drwx------ &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; root root &lt;span class=&#34;m&#34;&gt;4096&lt;/span&gt; Aug  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; ..
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw-r--r-- &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; root root  &lt;span class=&#34;m&#34;&gt;675&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt; authorized_keys
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;root@ip-10-0-10-3:~# cat .ssh/authorized_keys
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;REDIS0009	redis-ver5.0.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;redis-bits󿿀򳨭etOused-memXU
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;𮤭preamble~𷷳shB9
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDDh4OEFvyb4ubM7YPvzG/FfO6jE4PjLdmuCUdGP+aeLeJB5SXYT6zHkU9wlfY/Fo4UuBlhTqBaS6Ih/Wf62KepzrMsTQQYcSG/Xp8lgFzVCCFAk7apzxfRCPNk1pxaGiEF6MPoCmUu1UhC3ta3xyh2c4KZls0hyFN9JZsuD+siT8KVqm856vQ+RaTrZi3ThMa5gbeH+v3ZUcO35ZfMKor/uWXffHT0Yi06dsgIMN3faIiBrd1Lg0B5kOTaDq3fHs8Qs7pvR9C4ZTm2AK/Oct8ULdsnfS2YWtrYyC8rzNip9Wf083ZY1B4bj1UoxD+QwgThh5VP3xgRd9KDSzEYIBabstGh8GU5zDxr0zIuhQM35I0aALvojXl4QaaEnZwpqU3ZkojPG2aNC0QdiBK7eKwA38Gk+V8DEWc/TTkO+wm3aXYdll5sPmoWTAonaln1nmCiTDn4jKb73DxYHfSgNIDpJ6fS5kbWL5UJnElWCrxzaXKHUlqXJj3x81Oz6baFNv8&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; xj-test-user
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;得到用户名&lt;code&gt;xj-test-user&lt;/code&gt;,然后github溯源https://github.com/xj-test-user&lt;/p&gt;
+&lt;p&gt;找到https://github.com/xj-test-user/redis-rogue-getshell这个redis攻击工具的仓库&lt;/p&gt;
+&lt;p&gt;查看历史提交记录https://github.com/xj-test-user/redis-rogue-getshell/commit/main&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722120936906.png&#34;
+	width=&#34;1521&#34;
+	height=&#34;303&#34;
+	srcset=&#34;https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722120936906_hu16204039853555121997.png 480w, https://0d000721999.github.io/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/image-20250722120936906_hu8673744933128727065.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250722120936906&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;501&#34;
+		data-flex-basis=&#34;1204px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;flag{xj-test-user-wow-you-find-flag}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;通过本地-pc-ssh到服务器并且分析黑客篡改的命令将黑客篡改的命令里面的关键字符串作为-flag-提交&#34;&gt;通过本地 PC SSH到服务器并且分析黑客篡改的命令,将黑客篡改的命令里面的关键字符串作为 FLAG 提交;
+&lt;/h3&gt;&lt;p&gt;查看bin目录下的所有文件,发现ps命令异常的小&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rwxrwxrwx  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; root root         &lt;span class=&#34;m&#34;&gt;178&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt;  ps
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rwxr-xr-x  &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; root root      &lt;span class=&#34;m&#34;&gt;133432&lt;/span&gt; Jul &lt;span class=&#34;m&#34;&gt;31&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2023&lt;/span&gt;  ps_
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;查看&lt;code&gt;/usr/bin/ps&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;root@ip-10-0-10-3:~# cat /usr/bin/ps
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;#/bin/bash&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;oldifs&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$IFS&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;IFS&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;\$n&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;ps_ &lt;span class=&#34;nv&#34;&gt;$1&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;$2&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;$3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;grep -v &lt;span class=&#34;s1&#34;&gt;&amp;#39;threadd&amp;#39;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; v in &lt;span class=&#34;nv&#34;&gt;$result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;do&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; -e &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$v&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;\t&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;IFS&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$oldifs&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;#//c195i2923381905517d818e313792d196&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;所以flag&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;flag{c195i2923381905517d818e313792d196}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
         </item>
         
     </channel>
