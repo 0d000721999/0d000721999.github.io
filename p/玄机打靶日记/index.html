@@ -311,6 +311,15 @@
         <li><a href="#4黑客获取的权限-flagwhoami后的值">4.黑客获取的权限 flag{whoami后的值}</a></li>
       </ol>
     </li>
+    <li><a href="#第二章日志分析-apache日志分析">第二章日志分析-apache日志分析</a>
+      <ol>
+        <li><a href="#1提交当天访问次数最多的ip即黑客ip">1、提交当天访问次数最多的IP，即黑客IP：</a></li>
+        <li><a href="#2黑客使用的浏览器指纹是什么提交指纹的md5">2、黑客使用的浏览器指纹是什么，提交指纹的md5：</a></li>
+        <li><a href="#3查看包含indexphp页面被访问的次数提交次数">3、查看包含index.php页面被访问的次数，提交次数：</a></li>
+        <li><a href="#4查看黑客ip访问了多少次提交次数">4、查看黑客IP访问了多少次，提交次数：</a></li>
+        <li><a href="#5查看2023年8月03日8时这一个小时内有多少ip访问提交次数">5、查看2023年8月03日8时这一个小时内有多少IP访问，提交次数:</a></li>
+      </ol>
+    </li>
   </ol>
 </nav>
         </div>
@@ -387,7 +396,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 14 分钟
+                    阅读时长: 15 分钟
                 </time>
             </div>
         
@@ -1964,6 +1973,108 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{mysql}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="第二章日志分析-apache日志分析">第二章日志分析-apache日志分析
+</h2><h3 id="1提交当天访问次数最多的ip即黑客ip">1、提交当天访问次数最多的IP，即黑客IP：
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat /var/log/apache2/access.log <span class="p">|</span>grep <span class="s2">&#34;03/Aug/2023:08:&#34;</span> <span class="p">|</span> awk <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> sort -nr <span class="p">|</span> head -n <span class="m">10</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"> 6555 192.168.200.2
+</span></span><span class="line"><span class="cl">     29 ::1
+</span></span><span class="line"><span class="cl">      5 192.168.200.38
+</span></span><span class="line"><span class="cl">      1 192.168.200.48
+</span></span><span class="line"><span class="cl">      1 192.168.200.211
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{192.168.200.2}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2黑客使用的浏览器指纹是什么提交指纹的md5">2、黑客使用的浏览器指纹是什么，提交指纹的md5：
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat /var/log/apache2/access.log <span class="p">|</span> grep <span class="s2">&#34;192.168.200.2&#34;</span> <span class="p">|</span> awk -F<span class="s1">&#39;&#34;&#39;</span> <span class="s1">&#39;{print $6}&#39;</span> <span class="p">|</span> uniq -c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">12 Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0
+</span></span><span class="line"><span class="cl">      1 curl/7.74.0
+</span></span><span class="line"><span class="cl">   6543 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{2D6330F380F44AC20F3A02EED0958F66}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3查看包含indexphp页面被访问的次数提交次数">3、查看包含index.php页面被访问的次数，提交次数：
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat /var/log/apache2/access.log <span class="p">|</span> grep <span class="s2">&#34;/index.php&#34;</span> <span class="p">|</span> wc -l
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{27}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4查看黑客ip访问了多少次提交次数">4、查看黑客IP访问了多少次，提交次数：
+</h3><p>上面已经知道次数了，更精确可以加上grep</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{6555}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="5查看2023年8月03日8时这一个小时内有多少ip访问提交次数">5、查看2023年8月03日8时这一个小时内有多少IP访问，提交次数:
+</h3><p>又上面可知5条，或者加上<code>wc -l</code>命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{5}
 </span></span></code></pre></td></tr></table>
 </div>
 </div>
