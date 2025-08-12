@@ -7,7 +7,203 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>无敌可爱美咕噜</copyright>
-        <lastBuildDate>Mon, 11 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/tags/xss-trick/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 12 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/tags/xss-trick/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Web缓存投毒</title>
+        <link>https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/</link>
+        <pubDate>Tue, 12 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/</guid>
+        <description>&lt;img src="https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/1.webp" alt="Featured image of post Web缓存投毒" /&gt;&lt;h1 id=&#34;web缓存投毒&#34;&gt;Web缓存投毒
+&lt;/h1&gt;&lt;p&gt;参考这篇：&lt;a class=&#34;link&#34; href=&#34;https://xz.aliyun.com/news/7291&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;对缓存投毒的学习总结-先知社区&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;什么是缓存投毒&#34;&gt;什么是缓存投毒
+&lt;/h2&gt;&lt;h3 id=&#34;什么是缓存&#34;&gt;什么是缓存
+&lt;/h3&gt;&lt;p&gt;缓存位于服务器和用户之间，通常在固定的时间内保存（缓存）对特定请求的响应。如果另一个用户在这段时间内发送了同样的请求，则缓存会直接提供响应的副本(缓存)给用户，而无需与服务器直接进行交互。通过减少服务器对重复请求进行处理的次数，来减轻服务器的负担。使用CDN(内容分发网络)就可以达到这样的目的。&lt;/p&gt;
+&lt;p&gt;当缓存接收到HTTP请求的时候，它会匹配vary头部指定的HTTP HEADER来进行判断。当指定的头部与缓存中的数据匹配时，则提供缓存的内容。如果不匹配，就直接与服务器交互。这些指定的头部被称作：缓存键 “cache key”。其他的头部就是非缓存键。&lt;/p&gt;
+&lt;p&gt;下面举个例子说明缓存键&lt;/p&gt;
+&lt;p&gt;缓存系统认为以下两个请求是等效的，并且将很乐意的使用从第一个请求缓存的响应来响应第二个请求：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-makefile&#34; data-lang=&#34;makefile&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;GET&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;/blog/post.php?&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;mobile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;Host&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;example&lt;/span&gt;.&lt;span class=&#34;n&#34;&gt;com&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;User-Agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Mozilla&lt;/span&gt;/5.0 … &lt;span class=&#34;n&#34;&gt;Firefox&lt;/span&gt;/57.0
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;Cookie&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;language&lt;/span&gt;=&lt;span class=&#34;n&#34;&gt;pl&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;Connection&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;close&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-makefile&#34; data-lang=&#34;makefile&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;GET&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;/blog/post.php?&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;mobile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;Host&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;example&lt;/span&gt;.&lt;span class=&#34;n&#34;&gt;com&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;User-Agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Mozilla&lt;/span&gt;/5.0 … &lt;span class=&#34;n&#34;&gt;Firefox&lt;/span&gt;/57.0
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;Cookie&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;language&lt;/span&gt;=&lt;span class=&#34;n&#34;&gt;en&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;Connection&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;close&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;因此，该页面将以错误的语言输出提供给第二位访问者。这揭示了以下的问题-由非缓存键导致的差异化响应都能够被存储并提供给其他用户。理论上来说，网站可以使用“Vary”响应头来指定额外应该加入到缓存键中的其他请求头。在实践中，对Vary响应头的使用仅停留在理论阶段，像Cloudflare这样的CDN完全忽略它，大家甚至没有意识到他们的应用程序支持任何基于请求头的输入。&lt;/p&gt;
+&lt;h3 id=&#34;缓存投毒&#34;&gt;缓存投毒
+&lt;/h3&gt;&lt;p&gt;在web缓存部分我们知道，当一个页面的内容被缓存后，其他用户访问这个页面时会接收到同样的内容。如果在缓存的过程中，存入了有害的内容，比如存入了一个带有XSS payload的页面。其他用户访问时，就会受到XSS漏洞的攻击。这就是缓存投毒。&lt;/p&gt;
+&lt;h2 id=&#34;发现缓存投毒漏洞的方法&#34;&gt;发现缓存投毒漏洞的方法
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;判断哪些非缓存键会影响页面内容&lt;/p&gt;
+&lt;p&gt;任何的缓存投毒都依赖于非缓存键，所以我们在一开始就要判断哪些HTTP头部属于缓存键，哪些不属于。再通过修改或添加HTTP头部来判断哪些头部会引起页面内容的变化。常用的两种方式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;手动修改或添加HTTP头部，指定随机字符来判断头部是否影响页面内容&lt;/li&gt;
+&lt;li&gt;使用Brupsuite插件&lt;a class=&#34;link&#34; href=&#34;https://github.com/portswigger/param-miner&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Param Miner&lt;/a&gt;来自动判断&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;构造内容引起服务器端的有害响应&lt;/p&gt;
+&lt;p&gt;针对不同的非缓存键，我们需要知道哪些非缓存键会导致页面返回有害的内容。举一个例子：页面中js链接的域名是通过获取HTTP头部中的“X-Forwarded-Host”字段来设置的。而服务器不会将这个字段作为缓存键，那么这个字段就可以利用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;获取响应，使有害内容被缓存&lt;/p&gt;
+&lt;p&gt;通过构造有害的内容，访问页面，获取响应。就会将有害的内容存入缓存中。需要注意的是，页面是否会被缓存受到文件扩展名、内容类型、url路由、状态代码和响应标头的影响。在测试的会比较麻烦。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;bp靶场练习&#34;&gt;bp靶场练习
+&lt;/h2&gt;&lt;p&gt;这个靶场比较多，就挑一部分来练习&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://portswigger.net/web-security/all-labs#web-cache-poisoning&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;All labs | Web Security Academy&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;web-cache-poisoning-with-an-unkeyed-header&#34;&gt;Web cache poisoning with an unkeyed header
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;描述：&lt;/p&gt;
+&lt;p&gt;This lab is vulnerable to web cache poisoning because it handles input  from an unkeyed header in an unsafe way. An unsuspecting user regularly  visits the site&amp;rsquo;s home page. To solve this lab, poison the cache with a  response that executes &lt;code&gt;alert(document.cookie)&lt;/code&gt; in the visitor&amp;rsquo;s browser.&lt;/p&gt;
+&lt;p&gt;hint: This lab supports the &lt;code&gt;X-Forwarded-Host&lt;/code&gt; header.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;xss弹cookie，我们首先抓包，加&lt;code&gt;X-Forwarded-Host&lt;/code&gt;头，看到响应是有&lt;code&gt;X-Cache: hit&lt;/code&gt;,说明响应来自缓存&lt;/p&gt;
+&lt;p&gt;我们直接在get请求后面加上参数，比如&lt;code&gt;a=1&lt;/code&gt;,由于会加载缓存，这个界面跟前面的缓存键相同，会加载缓存，也会加载&lt;code&gt;X-Forwarded-Host&lt;/code&gt;头的内容&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812152207579.png&#34;
+	width=&#34;1480&#34;
+	height=&#34;764&#34;
+	srcset=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812152207579_hu211913164219199503.png 480w, https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812152207579_hu5218445825613205190.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250812152207579&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;464px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以看到响应出现了aaa.com，我们只需要拼接就能加载xss payload&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;X-Forwarded-Host: aaa.com&amp;#34;&amp;gt;&amp;lt;/script&amp;gt;&amp;lt;script&amp;gt;alert(document.cookie)&amp;lt;/script&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812152513235.png&#34;
+	width=&#34;1469&#34;
+	height=&#34;791&#34;
+	srcset=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812152513235_hu4749236686875146770.png 480w, https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812152513235_hu4535947661252793516.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250812152513235&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;185&#34;
+		data-flex-basis=&#34;445px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里其实就结束了，如果要完成的话要借助他的服务器，因为我们看到这个后面拼接了&lt;code&gt;/resources/js/tracking.js&lt;/code&gt;,&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812154152811.png&#34;
+	width=&#34;1520&#34;
+	height=&#34;794&#34;
+	srcset=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812154152811_hu14918202180556637260.png 480w, https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812154152811_hu13688922304197867692.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250812154152811&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;191&#34;
+		data-flex-basis=&#34;459px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后前面那个头写这个url，就可以触发了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812154229556.png&#34;
+	width=&#34;1477&#34;
+	height=&#34;837&#34;
+	srcset=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812154229556_hu17569363759346005540.png 480w, https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812154229556_hu10750291948486047374.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250812154229556&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;176&#34;
+		data-flex-basis=&#34;423px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;web-cache-poisoning-with-an-unkeyed-cookie&#34;&gt;Web cache poisoning with an unkeyed cookie
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;This lab is vulnerable to web cache poisoning because cookies aren&amp;rsquo;t  included in the cache key. An unsuspecting user regularly visits the  site&amp;rsquo;s home page. To solve this lab, poison the cache with a response  that executes &lt;code&gt;alert(1)&lt;/code&gt; in the visitor&amp;rsquo;s browser.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;插入alert(1)&lt;/p&gt;
+&lt;p&gt;首先抓包看到cookie&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812160957896.png&#34;
+	width=&#34;1475&#34;
+	height=&#34;750&#34;
+	srcset=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812160957896_hu4449586910785707311.png 480w, https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812160957896_hu5050773347126085240.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250812160957896&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;196&#34;
+		data-flex-basis=&#34;472px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;还是老办法拼接&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;};alert(1);aaa={&amp;#34;&amp;#34;:&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;注意分号要url编码&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812161226158.png&#34;
+	width=&#34;1486&#34;
+	height=&#34;764&#34;
+	srcset=&#34;https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812161226158_hu13149608581355691386.png 480w, https://0d000721999.github.io/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/image-20250812161226158_hu12901113250661311603.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250812161226158&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;194&#34;
+		data-flex-basis=&#34;466px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其他靶场看上面的参考文章就行了，原理都一样&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>Client-side desync attacks（CVE-2022-29361）</title>
         <link>https://0d000721999.github.io/p/client-side-desync-attackscve-2022-29361/</link>
         <pubDate>Mon, 11 Aug 2025 00:00:00 +0000</pubDate>
