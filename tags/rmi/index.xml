@@ -1,0 +1,1422 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>RMI on 美咕噜的小站</title>
+        <link>https://0d000721999.github.io/tags/rmi/</link>
+        <description>Recent content in RMI on 美咕噜的小站</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>无敌可爱美咕噜</copyright>
+        <lastBuildDate>Thu, 28 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/tags/rmi/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>RMI基础</title>
+        <link>https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/</link>
+        <pubDate>Thu, 28 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/</guid>
+        <description>&lt;img src="https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/1.webp" alt="Featured image of post RMI基础" /&gt;&lt;h1 id=&#34;rmi基础&#34;&gt;RMI基础
+&lt;/h1&gt;&lt;p&gt;RMI的介绍文档：&lt;a class=&#34;link&#34; href=&#34;https://java.cunzaima.cn/rmi/overview.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;RMI应用概述（Java™教程 &amp;gt; RMI）&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;这里用到的环境是jdk8u65&lt;/p&gt;
+&lt;p&gt;RMI 当中的攻击手法只在 jdk8u121 之前才可以进行攻击，因为在 8u121 之后，bind rebind unbind 这三个方法只能对 localhost 进行攻击，后续我们会提到。&lt;/p&gt;
+&lt;h2 id=&#34;rmi介绍&#34;&gt;RMI介绍
+&lt;/h2&gt;&lt;p&gt;RMI 全称 Remote Method Invocation（远程方法调用），即在一个 JVM 中 Java 程序调用在另一个远程  JVM 中运行的 Java 程序，这个远程 JVM 既可以在同一台实体机上，也可以在不同的实体机上，两者之间通过网络进行通信。&lt;/p&gt;
+&lt;p&gt;RMI 依赖的通信协议为 JRMP(Java Remote Message Protocol，Java 远程消息交换协议)，该协议为 Java 定制，要求服务端与客户端都为 Java 编写。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;这个协议就像 HTTP 协议一样，规定了客户端和服务端通信要满足的规范。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;所以我们等下起环境，尽量写两个项目，一个做服务端，一个做客户端&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827153137769.png&#34;
+	width=&#34;507&#34;
+	height=&#34;266&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827153137769_hu1777859197292154622.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827153137769_hu11200562372584210817.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827153137769&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;190&#34;
+		data-flex-basis=&#34;457px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;由于每个服务对应端口是动态的，所以引入registry注册端，提供服务注册与服务获取。即 Server 端向 Registry 注册服务，比如地址、端口等一些信息，Client 端从 Registry 获取远程对象的一些信息，如地址、端口等，然后进行远程调用。&lt;/p&gt;
+&lt;h2 id=&#34;rmi实现&#34;&gt;RMI实现
+&lt;/h2&gt;&lt;h3 id=&#34;server端&#34;&gt;Server端
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;先写一个接口，定义一个方法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.Remote&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.RemoteException&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;interface&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;RemoteObj&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;extends&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Remote&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;sayHello&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;words&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;throws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteException&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;注意这里要继承Remote接口，然后抛出异常&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;然后写接口的实现类&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.RemoteException&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.server.UnicastRemoteObject&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;RemoteObjImpl&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;extends&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UnicastRemoteObject&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;implements&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteObj&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;RemoteObjImpl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;throws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteException&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//    UnicastRemoteObject.exportObject(this, 0); // 如果不能继承 UnicastRemoteObject 就需要手工导出&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@Override&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;sayHello&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;words&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;throws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteException&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UpWords&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;words&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;toUpperCase&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;System&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;out&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;println&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UpWords&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UpWords&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;继承 UnicastRemoteObject 类，用于生成 Stub（存根）和 Skeleton（骨架）。 这个在后续的通信原理当中会讲到&lt;/p&gt;
+&lt;p&gt;实现类中使用的对象必须都可序列化，即都继承&lt;code&gt;java.io.Serializable&lt;/code&gt;&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;然后写注册远程对象&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.registry.LocateRegistry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.registry.Registry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;RMIServer&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;throws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Exception&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//实例化远程对象&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteObj&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteObjImpl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//创建注册中心&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Registry&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registry&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LocateRegistry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;createRegistry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1099&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//绑定对象到注册中心&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;bind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;obj&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这里端口默认1099，bind的绑定这里需要跟后面客户端查找的registry一致&lt;/p&gt;
+&lt;h3 id=&#34;client端&#34;&gt;Client端
+&lt;/h3&gt;&lt;p&gt;客户端只需从从注册器中获取远程对象，然后调用方法即可。当然客户端还需要一个远程对象的接口，不然不知道获取回来的对象是什么类型的。&lt;/p&gt;
+&lt;p&gt;所以同样要先写一个接口,注意要跟server端的名字一样&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.Remote&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.RemoteException&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;interface&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;RemoteObj&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;extends&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Remote&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;sayHello&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;words&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;throws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteException&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后客户端获取远程对象，然后调用方法&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.registry.LocateRegistry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nn&#34;&gt;java.rmi.registry.Registry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;RMIClient&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;throws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Exception&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Registry&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registry&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LocateRegistry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getRegistry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1099&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteObj&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteObj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;lookup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;RemoteObj&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;sayHello&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后可以测试一下，先运行server端代码，开启1099端口接收，然后client端运行代码，转换大写的函数被调用，server端返回大写的Hello&lt;/p&gt;
+&lt;h2 id=&#34;从idea断点调试分析rmi原理&#34;&gt;从IDEA断点调试分析RMI原理
+&lt;/h2&gt;&lt;p&gt;具体可以看这张图，来源是&lt;a class=&#34;link&#34; href=&#34;https://xz.aliyun.com/news/8760&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;JAVA安全基础（四）&amp;ndash; RMI机制-先知社区&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827163324203.png&#34;
+	width=&#34;1332&#34;
+	height=&#34;802&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827163324203_hu12292893060310456610.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827163324203_hu2297717007785124953.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827163324203&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;166&#34;
+		data-flex-basis=&#34;398px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;创建远程服务&#34;&gt;创建远程服务
+&lt;/h3&gt;&lt;p&gt;这里肯定是不存在漏洞的，存在漏洞的地方在端之间的交互，在前面的实例化这里下断点，把下面代码都注释了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827163849690.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827163849690_hu12315399510901865146.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827163849690_hu7731766517020546656.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827163849690&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;一直强制步入，到达我们前下写的接口实现类&lt;code&gt;RemoteObjImpl&lt;/code&gt;的构造函数，现在我们要把它发布到网络上去，我们要分析的是它如何被发布到网络上去的&lt;/p&gt;
+&lt;p&gt;首先它是继承父类&lt;code&gt;UnicastRemoteObject&lt;/code&gt;,所以先进到父类的构造函数里&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827165141332.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827165141332_hu8559770440060699774.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827165141332_hu5791468073690634438.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827165141332&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以看到这里port值为0，也就是说他会把我们的服务发布到一个随机的端口上，不是前面说的默认端口1099，因为这个是注册中心的默认端口&lt;/p&gt;
+&lt;p&gt;然后一路F8步过到这里&lt;code&gt;exportObject&lt;/code&gt;方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827170128883.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827170128883_hu1859245009132044378.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827170128883_hu9277882574938773269.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827170128883&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这个方法就是用来将远程服务发布到网络上的，之前我们在接口实现类的构造函数注释了一段代码&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;RemoteObjImpl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;throws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RemoteException&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//    UnicastRemoteObject.exportObject(this, 0); // 如果不能继承 UnicastRemoteObject 就需要手工导出&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;如果不能继承&lt;code&gt;UnicastRemoteObject&lt;/code&gt;类的话就要手动调用&lt;code&gt;exportObject&lt;/code&gt;函数&lt;/p&gt;
+&lt;p&gt;我们看看这个函数&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827171124142.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827171124142_hu14231821848087711760.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827171124142_hu8241673844126406614.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827171124142&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;第一个参数接受一个对象不多说明，第二个参数是&lt;code&gt;new UnicastServerRef(port)&lt;/code&gt;，很明显是处理我们的网络请求的类，我们继续跟进&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827171839824.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827171839824_hu569737189111240513.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827171839824_hu6617674354003259824.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827171839824&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以发现它又新建了一个叫&lt;code&gt;LiveRef&lt;/code&gt;的类，继续跟进&lt;/p&gt;
+&lt;p&gt;这里有个技巧，可以点F7步入后选择&lt;code&gt;LiveRef&lt;/code&gt;跟进&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827172435460.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827172435460_hu9643512765210042788.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827172435460_hu9305344986529359154.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827172435460&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;一个构造函数，跟进this&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827173519832.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827173519832_hu10969589761100900883.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827173519832_hu84968716888465239.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827173519832&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里来了三个参数，重点看第二个参数&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;TCPEndpoint&lt;/code&gt;类显然是一个网络请求相关的类，查看构造函数&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;TCPEndpoint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;host&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;port&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;host&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;port&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;传入ip和端口，这里又调了this,我们回到前面继续跟进this&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827174035460.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827174035460_hu12806277506669298500.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827174035460_hu9610643223997116712.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827174035460&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里之前全是封装，到这里才有ip和port，所以记住这些数据都封装在&lt;code&gt;LiveRef&lt;/code&gt;里面&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827174503042.png&#34;
+	width=&#34;834&#34;
+	height=&#34;501&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827174503042_hu8311051374987884478.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827174503042_hu3755405577377977068.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827174503042&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;166&#34;
+		data-flex-basis=&#34;399px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;回到前面的&lt;code&gt;new LiveRef(port)&lt;/code&gt;，进super看父类构造函数&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827175509892.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827175509892_hu2573973009208834190.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827175509892_hu16897275008247783746.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827175509892&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;整个服务从始至终只会调用一个&lt;code&gt;LiveRef&lt;/code&gt;,然后一路步过，走到前面&lt;code&gt;exportObject&lt;/code&gt;函数&lt;/p&gt;
+&lt;p&gt;接下来就是一直在不同的类里面调用&lt;code&gt;exportObject&lt;/code&gt;函数&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827190232345.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827190232345_hu14970102194996813112.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827190232345_hu13948150465985358464.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827190232345&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;走到这里看到一个stub,由上面那个图，我们发现stub实际上是在客户端client的，这里服务端为什么用到了&lt;/p&gt;
+&lt;p&gt;其实是先在服务端创建stub传给注册中心，然后客户端获取stub，后面跟skeleton交互，传给服务端&lt;/p&gt;
+&lt;p&gt;我们继续跟进stub,步过走到&lt;code&gt;createProxy&lt;/code&gt;函数,跟进去看看&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827193743823.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827193743823_hu11816281047531250164.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827193743823_hu8415029449768428311.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827193743823&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;if判断这里是判断是否存在stub，后面会用到&lt;/p&gt;
+&lt;p&gt;我们继续看下面&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827193910863.png&#34;
+	width=&#34;1152&#34;
+	height=&#34;317&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827193910863_hu4274531498689267938.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827193910863_hu3486939655586347988.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827193910863&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;363&#34;
+		data-flex-basis=&#34;872px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;一个动态代理的创建，然后继续跟回到上面,有个target把前面东西做了一个封装&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827200521478.png&#34;
+	width=&#34;961&#34;
+	height=&#34;180&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827200521478_hu4150735056405163062.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827200521478_hu7859370524261653932.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827200521478&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;533&#34;
+		data-flex-basis=&#34;1281px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后跟进Target&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827200535750.png&#34;
+	width=&#34;1183&#34;
+	height=&#34;235&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827200535750_hu14397866977497319891.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827200535750_hu8736001552285251332.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827200535750&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;503&#34;
+		data-flex-basis=&#34;1208px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里其实可以看到&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827202000098.png&#34;
+	width=&#34;822&#34;
+	height=&#34;540&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827202000098_hu617643568555415991.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827202000098_hu14739872350312021974.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827202000098&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;152&#34;
+		data-flex-basis=&#34;365px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;disp下面的是server端的&lt;code&gt;LiveRef&lt;/code&gt;和stub下面是client的&lt;code&gt;LiveRef&lt;/code&gt;是一样的，这样才能实现两个之间的通信&lt;/p&gt;
+&lt;p&gt;后面我们看看target封装之后的内容&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827202542193.png&#34;
+	width=&#34;1208&#34;
+	height=&#34;147&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827202542193_hu5590596293804203540.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827202542193_hu16213101303090273913.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827202542193&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;821&#34;
+		data-flex-basis=&#34;1972px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;我们看到这里又调用了&lt;code&gt;exportObject&lt;/code&gt;,把前面封装好的target传入&lt;/p&gt;
+&lt;p&gt;跟进这个函数，一路跟到这个部分&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827203030816.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1030&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827203030816_hu10188889106514143240.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827203030816_hu4298270729276475921.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827203030816&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这个listen说白了就是开端口监听，跟进去看看&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827204026656.png&#34;
+	width=&#34;1105&#34;
+	height=&#34;425&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827204026656_hu7472528884789504659.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827204026656_hu2513986150791302529.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827204026656&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;260&#34;
+		data-flex-basis=&#34;624px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后看到下面有个&lt;code&gt;newServerSocket&lt;/code&gt;函数，显然是创建了新的socket&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827205857958.png&#34;
+	width=&#34;1101&#34;
+	height=&#34;292&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827205857958_hu9037047528655059481.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827205857958_hu780673829275546207.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827205857958&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;377&#34;
+		data-flex-basis=&#34;904px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后开启一个新的线程，处理这些网络请求，回到上面我们查看target，发现port有数值了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827211101050.png&#34;
+	width=&#34;719&#34;
+	height=&#34;630&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827211101050_hu92572045149691844.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827211101050_hu5583884559346554899.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827211101050&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;114&#34;
+		data-flex-basis=&#34;273px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其实前面的TCPEndpoint类里面的&lt;code&gt;newServerSocket&lt;/code&gt;方法就已经随机赋值了，如果前面listen的port为0，就随机赋值&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827210946848.png&#34;
+	width=&#34;1130&#34;
+	height=&#34;659&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827210946848_hu7391670266160323369.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827210946848_hu30265335631060388.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827210946848&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;171&#34;
+		data-flex-basis=&#34;411px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后这里走完，下面又走到一个&lt;code&gt;exportObject&lt;/code&gt;方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827214029190.png&#34;
+	width=&#34;787&#34;
+	height=&#34;316&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827214029190_hu9239065479633205922.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827214029190_hu13362700621515306750.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827214029190&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;249&#34;
+		data-flex-basis=&#34;597px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;跟进去，然后是一堆赋值，最后跟到这里&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827214738828.png&#34;
+	width=&#34;1105&#34;
+	height=&#34;785&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827214738828_hu6341932389909348364.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250827214738828_hu4790860316331117834.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250827214738828&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;140&#34;
+		data-flex-basis=&#34;337px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;也是一个赋值，把前面存储在target里面的内容赋值给两个表&lt;/p&gt;
+&lt;p&gt;然后接下来一直步过，每个部分都返回值，整个流程就结束了&lt;/p&gt;
+&lt;h3 id=&#34;创建注册中心--绑定&#34;&gt;创建注册中心 + 绑定
+&lt;/h3&gt;&lt;p&gt;这里在创建注册中心这里下断点，因为注册中心与服务端是独立的，谁先谁后无所谓，本质是一个东西&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828180724978.png&#34;
+	width=&#34;967&#34;
+	height=&#34;375&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828180724978_hu1723528008365248662.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828180724978_hu13116309201316920569.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828180724978&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;257&#34;
+		data-flex-basis=&#34;618px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;直接跟进去&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828180918190.png&#34;
+	width=&#34;1055&#34;
+	height=&#34;119&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828180918190_hu6663568258024899686.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828180918190_hu6777478455805233245.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828180918190&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;886&#34;
+		data-flex-basis=&#34;2127px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里调用了一个创建注册中心的方法，然后给默认端口传到一个类里面，我们继续跟&lt;/p&gt;
+&lt;p&gt;这里会走到奇怪的代码，我们先在&lt;code&gt;RegistryImpl&lt;/code&gt;类里面下断点，然后上面F8之后点恢复就能跟进去了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828181418149.png&#34;
+	width=&#34;1282&#34;
+	height=&#34;576&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828181418149_hu12118866192782527360.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828181418149_hu8630224470209868733.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828181418149&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;222&#34;
+		data-flex-basis=&#34;534px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这部分if判断是检测端口是否为注册中心端口，然后做一个安全检查，这里直接步过，走到下面这里&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828181824061.png&#34;
+	width=&#34;1245&#34;
+	height=&#34;611&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828181824061_hu11280439765102470000.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828181824061_hu7699069856098498573.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828181824061&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;203&#34;
+		data-flex-basis=&#34;489px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里看到很熟悉的LiveRef和UnicastServerRef，跟前面创建远程服务一个逻辑，可以看到这里的端口已经设置为1099，如果跟进会发现跟前面流程完全一致&lt;/p&gt;
+&lt;p&gt;调用exportObject的参数略有不同&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182427929.png&#34;
+	width=&#34;953&#34;
+	height=&#34;267&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182427929_hu17327105828719873146.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182427929_hu11516479445659088955.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828182427929&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;356&#34;
+		data-flex-basis=&#34;856px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里是前面创建远程服务的&lt;/p&gt;
+&lt;p&gt;然后下面这个是注册中心的&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182552378.png&#34;
+	width=&#34;1014&#34;
+	height=&#34;267&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182552378_hu12579253076945864863.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182552378_hu2284462087620744448.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828182552378&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;379&#34;
+		data-flex-basis=&#34;911px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以发现第三个bool值不一样了，跟进去看看这个是什么&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182632797.png&#34;
+	width=&#34;730&#34;
+	height=&#34;198&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182632797_hu12767182883712706460.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828182632797_hu9351900218269816501.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828182632797&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;368&#34;
+		data-flex-basis=&#34;884px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;permanent，所以前面创建远程服务的是临时对象，而我们这里创建注册中心的是永久对象&lt;/p&gt;
+&lt;p&gt;接着流程相似，创建stub，这里的stub创建就与前面有不一样的地方了，首先还是走到createProxy里面&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828183042184.png&#34;
+	width=&#34;1032&#34;
+	height=&#34;370&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828183042184_hu4418809268725032597.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828183042184_hu5594582622058844067.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828183042184&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;278&#34;
+		data-flex-basis=&#34;669px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;前面我们这个&lt;code&gt;stubClassExists&lt;/code&gt;没有分析，这里分析一下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828183745088.png&#34;
+	width=&#34;841&#34;
+	height=&#34;381&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828183745088_hu3211603135337126605.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828183745088_hu3322320696193028384.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828183745088&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;220&#34;
+		data-flex-basis=&#34;529px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其实就是在类名后面加上&lt;code&gt;_Stub&lt;/code&gt;，然后查看有没有这个类，有的话返回true&lt;/p&gt;
+&lt;p&gt;这里是&lt;code&gt;RegistryImpl&lt;/code&gt;类，所以查找的就是&lt;code&gt;RegistryImpl_Stub&lt;/code&gt;,显然这里是存在的&lt;/p&gt;
+&lt;p&gt;所以进了判断，之前创建远程服务，我们记得直接就没进判断，这里进&lt;code&gt;createStub&lt;/code&gt;函数&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828184602266.png&#34;
+	width=&#34;1332&#34;
+	height=&#34;525&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828184602266_hu6829722792773581441.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828184602266_hu598881698499842607.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828184602266&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;253&#34;
+		data-flex-basis=&#34;608px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里单纯就是获取了&lt;code&gt;RegistryImpl_Stub&lt;/code&gt;类，然后实例化了一下&lt;/p&gt;
+&lt;p&gt;我们走出去，看看走完这个流程的stub现在是什么&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828184909441.png&#34;
+	width=&#34;1307&#34;
+	height=&#34;857&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828184909441_hu10647271415872039304.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828184909441_hu1233723289920195413.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828184909441&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;152&#34;
+		data-flex-basis=&#34;366px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以看到还是UnicastRef,跟前面创建远程服务的stub差不多，只不过前面的stub是先创建动态代理，然后把ref放进去，这里是直接反射，用&lt;code&gt;forName&lt;/code&gt;方法，直接把ref传进去&lt;/p&gt;
+&lt;p&gt;然后下面这里stub是定义好的，走到&lt;code&gt;setSkeleton&lt;/code&gt;函数这里，用来创建&lt;code&gt;Skeleton&lt;/code&gt;的，前面那个图里面也很清楚&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828195241519.png&#34;
+	width=&#34;889&#34;
+	height=&#34;143&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828195241519_hu9927620175770608343.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828195241519_hu3409669041586685801.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828195241519&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;621&#34;
+		data-flex-basis=&#34;1492px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后跟进去&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828195411144.png&#34;
+	width=&#34;1102&#34;
+	height=&#34;202&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828195411144_hu11220118828675506799.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828195411144_hu4935505009092201720.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828195411144&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;545&#34;
+		data-flex-basis=&#34;1309px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里会走到createSkeleton&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200008251.png&#34;
+	width=&#34;1279&#34;
+	height=&#34;609&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200008251_hu15354806841942944807.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200008251_hu4340620355311716575.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828200008251&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;210&#34;
+		data-flex-basis=&#34;504px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后同样反射获取已有的&lt;code&gt;RegistryImpl_Skel&lt;/code&gt;类,走出来，我们可以看到skel被赋值了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200215341.png&#34;
+	width=&#34;1174&#34;
+	height=&#34;910&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200215341_hu15323333931853787521.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200215341_hu17517747455942089173.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828200215341&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;129&#34;
+		data-flex-basis=&#34;309px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后走完这里，同样走到了target进行封装数据&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200417133.png&#34;
+	width=&#34;952&#34;
+	height=&#34;203&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200417133_hu3743877024773582087.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828200417133_hu5910837391944988164.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828200417133&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;468&#34;
+		data-flex-basis=&#34;1125px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里跟进流程跟前面服务端一样，我们直接跟到target把值赋值给表的地方，我们查看这次封装了什么&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828201934792.png&#34;
+	width=&#34;1205&#34;
+	height=&#34;436&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828201934792_hu4813590120139025043.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828201934792_hu10868767586845263342.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828201934792&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;276&#34;
+		data-flex-basis=&#34;663px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;跟到这里，然后查看static下的objTable,发现有三个表，至于为什么有三个表，后面会说&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202056665.png&#34;
+	width=&#34;875&#34;
+	height=&#34;699&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202056665_hu10760409664502523416.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202056665_hu3969964736413749951.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828202056665&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;125&#34;
+		data-flex-basis=&#34;300px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;可以看到这里的skel是叫&lt;code&gt;DGIImpl_Skel&lt;/code&gt;，是一个垃圾回收机制有关的对象，这里的port为62173，是一个随机分配的端口&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202346458.png&#34;
+	width=&#34;849&#34;
+	height=&#34;725&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202346458_hu14741232458959461505.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202346458_hu10112424199986329360.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828202346458&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;117&#34;
+		data-flex-basis=&#34;281px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;第二个表这里的skel没有赋值，然后端口跟上面随机赋值的结果一样&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202437236.png&#34;
+	width=&#34;940&#34;
+	height=&#34;712&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202437236_hu3324250737348747289.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202437236_hu16815570455657212825.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828202437236&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;132&#34;
+		data-flex-basis=&#34;316px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;第三个表这里才是我们前下注册中心有关的，skel值为RegistryImpl_Skel,然后端口是1099&lt;/p&gt;
+&lt;h4 id=&#34;绑定&#34;&gt;绑定
+&lt;/h4&gt;&lt;p&gt;这里把前面代码的bind部分加上断点&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202746332.png&#34;
+	width=&#34;1000&#34;
+	height=&#34;243&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202746332_hu3006741597434421464.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202746332_hu301875223057553013.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828202746332&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;411&#34;
+		data-flex-basis=&#34;987px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后跟进&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202906042.png&#34;
+	width=&#34;1076&#34;
+	height=&#34;309&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202906042_hu7734767081387888112.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828202906042_hu12448431376592726510.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828202906042&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;348&#34;
+		data-flex-basis=&#34;835px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;本地进行一个检查，没必要跟了，全都通过，直接来到下一步，如果绑定了，就直接获取我们绑定的&lt;code&gt;RemoteObj&lt;/code&gt;,没有就put进去&lt;/p&gt;
+&lt;h3 id=&#34;客户端-客户端请求注册中心&#34;&gt;客户端-客户端请求注册中心
+&lt;/h3&gt;&lt;p&gt;首先在所有代码部分都下断点&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828204331977.png&#34;
+	width=&#34;1076&#34;
+	height=&#34;271&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828204331977_hu4826985320614543432.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828204331977_hu18373416917285940929.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828204331977&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;397&#34;
+		data-flex-basis=&#34;952px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;首先是获取注册中心，我们跟进去看看，这里其实直接就是接收ip和端口新建了一个liveref，然后直接调动态代理，并没有通过序列化和反序列化的方式进行&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828204705361.png&#34;
+	width=&#34;1186&#34;
+	height=&#34;272&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828204705361_hu13393976419649599928.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828204705361_hu1552788391037260357.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828204705361&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;436&#34;
+		data-flex-basis=&#34;1046px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里跟进去发现其实跟前面注册中心创建stub的流程一样，只是接受了注册中心给的几个参数，并没有用到序列化和反序列化&lt;/p&gt;
+&lt;p&gt;这里我发现其实shift+F7的智能步入挺好用的，后面都用这个步入，不会走到奇怪的地方&lt;/p&gt;
+&lt;p&gt;然后接着就走到第二行代码，这里实际上是在获取服务端前面创建的动态代理，但是这里调试不了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828205656655.png&#34;
+	width=&#34;1233&#34;
+	height=&#34;570&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828205656655_hu148222243550283150.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828205656655_hu15333835648210940198.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828205656655&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;216&#34;
+		data-flex-basis=&#34;519px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;因为这里是1.1版本的class文件，没办法下断点，我们直接看逻辑就行了&lt;/p&gt;
+&lt;p&gt;这里接着会走到newCall方法，也就是创建一个链接，没什么可看的&lt;/p&gt;
+&lt;p&gt;这里我们直接看lookup逻辑，这里的var1就是我们前面传入的&lt;code&gt;Remoteobj&lt;/code&gt;,然后他newCall完，执行了&lt;code&gt;writeObject&lt;/code&gt;，也就是序列化的过程，显然注册中心会有一个反序列化的过程&lt;/p&gt;
+&lt;p&gt;接着就是调用invoke方法，这里调用的是父类&lt;code&gt;UnicastRef&lt;/code&gt;这个类的方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828210824000.png&#34;
+	width=&#34;887&#34;
+	height=&#34;402&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828210824000_hu169429216807361702.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828210824000_hu14605688424816407491.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828210824000&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;220&#34;
+		data-flex-basis=&#34;529px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里调用了一个executeCall方法，接着跟进去&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828210930903.png&#34;
+	width=&#34;1234&#34;
+	height=&#34;590&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828210930903_hu1785686744606204680.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828210930903_hu5778137577196166392.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828210930903&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;209&#34;
+		data-flex-basis=&#34;501px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;跟到这个&lt;code&gt;StreamRemoteCall&lt;/code&gt;类，这里是真正实现网络请求的方法&lt;/p&gt;
+&lt;p&gt;处理完之后走出来&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211116296.png&#34;
+	width=&#34;851&#34;
+	height=&#34;310&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211116296_hu10911432308021011491.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211116296_hu9897361338167190690.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828211116296&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;274&#34;
+		data-flex-basis=&#34;658px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里来了个&lt;code&gt;readObject&lt;/code&gt;，反序列化的地方，这里我们很明显知道，如果注册中心有恶意代码，这里经过反序列化就能攻击客户端&lt;/p&gt;
+&lt;p&gt;我们在前面的&lt;code&gt;StreamRemoteCall&lt;/code&gt;类那里下断点就能走了，不过我怎么步入都走不到这里，还是静态分析吧&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211538426.png&#34;
+	width=&#34;1059&#34;
+	height=&#34;441&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211538426_hu12788368352424919398.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211538426_hu2149529055552077123.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828211538426&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;240&#34;
+		data-flex-basis=&#34;576px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;往下看，看到这里又来了个&lt;code&gt;readObject&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211949575.png&#34;
+	width=&#34;930&#34;
+	height=&#34;396&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211949575_hu1614751283167479053.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828211949575_hu16932168182348518801.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828211949575&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;234&#34;
+		data-flex-basis=&#34;563px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里在异常发生时，会进行反序列化，获取详细的信息，如果我们注册中心有恶意流的话，同样也会攻击客户端&lt;/p&gt;
+&lt;p&gt;由于这里这个executeCall方法是由invoke方法调用的，也就是说，类里面所有调用invoke方法的地方，都可能被攻击&lt;/p&gt;
+&lt;p&gt;就比如下面这个bind方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828212415769.png&#34;
+	width=&#34;1076&#34;
+	height=&#34;722&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828212415769_hu18397727753178724651.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828212415769_hu13887097688697791085.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828212415769&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;149&#34;
+		data-flex-basis=&#34;357px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;虽然不像lookup一样直接反序列化，但是它调用了invoke方法，还是可能被攻击&lt;/p&gt;
+&lt;h3 id=&#34;客户端-客户端请求服务端&#34;&gt;客户端-客户端请求服务端
+&lt;/h3&gt;&lt;p&gt;这里接着上面来调试，走到第三行代码，这里正常debug走不进去，要在&lt;code&gt;RemoteObjectInvocationHandler&lt;/code&gt; 类下的 &lt;code&gt;invoke()&lt;/code&gt; 方法的 if 判断里面打个断点，这样才能走进去。&lt;/p&gt;
+&lt;p&gt;后面我算是明白了，服务端的代码必须在后台运行着，这样才能走到里面去&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214132447.png&#34;
+	width=&#34;1196&#34;
+	height=&#34;377&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214132447_hu644468001183768434.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214132447_hu12607275066959449711.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828214132447&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;317&#34;
+		data-flex-basis=&#34;761px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;事实上，是由于前面的代码是起了一个动态代理来调用方法，然后会走到调用处理器的invoke方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214301461.png&#34;
+	width=&#34;846&#34;
+	height=&#34;260&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214301461_hu14953313317043786094.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214301461_hu2863741658786782818.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828214301461&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;325&#34;
+		data-flex-basis=&#34;780px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后走到&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214403739.png&#34;
+	width=&#34;836&#34;
+	height=&#34;269&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214403739_hu10677740794077128659.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214403739_hu11551896485821764893.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828214403739&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;310&#34;
+		data-flex-basis=&#34;745px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后我们再走到invoke里面看看&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214947311.png&#34;
+	width=&#34;1130&#34;
+	height=&#34;520&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214947311_hu17295871148376181246.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828214947311_hu13838961035469296501.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828214947311&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;217&#34;
+		data-flex-basis=&#34;521px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;走到这里调用了一个marshalValue方法，实际上就是序列化，参数就是我们前面传的hello&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215123142.png&#34;
+	width=&#34;888&#34;
+	height=&#34;670&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215123142_hu7903944128098010073.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215123142_hu5605002989456162688.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828215123142&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;132&#34;
+		data-flex-basis=&#34;318px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;前面的序列化走完，往下看&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215502687.png&#34;
+	width=&#34;887&#34;
+	height=&#34;316&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215502687_hu14486333249285697647.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215502687_hu11228159100464112911.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828215502687&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;280&#34;
+		data-flex-basis=&#34;673px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;又调用了executeCall方法，又是一个利用点，走完这个&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215711097.png&#34;
+	width=&#34;940&#34;
+	height=&#34;528&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215711097_hu9698762423737107703.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215711097_hu12874462180505825821.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828215711097&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;178&#34;
+		data-flex-basis=&#34;427px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;我们前面的函数定义有返回值就会进到这个if判断里，这里有一个unmarshalValue方法，跟前面反着来的，显然是一个反序列化的函数&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215840867.png&#34;
+	width=&#34;994&#34;
+	height=&#34;577&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215840867_hu8106847098456435847.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828215840867_hu10835139370644525746.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828215840867&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;172&#34;
+		data-flex-basis=&#34;413px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后就走完了&lt;/p&gt;
+&lt;h3 id=&#34;注册中心-客户端请求注册中心&#34;&gt;注册中心-客户端请求注册中心
+&lt;/h3&gt;&lt;p&gt;不多说直接上断点位置&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828221629689.png&#34;
+	width=&#34;1360&#34;
+	height=&#34;657&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828221629689_hu700908569421399289.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828221629689_hu10886702573458502798.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828221629689&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;207&#34;
+		data-flex-basis=&#34;496px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后服务端开调试，客户端运行一遍走到断点这里&lt;/p&gt;
+&lt;p&gt;然后往下走，调用disp的dispatch方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828222827062.png&#34;
+	width=&#34;1100&#34;
+	height=&#34;273&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828222827062_hu18076028988423190139.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828222827062_hu11805157374802330938.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828222827062&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;402&#34;
+		data-flex-basis=&#34;967px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;跟进去&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828222900690.png&#34;
+	width=&#34;1117&#34;
+	height=&#34;350&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828222900690_hu11171443130555284561.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828222900690_hu4698528923080487079.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828222900690&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;319&#34;
+		data-flex-basis=&#34;765px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;skel不为null，走到oldDispatch里面&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828223003563.png&#34;
+	width=&#34;887&#34;
+	height=&#34;283&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828223003563_hu4537290287331702326.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828223003563_hu16143207890254527127.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828223003563&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;313&#34;
+		data-flex-basis=&#34;752px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后走到skel的dispatch方法，这里我们看看&lt;code&gt;Registry_Skel&lt;/code&gt;的源码&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828223711994.png&#34;
+	width=&#34;1084&#34;
+	height=&#34;871&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828223711994_hu15709494448258858917.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828223711994_hu14479614480862572616.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828223711994&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;124&#34;
+		data-flex-basis=&#34;298px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里有个switch选择&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0-&amp;gt;bind
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1-&amp;gt;list
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2-&amp;gt;lookup
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3-&amp;gt;rebind
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4-&amp;gt;unbind
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后查看是否有readObject，最后只有list不行，其他都能反序列化，所以这里的利用点就是dispatch，用于客户端攻击注册中心&lt;/p&gt;
+&lt;h3 id=&#34;服务端-客户端请求服务端&#34;&gt;服务端-客户端请求服务端
+&lt;/h3&gt;&lt;p&gt;这里接着上面来，然后按F9直到target这里的stub为proxy&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828225945225.png&#34;
+	width=&#34;588&#34;
+	height=&#34;313&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828225945225_hu15443505201993759184.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828225945225_hu8553693011151961064.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828225945225&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;187&#34;
+		data-flex-basis=&#34;450px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;按F9的过程我们会发现stub有三个，对应了之前的三个表&lt;/p&gt;
+&lt;p&gt;这里跟进dispatch我们发现skel为null了，进不了if判断，也就是进不了oldDispatch&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828230252666.png&#34;
+	width=&#34;1301&#34;
+	height=&#34;941&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828230252666_hu8902080726965956805.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828230252666_hu2903782745304185022.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828230252666&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;138&#34;
+		data-flex-basis=&#34;331px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后一直步过&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828230414831.png&#34;
+	width=&#34;1166&#34;
+	height=&#34;476&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828230414831_hu8891693342359431577.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828230414831_hu10598464913053542560.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828230414831&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;244&#34;
+		data-flex-basis=&#34;587px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;我们看到了熟悉的unmarshalValue方法，用于反序列化的，用于客户端打服务端的&lt;/p&gt;
+&lt;h3 id=&#34;dgc-客户端请求服务端&#34;&gt;DGC-客户端请求服务端
+&lt;/h3&gt;&lt;p&gt;跟上面那个一样，前面我们F9的时候stub是变了三次，其中一次就是DGC&lt;/p&gt;
+&lt;p&gt;同样的流程debug&lt;/p&gt;
+&lt;p&gt;然后断点下在&lt;code&gt;ObjectTable&lt;/code&gt;类里面&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828231500599.png&#34;
+	width=&#34;1015&#34;
+	height=&#34;265&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828231500599_hu16005958389966278526.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828231500599_hu17698168468548337007.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828231500599&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;383&#34;
+		data-flex-basis=&#34;919px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后在这里下个断点&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828232212921.png&#34;
+	width=&#34;1385&#34;
+	height=&#34;551&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828232212921_hu14480423005710263978.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828232212921_hu9822639221972736922.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828232212921&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;251&#34;
+		data-flex-basis=&#34;603px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后走到createProxy里面&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828232440945.png&#34;
+	width=&#34;1193&#34;
+	height=&#34;295&#34;
+	srcset=&#34;https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828232440945_hu7613755101397576195.png 480w, https://0d000721999.github.io/p/rmi%E5%9F%BA%E7%A1%80/image-20250828232440945_hu1948255435406349582.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250828232440945&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;404&#34;
+		data-flex-basis=&#34;970px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后就是跟前面动态代理一个流程，判断加上&lt;code&gt;_Stub&lt;/code&gt;是否为true了，然后有这个类，接着创建stub，然后包装到target，实际上跟前面注册中心一样&lt;/p&gt;
+&lt;p&gt;接下来就是看看&lt;code&gt;DGCImpl_Stub&lt;/code&gt;和&lt;code&gt;DGCImpl_Skel&lt;/code&gt;了&lt;/p&gt;
+&lt;p&gt;同样都有invoke或者直接就有readObject，能被反序列化攻击，而且好处在于他只要远程服务创建它就会创建，而且服务端和客户端都能被攻击，也就是JRMP绕过&lt;/p&gt;
+&lt;h2 id=&#34;总结&#34;&gt;总结
+&lt;/h2&gt;&lt;p&gt;如果是漏洞利用的话，单纯攻击 RMI 意义是不大的，因为在 jdk8u121 之后都基本修复完毕了。&lt;/p&gt;
+&lt;p&gt;RMI 多数的利用还是在后续的 fastjson，strust2 这种类型的攻击组合拳比较多&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
