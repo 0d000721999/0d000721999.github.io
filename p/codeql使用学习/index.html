@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Codeql使用学习 安装 https://github.com/github/codeql-cli-binaries/releases去这里下载codeql执行程序，然后设置环境变量，指定到codeql文件夹\n">
+<title>Codeql使用学习</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="Codeql使用学习">
+<meta property='og:description' content="Codeql使用学习 安装 https://github.com/github/codeql-cli-binaries/releases去这里下载codeql执行程序，然后设置环境变量，指定到codeql文件夹\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Codeql' /><meta property='article:tag' content='Java' /><meta property='article:tag' content='静态分析' /><meta property='article:published_time' content='2025-12-17T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-12-17T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/1.jpg' />
+<meta name="twitter:title" content="Codeql使用学习">
+<meta name="twitter:description" content="Codeql使用学习 安装 https://github.com/github/codeql-cli-binaries/releases去这里下载codeql执行程序，然后设置环境变量，指定到codeql文件夹\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/1.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "light");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#安装">安装</a></li>
+    <li><a href="#语法">语法</a>
+      <ol>
+        <li><a href="#基本语法">基本语法</a></li>
+        <li><a href="#类库">类库</a></li>
+        <li><a href="#谓词">谓词</a></li>
+        <li><a href="#source和sink">source和sink</a></li>
+      </ol>
+    </li>
+    <li><a href="#实操">实操</a></li>
+    <li><a href="#小技巧">小技巧</a>
+      <ol>
+        <li><a href="#递归">递归</a></li>
+        <li><a href="#强制类型转换">强制类型转换</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/">
+                <img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/1.jpg"
+                        
+                        width="1640" 
+                        height="1700" 
+                        loading="lazy"
+                        alt="Featured image of post Codeql使用学习" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/java/" style="background-color: #264653; color: #fff;">
+                Java
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/">Codeql使用学习</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Dec 17, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 9 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="codeql使用学习">Codeql使用学习
+</h1><h2 id="安装">安装
+</h2><p><a class="link" href="https://github.com/github/codeql-cli-binaries/releases"  target="_blank" rel="noopener"
+    >https://github.com/github/codeql-cli-binaries/releases</a>去这里下载codeql执行程序，然后设置环境变量，指定到codeql文件夹</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217195545208.png"
+	width="1483"
+	height="762"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217195545208_hu6841510190613788225.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217195545208_hu4418687218901065403.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217195545208"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>这样就设置成功了</p>
+<p>下载SDK:https://github.com/github/codeql,下载后解压重命名为ql文件夹，与前面codeql同目录</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217195821377.png"
+	width="1483"
+	height="762"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217195821377_hu6464240428237184718.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217195821377_hu5730828282439759069.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217195821377"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p><strong>vscode配合codeql</strong></p>
+<p>下载插件后，配置codeql文件地址</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217201714304.png"
+	width="1158"
+	height="595"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217201714304_hu17317457758962394463.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217201714304_hu11428297313408421214.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217201714304"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>接下来创建数据库来测试一下</p>
+<p>这里选择https://github.com/l4yn3/micro_service_seclab/这个项目来测试</p>
+<p>接下来创建数据库,命令一般是</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">codeql database create &lt;数据库名&gt; --language<span class="o">=</span>&lt;语言标识符&gt; --source-root<span class="o">=</span>&lt;源码路径&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果是maven项目的话，还需要加上command参数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">--command<span class="o">=</span><span class="s2">&#34;mvn clean install&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里我们直接在下载的这个靶场的目录下创建，无需指定源码路径了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">codeql database create codeqltest --language<span class="o">=</span>java
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>执行成功的话会出现codeqltest文件夹,这里java版本要是jdk1.8的</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217210734868.png"
+	width="1483"
+	height="762"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217210734868_hu16432069968640623272.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217210734868_hu1307145763162961420.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217210734868"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>现在打开vscode</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217211036362.png"
+	width="500"
+	height="726"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217211036362_hu6843908870432812071.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217211036362_hu3628550171501958686.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217211036362"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="68"
+		data-flex-basis="165px"
+	
+></p>
+<p>添加数据库，这里打开要在codeql同目录下打开，然后上面语言选择java</p>
+<p>然后可以在下面的queries里面添加我们想要的ql查询语句进行查询，我们回到sdk的目录，在java/ql/examples下面创建一个demo.ql</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217212031018.png"
+	width="1920"
+	height="1030"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217212031018_hu14827361678170271609.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217212031018_hu6782490069084664101.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217212031018"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<h2 id="语法">语法
+</h2><p>codeql语法有点像sql,CodeQL 引擎的作用就是帮我们把源码转换为 CodeQL 能识别的数据库，所以我们能做的就是编写 QL 规则，再通过其引擎来运行我们的规则，这样就可以达到一个自动审计的功能</p>
+<h3 id="基本语法">基本语法
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">i</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">i</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><code>from int i</code>，表示我们定义一个变量i，它的类型是int，表示我们获取所有的int类型的数据</p>
+<p><code>where i = 1</code>, 表示当i等于1的时候，符合条件</p>
+<p><code>select i</code>，表示输出i</p>
+</blockquote>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217212835104.png"
+	width="1400"
+	height="501"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217212835104_hu10902638256955197000.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217212835104_hu9997211512864148202.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217212835104"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="279"
+		data-flex-basis="670px"
+	
+></p>
+<p>所以codeql的语法结构为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">from</span><span class="w"> </span><span class="p">[</span><span class="n">datatype</span><span class="p">]</span><span class="w"> </span><span class="n">var</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">condition</span><span class="p">(</span><span class="n">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">something</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">var</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="类库">类库
+</h3><p>我们经常会用到的ql类库大体如下：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Method</td>
+          <td>方法类，Method method表示获取当前项目中所有的方法</td>
+      </tr>
+      <tr>
+          <td>MethodAccess</td>
+          <td>方法调用类，MethodAccess call表示获取当前项目当中的所有方法调用</td>
+      </tr>
+      <tr>
+          <td>Parameter</td>
+          <td>参数类，Parameter表示获取当前项目当中所有的参数</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>在现在的版本中<code>MethodAccess</code> 被重名成 <code>MethodCall </code>了</p>
+<p>我们现在可以来查询一下我们这个项目的所有方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">Method</span><span class="w"> </span><span class="n">kkk</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">kkk</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217213942659.png"
+	width="1409"
+	height="959"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217213942659_hu409585270801518780.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217213942659_hu10649420660536171698.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217213942659"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="146"
+		data-flex-basis="352px"
+	
+></p>
+<p>可以查询到超级多方法，我们可以过滤出名字为 getStudent 的方法名称</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">Method</span><span class="w"> </span><span class="n">k</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">k</span><span class="p">.</span><span class="n">hasName</span><span class="p">(</span><span class="s2">&#34;getStudent&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">k</span><span class="p">.</span><span class="n">getName</span><span class="p">(),</span><span class="w"> </span><span class="n">k</span><span class="p">.</span><span class="n">getDeclaringType</span><span class="p">()</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217214232707.png"
+	width="1403"
+	height="282"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217214232707_hu4454641327077847053.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217214232707_hu8136033695504926085.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217214232707"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="497"
+		data-flex-basis="1194px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">k</span><span class="p">.</span><span class="n">hashName</span><span class="p">()</span><span class="w"> </span><span class="err">判断名字是否匹配</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">k</span><span class="p">.</span><span class="n">getName</span><span class="p">()</span><span class="w"> </span><span class="err">获取的是当前方法的名称</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">k</span><span class="p">.</span><span class="n">getDeclaringType</span><span class="p">()</span><span class="w"> </span><span class="err">获取的是当前方法所属</span><span class="n">class的名称</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="谓词">谓词
+</h3><p>如果限制条件比较多，where 语句就会很冗长。CodeQL提供一种机制可以帮助我们把很长的查询语句封装成函数，而这个函数，就叫谓词。</p>
+<p>比如上面的案例，我们可以写成如下，获得的结果跟上面是一样的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">predicate</span><span class="w"> </span><span class="n">isStudent</span><span class="p">(</span><span class="k">Method</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">k</span><span class="p">.</span><span class="n">getName</span><span class="p">()</span><span class="o">=</span><span class="s2">&#34;getStudent&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">Method</span><span class="w"> </span><span class="n">k</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">isStudent</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">k</span><span class="p">.</span><span class="n">getName</span><span class="p">(),</span><span class="w"> </span><span class="n">k</span><span class="p">.</span><span class="n">getDeclaringType</span><span class="p">()</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="source和sink">source和sink
+</h3><p>source、sink以及sanitizer这个学过静态分析的不可能不知道，这里不多说了</p>
+<p>只有当source和sink同时存在，并且从source到sink的链路是通的，才表示当前漏洞是存在的。</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217221016177.png"
+	width="949"
+	height="465"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217221016177_hu12079689284311416921.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217221016177_hu4575923578002767005.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217221016177"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="204"
+		data-flex-basis="489px"
+	
+></p>
+<p>显然这里是一个source</p>
+<p><strong>设置source</strong></p>
+<p>在CodeQL中我们通过以下方法来设置Source</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">override</span><span class="w"> </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">src</span><span class="p">)</span><span class="w"> </span><span class="err">{}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于上面的source是http请求参数</p>
+<p>我们设置的source就为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">override</span><span class="w"> </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">src</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="n">src</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">RemoteFlowSource</span><span class="w"> </span><span class="err">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><code>RemoteFlowSource</code> 是 CodeQL 标准库中预定义的 <strong>“远程数据源”</strong> 类，比如HTTP 请求参数，用户输入以及其他外部输入等</p>
+</blockquote>
+<p>这是<code>SDK</code>自带的规则，里面包含了大多常用的Source入口。我们使用的SpringBoot也包含在其中，可以直接使用。</p>
+<blockquote>
+<p>注: instanceof 语法是CodeQL提供的语法，这里就是检查获得的 src 是否为 RemoteFlowSource</p>
+</blockquote>
+<p>这里测试输出所有可能的source点，其实就是有http请求参数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">FlowSources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">predicate</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">src</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="n">src</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">RemoteFlowSource</span><span class="w"> </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">src</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">src</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">src</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;是一个Source点&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217225012897.png"
+	width="1533"
+	height="818"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217225012897_hu1213535506827824165.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217225012897_hu15485601094374446984.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217225012897"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="187"
+		data-flex-basis="449px"
+	
+></p>
+<p><strong>设置sink</strong></p>
+<p>在CodeQL中我们通过以下方法来设置Sink</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">override</span><span class="w"> </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w"> </span><span class="err">{}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在实际中，我们最后都是触发到某个恶意方法，如 getter，setter，所以 sink 应该是个方法，假设我们这里的sink 点是个<code>query</code>方法(Method)的调用(MethodCall)，所以我们设置Sink为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">override</span><span class="w"> </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">exists</span><span class="p">(</span><span class="k">Method</span><span class="w"> </span><span class="k">method</span><span class="p">,</span><span class="w"> </span><span class="n">MethodCall</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="o">|</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">method</span><span class="p">.</span><span class="n">hasName</span><span class="p">(</span><span class="s2">&#34;query&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">and</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">call</span><span class="p">.</span><span class="n">getMethod</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">method</span><span class="w"> </span><span class="k">and</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">sink</span><span class="p">.</span><span class="n">asExpr</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">call</span><span class="p">.</span><span class="n">getArgument</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	  </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这里我们使用了exists子查询，这个是CodeQL谓词语法里非常常见的语法结构，它根据内部的子查询返回true or false，来决定筛选出哪些数据。</p>
+<p><code>sink.asExpr() = call.getArgument(0)</code>：将 sink 节点转换为表达式，并检查它是否等于 <code>call</code> 的第一个参数</p>
+<p>故上面sink语句的作用是查找一个query()方法的调用点，并把它的第一个参数设置为sink</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">FlowSources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">predicate</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="k">exists</span><span class="p">(</span><span class="k">Method</span><span class="w"> </span><span class="k">method</span><span class="p">,</span><span class="w"> </span><span class="n">MethodCall</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="o">|</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">method</span><span class="p">.</span><span class="n">hasName</span><span class="p">(</span><span class="s2">&#34;query&#34;</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">call</span><span class="p">.</span><span class="n">getMethod</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">method</span><span class="w"> </span><span class="k">and</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">sink</span><span class="p">.</span><span class="n">asExpr</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">call</span><span class="p">.</span><span class="n">getArgument</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">sink</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;传入 query() 方法的第一个参数是敏感点&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217225308882.png"
+	width="1541"
+	height="521"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217225308882_hu3850143237945606729.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251217225308882_hu1632823609055449657.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251217225308882"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="295"
+		data-flex-basis="709px"
+	
+></p>
+<p>点进第一个实际上就确实是sql注入漏洞点</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">jdbcTemplate</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span><span class="w"> </span><span class="n">ROW_MAPPER</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>flow数据流</strong></p>
+<p>确定了上面的source和sink，现在要找中间的链子了</p>
+<p>这个连通工作就是CodeQL引擎本身来完成的。我们通过使用<code>config.hasFlowPath(source, sink)</code>方法来判断是否连通。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">from</span><span class="w"> </span><span class="n">VulConfig</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">PathNode</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">PathNode</span><span class="w"> </span><span class="n">sink</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">hasFlowPath</span><span class="p">(</span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="k">source</span><span class="p">.</span><span class="n">getNode</span><span class="p">(),</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;source&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>我们传递给<code>config.hasFlowPath(source, sink)</code>我们定义好的source和sink，系统就会自动帮我们判断是否存在漏洞了。</p>
+<p><code>source.getNode()</code>：获取源节点的底层语法树节点（AST Node），显示漏洞源头在代码中的具体位置</p>
+</blockquote>
+<h2 id="实操">实操
+</h2><p>现在来试着探测sql注入的可行性,这里l3yx师傅在freebuff上那种写法在新版已经被弃用了，在新版 CodeQL中，数据流分析（DataFlow）和污点跟踪（TaintTracking）的 API 发生了重大变化。旧的 <code>TaintTracking::Configuration</code> 类已被弃用，取而代之的是<strong>模块化（Modular）</strong> 的写法。</p>
+<p>然后我让gemini生成一个新版可用的ql代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * @id java/examples/vuldemo
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * @name Sql-Injection
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * @description Sql-Injection
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * @kind path-problem
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * @problem.severity warning
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">DataFlow</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">TaintTracking</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">FlowSources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">//</span><span class="w"> </span><span class="mi">1</span><span class="p">.</span><span class="w"> </span><span class="err">定义配置模块，实现</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">ConfigSig</span><span class="w"> </span><span class="err">签名</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">VulConfig</span><span class="w"> </span><span class="n">implements</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">ConfigSig</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">//</span><span class="w"> </span><span class="err">定义</span><span class="w"> </span><span class="k">Source</span><span class="w"> </span><span class="p">(</span><span class="err">污染源</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="k">source</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">source</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">RemoteFlowSource</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">//</span><span class="w"> </span><span class="err">定义</span><span class="w"> </span><span class="n">Sink</span><span class="w"> </span><span class="p">(</span><span class="err">汇聚点</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">exists</span><span class="p">(</span><span class="n">MethodCall</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="o">|</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="o">//</span><span class="w"> </span><span class="err">查找方法名为</span><span class="w"> </span><span class="s2">&#34;query&#34;</span><span class="w"> </span><span class="err">的调用</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">call</span><span class="p">.</span><span class="n">getMethod</span><span class="p">().</span><span class="n">hasName</span><span class="p">(</span><span class="s2">&#34;query&#34;</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="o">//</span><span class="w"> </span><span class="n">sink</span><span class="w"> </span><span class="err">是该调用的第一个参数</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">sink</span><span class="p">.</span><span class="n">asExpr</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">call</span><span class="p">.</span><span class="n">getArgument</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">//</span><span class="w"> </span><span class="mi">2</span><span class="p">.</span><span class="w"> </span><span class="err">使用</span><span class="w"> </span><span class="n">TaintTracking</span><span class="p">::</span><span class="k">Global</span><span class="w"> </span><span class="err">模板生成具体的分析模块</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">VulFlow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaintTracking</span><span class="p">::</span><span class="k">Global</span><span class="o">&lt;</span><span class="n">VulConfig</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">//</span><span class="w"> </span><span class="mi">3</span><span class="p">.</span><span class="w"> </span><span class="err">从生成的模块中导入</span><span class="w"> </span><span class="n">PathGraph</span><span class="w"> </span><span class="p">(</span><span class="err">解决</span><span class="w"> </span><span class="n">import</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">PathGraph</span><span class="w"> </span><span class="err">报错的问题</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">PathGraph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">PathNode</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">PathNode</span><span class="w"> </span><span class="n">sink</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">flowPath</span><span class="p">(</span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">sink</span><span class="p">.</span><span class="n">getNode</span><span class="p">(),</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;Detected SQL Injection from $@&#34;</span><span class="p">,</span><span class="w"> </span><span class="k">source</span><span class="p">.</span><span class="n">getNode</span><span class="p">(),</span><span class="w"> </span><span class="s2">&#34;source&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218201722852.png"
+	width="1555"
+	height="835"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218201722852_hu12728373891440033010.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218201722852_hu10611287456533980469.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251218201722852"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="446px"
+	
+></p>
+<p>然后左上角点成alert就能看到完整的gadget</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218201756697.png"
+	width="830"
+	height="623"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218201756697_hu342001912076382750.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218201756697_hu16944760650563458408.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251218201756697"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="319px"
+	
+></p>
+<p>这里解释一下后面的代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="o">//</span><span class="w"> </span><span class="mi">3</span><span class="p">.</span><span class="w"> </span><span class="err">从生成的模块中导入</span><span class="w"> </span><span class="n">PathGraph</span><span class="w"> </span><span class="p">(</span><span class="err">解决</span><span class="w"> </span><span class="n">import</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">PathGraph</span><span class="w"> </span><span class="err">报错的问题</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">PathGraph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">PathNode</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">PathNode</span><span class="w"> </span><span class="n">sink</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">VulFlow</span><span class="p">::</span><span class="n">flowPath</span><span class="p">(</span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">sink</span><span class="p">.</span><span class="n">getNode</span><span class="p">(),</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;Detected SQL Injection from $@&#34;</span><span class="p">,</span><span class="w"> </span><span class="k">source</span><span class="p">.</span><span class="n">getNode</span><span class="p">(),</span><span class="w"> </span><span class="s2">&#34;source&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ul>
+<li>DataFlow::Node：代表代码中的一个点（比如一个变量、一个参数）。它关注的是<strong>代码位置</strong>。</li>
+<li>PathNode：代表数据流路径图中的一个节点。它包裹了 DataFlow::Node，但它专为路径追踪设计。</li>
+<li>VulFlow::flowPath(source, sink)判断两个 PathNode（起点和终点）之间是否存在一条完整的、可达的污点传播路径。相比与flow函数，flow函数只告诉你 node1 能流到 node2，是个布尔值（True/False），不包含中间经过了谁。</li>
+<li>最后PathGraph用来在结果中生成edges这个谓词，PathGraph 模块自动把 VulFlow 计算出的所有数据流关系转换成图的边（edges）。必须引用这个，不然最后看不到gadget</li>
+</ul>
+</blockquote>
+<p>在CodeQL中存在两种数据流：</p>
+<ul>
+<li>本地数据流：本地数据流是指单个方法或可调用函数内的数据流。本地数据流通常比全局数据流更简单、更快速、更精确，并且足以应对许多查询。</li>
+<li>全局数据流：全局数据流跟踪整个程序的数据流，因此比局部数据流更强大。然而，全局数据流的精确度低于局部数据流，并且分析通常需要更多的时间和内存。</li>
+</ul>
+<p>这里我们当然先学习全局数据流，本地数据流相对而言效果不是太好，我们需要通过实现签名<code>DataFlow::ConfigSig</code>和应用模块来使用全局数据流库<code>DataFlow::Global&lt;ConfigSig&gt;</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">DataFlow</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">MyFlowConfiguration</span><span class="w"> </span><span class="n">implements</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">ConfigSig</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="k">source</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">MyFlow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="k">Global</span><span class="o">&lt;</span><span class="n">MyFlowConfiguration</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>isSource</code>– 定义数据流出的位置。</li>
+<li><code>isSink</code>– 定义数据流向何处。</li>
+<li><code>isBarrier</code>– 可选，定义数据流被阻止的位置。</li>
+<li><code>isAdditionalFlowStep</code>– 可选，添加额外的流程步骤。</li>
+</ul>
+<p>如果想使用污点追踪，需要使用TaintTracking：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">TaintTracking</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">MyFlowConfiguration</span><span class="w"> </span><span class="n">implements</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">ConfigSig</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="k">source</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">MyFlow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaintTracking</span><span class="p">::</span><span class="k">Global</span><span class="o">&lt;</span><span class="n">MyFlowConfiguration</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后使用使用谓词执行数据流分析：<code>flow(DataFlow::Node source, DataFlow::Node sink)</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">from</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">MyFlow</span><span class="p">::</span><span class="n">flow</span><span class="p">(</span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;Data flow to $@.&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">.</span><span class="n">toString</span><span class="p">()</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>总结上面的，得到完整代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">DataFlow</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">import</span><span class="w"> </span><span class="n">semmle</span><span class="p">.</span><span class="n">code</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">dataflow</span><span class="p">.</span><span class="n">FlowSources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">SourceToSinkConfig</span><span class="w"> </span><span class="n">implements</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">ConfigSig</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSource</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="k">source</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="k">source</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">RemoteFlowSource</span><span class="w"> </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">predicate</span><span class="w"> </span><span class="n">isSink</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">exists</span><span class="p">(</span><span class="k">Method</span><span class="w"> </span><span class="k">method</span><span class="p">,</span><span class="w"> </span><span class="n">MethodCall</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="o">|</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">method</span><span class="p">.</span><span class="n">hasName</span><span class="p">(</span><span class="s2">&#34;query&#34;</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">call</span><span class="p">.</span><span class="n">getMethod</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">method</span><span class="w"> </span><span class="k">and</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">sink</span><span class="p">.</span><span class="n">asExpr</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">call</span><span class="p">.</span><span class="n">getArgument</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">module</span><span class="w"> </span><span class="n">SourceToSink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaintTracking</span><span class="p">::</span><span class="k">Global</span><span class="o">&lt;</span><span class="n">SourceToSinkConfig</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sink</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">SourceToSink</span><span class="p">::</span><span class="n">flow</span><span class="p">(</span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="k">source</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;flow to&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218195737221.png"
+	width="1540"
+	height="731"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218195737221_hu13832858094356786332.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218195737221_hu5128382772234475712.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251218195737221"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="505px"
+	
+></p>
+<p>点前面两个确实是对的，但是第三个出现了误报了</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218200224706.png"
+	width="1529"
+	height="651"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218200224706_hu7708359151373105462.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218200224706_hu9457439113048341949.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251218200224706"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="234"
+		data-flex-basis="563px"
+	
+></p>
+<p>现在来解决上面的误报问题，因为我们最开始写的那个也会误报这个<code>List&lt;Long&gt;</code>的参数，因为我们的查询没有设置参数类型,这里用<code>isSanitizer</code>来实现排除误报，要是判断到传入类型是基础类型、数字类型、泛型数字类型时，就切断数据流</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="w"> </span><span class="n">predicate</span><span class="w"> </span><span class="n">isBarrier</span><span class="p">(</span><span class="n">DataFlow</span><span class="p">::</span><span class="n">Node</span><span class="w"> </span><span class="n">sanitizer</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">sanitizer</span><span class="p">.</span><span class="n">getType</span><span class="p">()</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">PrimitiveType</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">or</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">sanitizer</span><span class="p">.</span><span class="n">getType</span><span class="p">()</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">BoxedType</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">or</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">sanitizer</span><span class="p">.</span><span class="n">getType</span><span class="p">()</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">NumberType</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">or</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">exists</span><span class="p">(</span><span class="n">ParameterizedType</span><span class="w"> </span><span class="n">pt</span><span class="w"> </span><span class="o">|</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">sanitizer</span><span class="p">.</span><span class="n">getType</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pt</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">pt</span><span class="p">.</span><span class="n">getTypeArgument</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">instanceof</span><span class="w"> </span><span class="n">NumberType</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="err">这里的</span><span class="w"> </span><span class="n">ParameterizedType</span><span class="w"> </span><span class="err">代表所有泛型，判断泛型当中的传参是否为</span><span class="w"> </span><span class="nb">Number</span><span class="w"> </span><span class="err">型</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>直接添加上去，查询发现确实去掉了前下的误报的链子</p>
+<p><img src="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218203957858.png"
+	width="769"
+	height="671"
+	srcset="/p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218203957858_hu15300281944593188240.png 480w, /p/codeql%E4%BD%BF%E7%94%A8%E5%AD%A6%E4%B9%A0/image-20251218203957858_hu17324562406020785143.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251218203957858"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="114"
+		data-flex-basis="275px"
+	
+></p>
+<h2 id="小技巧">小技巧
+</h2><h3 id="递归">递归
+</h3><p>CodeQL里面的递归调用语法是：在谓词方法的后面跟*或者+，来表示调用0次以上和1次以上（和正则类似），0次会打印自己。</p>
+<p>例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">classes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">classes</span><span class="p">.</span><span class="n">getName</span><span class="p">().</span><span class="n">toString</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&#34;innerTwo&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">classes</span><span class="p">.</span><span class="n">getEnclosingType</span><span class="p">().</span><span class="n">getEnclosingType</span><span class="p">().</span><span class="n">getEnclosingType</span><span class="p">()</span><span class="w">   </span><span class="o">//</span><span class="w"> </span><span class="n">getEnclosingtype获取作用域</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们想要调用classes的上层作用域，一直写这玩意很麻烦，我们在调用方法后面加*(从自身开始调用)或者+(从上一级开始调用)，来解决此问题。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">from</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">classes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">classes</span><span class="p">.</span><span class="n">getName</span><span class="p">().</span><span class="n">toString</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&#34;innerTwo&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">classes</span><span class="p">.</span><span class="n">getEnclosingType</span><span class="o">+</span><span class="p">()</span><span class="w">   </span><span class="o">//</span><span class="w"> </span><span class="err">获取作用域</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>+</code> 是从上一级开始调用</p>
+<p><code>*</code> 是从自身开始调用</p>
+<h3 id="强制类型转换">强制类型转换
+</h3><p>在 CodeQL 中可以用 getType() 来对返回结果做强制类型转换</p>
+<p>查询下当前数据库中所有的参数及其类型</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">Parameter</span><span class="w"> </span><span class="n">param</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">param</span><span class="p">.</span><span class="n">getType</span><span class="p">()</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>后面加上指定的参数类型就会查询对应剩下的类型</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">import</span><span class="w"> </span><span class="n">java</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">Parameter</span><span class="w"> </span><span class="n">param</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">param</span><span class="p">.</span><span class="n">getType</span><span class="p">().(</span><span class="n">IntegeralType</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/codeql/">Codeql</a>
+        
+            <a href="/tags/java/">Java</a>
+        
+            <a href="/tags/%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90/">静态分析</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/java%E5%86%85%E5%AD%98%E9%A9%AC/">
+        
+        
+            <div class="article-image">
+                <img src="/p/java%E5%86%85%E5%AD%98%E9%A9%AC/1.f4e77127f2e801a7bba91fcd64064fda.jpg" 
+                        width="1722" 
+                        height="2435" 
+                        loading="lazy"
+                        alt="Featured image of post java内存马"
+                        
+                        data-hash="md5-9OdxJ/LoAae7qR/NZAZP2g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">java内存马</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/el%E8%A1%A8%E8%BE%BE%E5%BC%8Fspel%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5%E5%AD%A6%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/el%E8%A1%A8%E8%BE%BE%E5%BC%8Fspel%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5%E5%AD%A6%E4%B9%A0/1.7ebca9ad010efaea9c0f0e869456942f.webp" 
+                        width="1200" 
+                        height="2415" 
+                        loading="lazy"
+                        alt="Featured image of post EL表达式&amp;&amp;SPEL表达式注入学习"
+                        
+                        data-hash="md5-fryprQEO&#43;uqcDw6GlFaULw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">EL表达式&amp;&amp;SPEL表达式注入学习</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/jndi%E5%AD%A6%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/jndi%E5%AD%A6%E4%B9%A0/1.cb7c201aaab553a562e70852d912b0c7.png" 
+                        width="1024" 
+                        height="768" 
+                        loading="lazy"
+                        alt="Featured image of post JNDI学习"
+                        
+                        data-hash="md5-y3wgGqq1U6Vi5whS2RKwxw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JNDI学习</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/lambda%E8%A1%A8%E8%BE%BE%E5%BC%8Fstream%E6%B5%81-%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/">
+        
+        
+            <div class="article-image">
+                <img src="/p/lambda%E8%A1%A8%E8%BE%BE%E5%BC%8Fstream%E6%B5%81-%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/1.8e59d8f82e05767f6e0a9524814c6bb5.jpg" 
+                        width="1126" 
+                        height="2000" 
+                        loading="lazy"
+                        alt="Featured image of post Lambda表达式&amp;Stream流-函数式编程"
+                        
+                        data-hash="md5-jlnY&#43;C4Fdn9uCpUkgUxrtQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Lambda表达式&amp;Stream流-函数式编程</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+        
+        
+            <div class="article-image">
+                <img src="/p/jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.62bd4af0f4024c8b78052afff5928006.png" 
+                        width="2048" 
+                        height="3072" 
+                        loading="lazy"
+                        alt="Featured image of post jackson反序列化"
+                        
+                        data-hash="md5-Yr1K8PQCTIt4BSr/9ZKABg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">jackson反序列化</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
