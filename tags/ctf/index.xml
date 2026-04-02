@@ -52,7 +52,8 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;对于user权限的用户，只允许访问/user前缀的路径，然后这里用到&lt;code&gt;getServletPath&lt;/code&gt;方法，tomcat解析url路径的时候，会忽略&lt;code&gt;;&lt;/code&gt;后面的内容，保留前面的内容&lt;/p&gt;
+&lt;/div&gt;&lt;p&gt;对于user权限的用户，只允许访问/user前缀的路径，然后这里用到&lt;code&gt;getServletPath&lt;/code&gt;方法，tomcat解析url路径的时候，会忽略&lt;code&gt;;&lt;/code&gt;后面的内容，保留前面的内容，其实复现过shiro2020的那几个cve对这个应该很熟，老bypass了，也可以参考&lt;a class=&#34;link&#34; href=&#34;https://i.blackhat.com/us-18/Wed-August-8/us-18-Orange-Tsai-Breaking-Parser-Logic-Take-Your-Path-Normalization-Off-And-Pop-0days-Out-2.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Breaking Parser Logic - Take Your Path Normalization Off and Pop 0days Out&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;org.apache.catalina.connector.CoyoteAdapter#postParseRequest&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://0d000721999.github.io/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/image-20260223153901984.png&#34;
 	width=&#34;1109&#34;
@@ -235,7 +236,8 @@
 &lt;p&gt;这里直接用了&lt;code&gt;readObject&lt;/code&gt;可以反序列化&lt;/p&gt;
 &lt;h2 id=&#34;利用&#34;&gt;利用
 &lt;/h2&gt;&lt;p&gt;查看pom.xml，可以发现fastjson1.2.48，这里可以选择打fastjson原生反序列化，用的是&lt;code&gt;EventListenerList#readObject-&amp;gt;JsonArray#toString-&amp;gt;TemplatesImpl#getOutputProperties&lt;/code&gt;这条链&lt;/p&gt;
-&lt;p&gt;题目预期是不出网的，所以打内存马，这里打Filter内存马&lt;/p&gt;
+&lt;p&gt;由于是springboot起的，显然有jackson，也可以走jackson原生反序列化那条链&lt;/p&gt;
+&lt;p&gt;题目预期是不出网的，但是平台实现不了，这里打Filter内存马&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;  1

@@ -349,7 +349,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 5 分钟
+                    阅读时长: 6 分钟
                 </time>
             </div>
         
@@ -403,7 +403,8 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p>对于user权限的用户，只允许访问/user前缀的路径，然后这里用到<code>getServletPath</code>方法，tomcat解析url路径的时候，会忽略<code>;</code>后面的内容，保留前面的内容</p>
+</div><p>对于user权限的用户，只允许访问/user前缀的路径，然后这里用到<code>getServletPath</code>方法，tomcat解析url路径的时候，会忽略<code>;</code>后面的内容，保留前面的内容，其实复现过shiro2020的那几个cve对这个应该很熟，老bypass了，也可以参考<a class="link" href="https://i.blackhat.com/us-18/Wed-August-8/us-18-Orange-Tsai-Breaking-Parser-Logic-Take-Your-Path-Normalization-Off-And-Pop-0days-Out-2.pdf"  target="_blank" rel="noopener"
+    >Breaking Parser Logic - Take Your Path Normalization Off and Pop 0days Out</a></p>
 <p><code>org.apache.catalina.connector.CoyoteAdapter#postParseRequest</code></p>
 <p><img src="/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/image-20260223153901984.png"
 	width="1109"
@@ -586,7 +587,8 @@
 <p>这里直接用了<code>readObject</code>可以反序列化</p>
 <h2 id="利用">利用
 </h2><p>查看pom.xml，可以发现fastjson1.2.48，这里可以选择打fastjson原生反序列化，用的是<code>EventListenerList#readObject-&gt;JsonArray#toString-&gt;TemplatesImpl#getOutputProperties</code>这条链</p>
-<p>题目预期是不出网的，所以打内存马，这里打Filter内存马</p>
+<p>由于是springboot起的，显然有jackson，也可以走jackson原生反序列化那条链</p>
+<p>题目预期是不出网的，但是平台实现不了，这里打Filter内存马</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">  1
